@@ -1,0 +1,21 @@
+{
+  "name": "VyatkaOwls",
+  "scripts": {
+    "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\"",
+    "dev:frontend": "cd frontend && bun run dev",
+    "dev:backend": "cd backend && bun run dev",
+    "start": "concurrently \"bun run start:frontend\" \"bun run start:backend\"",
+    "start:frontend": "cd frontend && bun run start",
+    "start:backend": "cd backend && bun run start"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "^1.1.13"
+  },
+  "peerDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

@@ -1,0 +1,44 @@
+/* Лого */
+.logo {
+    font-weight: 800;
+    width: max-content;
+    height: max-content;
+}
+
+.logo * {
+    font-size: 28pt;
+}
+
+:global(.dark) .mainText {
+    color: white;
+}
+
+/* Размеры */
+.logo.small * {
+    font-size: 23pt;
+}
+
+.logo.big * {
+    font-size: 34pt;
+}
+
+/* Цветное */
+.mainText {
+    color: black;
+}
+
+.red {
+    color: hsl(var(--nextui-danger-500));
+}
+
+.blue {
+    color: hsl(var(--nextui-primary-500));
+}
+
+/* Враппер */
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}

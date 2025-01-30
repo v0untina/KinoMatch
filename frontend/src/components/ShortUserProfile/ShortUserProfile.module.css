@@ -1,0 +1,64 @@
+/*Блок с короткой информацией*/
+.short_info {
+    gap: 10px;
+    padding: 16px;
+    border-radius: 12px;
+    background: var(--clr-default-100);
+    display: flex;
+    cursor: pointer;
+}
+
+.profile_popover {
+    background: var(--clr-default-100);
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+}
+
+.short_info_inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.short_info img {
+    width: 60px;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    aspect-ratio: 1/1;
+    border-radius: 100%;
+}
+
+.short_info_text {
+    display: flex;
+    flex-direction: column;
+}
+
+.nick {
+    font-weight: 600;
+    font-size: 24px;
+}
+
+.favorite {
+    height: 100%;
+    width: 60px;
+    aspect-ratio: 1/1;
+    border-radius: 0.5rem;
+    background-size: 60%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: 0.1s;
+    cursor: pointer;
+    background-image: url('/favorite.png');
+}
+
+.favorite:hover {
+    background-image: url('/red_fav.png');
+}
+
+.short_info_reg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+}

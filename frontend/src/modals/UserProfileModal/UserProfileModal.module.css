@@ -1,0 +1,28 @@
+.profile_page {
+    width: max-content;
+    min-width: 14vw;
+    height: max-content;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    background: var(--clr-default-100);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile_info {
+    display: flex;
+    flex-direction: column;
+}
+
+.avatar {
+    font-size: 64px;
+}
+
+.header {
+    font-size: 36px;
+    font-weight: 600;
+}

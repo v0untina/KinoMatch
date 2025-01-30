@@ -1,0 +1,22 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    width: 100vw;
+    height: max-content;
+    background: var(--clr-default-100);
+}
+
+.headerInner {
+    width: 100%;
+    min-width: 30vw;
+    max-width: 75vw;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.search {
+    flex-grow: 1;
+}

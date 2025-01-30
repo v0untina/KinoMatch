@@ -1,0 +1,36 @@
+.preloaderWrapper {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 99999;
+
+    background: white;
+
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+.preloaderWrapper.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.preloaderWrapper.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+:global(.dark) .preloaderWrapper {
+    background: black;
+}
