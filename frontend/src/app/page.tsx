@@ -1,21 +1,24 @@
+// frontend/src/app/page.tsx
 import styles from './page.module.css'
 import React from "react";
 import EventsViewer from "@/widgets/EventsViewer/EventsViewer";
 import MainLayout from "@/layouts/MainLayout/MainLayout";
 import LeftBarLayout from "@/layouts/LeftBarLayout/LeftBarLayout";
+import MovieRecommendationWidget from '@/widgets/MovieRecommendationWidget/MovieRecommendationWidget'; // <--- Импортируем MovieRecommendationWidget
 
 export default function Home() {
   return (
-    <div className={styles.wrap}>
-      <MainLayout>
-        <div className={styles.mainLayout}>
+    <MainLayout>
+      <LeftBarLayout>
+        <div>
+          <h1>Главная страница KinoMatch</h1>
+          <p>Добро пожаловать в KinoMatch!</p>
 
-          <LeftBarLayout>
-            <EventsViewer className={styles.content}/>
-          </LeftBarLayout>
+          <MovieRecommendationWidget /> {/* <--- Используем MovieRecommendationWidget */}
 
+          <EventsViewer /> {/* Пример использования EventsViewer */}
         </div>
-      </MainLayout>
-    </div>
-  );
+      </LeftBarLayout>
+    </MainLayout>
+  )
 }

@@ -9,14 +9,14 @@ datasource db {
 
 // Юзер
 model User {
-  id    Int       @unique @default(autoincrement())
+  id    Int       @id @default(autoincrement()) 
   email String
   otp   OTPCode[]
 }
 
 // OTP-код
 model OTPCode {
-  id     Int  @unique @default(autoincrement())
+  id     Int  @id @default(autoincrement()) 
   user   User @relation(fields: [userId], references: [id])
   userId Int
   code   Int

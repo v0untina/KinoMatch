@@ -62,6 +62,20 @@ async function bootstrap() {
     allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
   }));
 
+  // Обработчик для корневого пути "/"
+  app.get("/", () => {
+    return {
+      message: "Добро пожаловать в KinoMatch Backend API!"
+    };
+  });
+
+  // Подключение роутов API
+  app.group("/api", (app) =>
+    app
+      .use(AuthRoute)
+      .use(ProfileRoute)
+  );
+
   // Подключение роутов
   app.group("/api", (app) =>
     app

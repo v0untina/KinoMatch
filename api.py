@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import google.generativeai as genai
+from flask_cors import CORS 
 
 app = Flask(__name__)
+CORS(app) 
 
 API_KEY = "AIzaSyBlpcDVPCIFRsBKbVkBeT3pOGvvJgfiWJw" 
 genai.configure(api_key=API_KEY)
-model = genai.GenerativeModel('gemini-2.0-flash-thinking-exp-01-21') 
+model = genai.GenerativeModel('gemini-2.0-flash-thinking-exp-01-21')
 
 
 @app.route('/recommend_movie', methods=['POST'])
@@ -27,8 +29,8 @@ def recommend_movie():
         Порекомендуй мне один фильм, похожий на фильмы "{movie1}" и "{movie2}".
         Выведи ответ в **две строки** в следующем формате:
 
-        **Строка 1:**  "Я рекомендую фильм \"[название рекомендованного фильма]\", потому что фильмы \"{movie1}\" и \"{movie2}\" похожи [краткое перечисление общих характеристик]."
-        **Строка 2:** "Поэтому \"[название рекомендованного фильма]\" - отличный вариант для просмотра."
+        Строка 1:  "Я рекомендую фильм \"[название рекомендованного фильма]\", потому что фильмы \"{movie1}\" и \"{movie2}\" похожи [краткое перечисление общих характеристик]."
+        Строка 2: "Поэтому \"[название рекомендованного фильма]\" - отличный вариант для просмотра."
         """
 
         response = model.generate_content(user_query)
