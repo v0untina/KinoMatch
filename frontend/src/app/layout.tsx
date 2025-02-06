@@ -7,10 +7,10 @@ import PagePreloader from "@/components/PagePreloader/PagePreloader";
 import BackgroundsCircles from "@/widgets/BackgroundsCircles/BackgroundsCircles";
 
 export const metadata: Metadata = {
-  title: "Все матчи РФ",
+  title: "KinoMatch",
   description: "VO",
   openGraph: {
-    title: 'Все матчи РФ',
+    title: 'Kinomatch',
     description: "VO"
   }
 };

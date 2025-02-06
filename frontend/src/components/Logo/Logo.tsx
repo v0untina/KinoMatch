@@ -14,10 +14,8 @@ const Logo: React.FC<LogoProps> = ({size = 'medium', colored = false}) => {
   return (
     <div className={styles.wrapper}>
       <span className={`${styles.logo} ${sizeClass} ${coloredClass}`}>
-        <span className={styles.mainText}>Все</span>
-        <span className={styles.blue}>Матчи</span>
-        <span className={styles.mainText}>.</span>
-        <span className={styles.red}>РФ</span>
+        <span className={styles.mainText}>Kino</span>
+        <span className={styles.blue}>Match</span>
       </span>
     </div>
   );
