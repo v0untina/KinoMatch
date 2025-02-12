@@ -1,0 +1,132 @@
+/* Base Styles */
+.main {
+  width: 100%;
+  height: 100vh;
+  margin-top: 100px;
+  padding: 50px 100px 50px 100px;
+}
+
+.title {
+  font-size: 50px;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 150px;
+  opacity: 0;
+  transform: translateY(-50px);
+  animation: titleAnimation 1s forwards;
+}
+
+.titleAnimation {
+  animation-delay: 0.5s; /* Delay the title's animation for smooth entry */
+}
+
+@keyframes titleAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card_image {
+  margin-bottom: 20px;
+}
+
+/* Card animations */
+.cardAnimation {
+  opacity: 0;
+  transform: translateY(50px);
+  animation: cardAnimation 1s forwards;
+}
+
+@keyframes cardAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Crossing Image animation (rotate and bounce) */
+.crossingImageAnimation {
+  width: 173px;
+  height: 158px;
+  animation: crossingImageAnimation 1.5s ease-in-out infinite;
+}
+
+@keyframes crossingImageAnimation {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+/* Flexbox setup for positioning elements */
+.crossing {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 1000px;
+  text-align: center;
+}
+
+.crossing_center {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.loginbutton {
+  margin-top: 99px;
+  width: 300px;
+  height: 60px;
+  background-color: #00B9AE;
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 40px;
+  color: white;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  opacity: 0;
+  transform: translateY(50px);
+  animation: buttonAnimation 1s forwards;
+}
+
+@keyframes buttonAnimation {
+  0% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loginbutton:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+.loginlink {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}

@@ -1,20 +1,9 @@
 .wrap {
     width: 100vw;
     height: 100vh;
-    overflow-y: hidden;
     overflow-x: hidden;
-}
+    background-color: var(--clr-default-100);
 
-.mainLayout {
-    display: grid;
-    grid-template-rows: 1fr;
-    grid-template-columns: max-content 1fr;
-    grid-template-areas:
-        "filters content";
-
-    width: 80vw;
-    height: max-content;
-    gap: 4rem;
 }
 
 .filters {

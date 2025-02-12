@@ -1,0 +1,33 @@
+.footer{
+  height: 276px;
+  width: 100%;
+  border-top: 1px solid #5F5B5B;
+  display: flex;
+  justify-content: space-between;
+  padding: 30px;
+  font-size: 30px;
+}
+
+.title{
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.tech_support, .help, .about_kinomatch{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.paragraph{
+  color: gray;
+  cursor: pointer;
+  transition: all 0.3s ease; 
+}
+
+.paragraph:hover{
+  color: #a7a6a6; 
+  transform: scale(1.1);
+  font-weight: 600; 
+}

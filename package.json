@@ -1,5 +1,5 @@
 {
-  "name": "VyatkaOwls",
+  "name": "KinoMatch",
   "scripts": {
     "dev": "concurrently \"bun run dev:frontend\" \"bun run dev:backend\"",
     "dev:frontend": "cd frontend && bun run dev",
