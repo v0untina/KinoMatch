@@ -12,7 +12,7 @@
   margin-bottom: 50px;
   opacity: 0;
   animation: fadeInTitle 1s forwards;
-  animation-delay: 1.5s; /* Задержка после появления списка */
+  animation-delay: 1.5s; 
 }
 
 @keyframes fadeInTitle {
@@ -42,22 +42,21 @@
   background-size: 45px 55px;
   font-size: 35px;
   line-height: 3;
-  opacity: 0; /* Начальная непрозрачность 0, чтобы скрыть элементы */
-  animation: fadeIn 1s forwards; /* Анимация для плавного появления */
+  opacity: 0; 
+  animation: fadeIn 1s forwards; 
 }
 
-/* Каждому элементу будет добавлена задержка */
 .customList li:nth-child(1) {
-  animation-delay: 2s; /* Задержка для первого элемента */
+  animation-delay: 2s; 
 }
 .customList li:nth-child(2) {
-  animation-delay: 2.8s; /* Задержка для второго элемента */
+  animation-delay: 2.8s; 
 }
 .customList li:nth-child(3) {
-  animation-delay: 3.4s; /* Задержка для третьего элемента */
+  animation-delay: 3.4s; 
 }
 .customList li:nth-child(4) {
-  animation-delay: 4s; /* Задержка для четвертого элемента */
+  animation-delay: 4s; 
 }
 
 .robot {

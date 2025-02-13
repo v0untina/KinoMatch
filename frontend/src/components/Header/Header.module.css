@@ -1,12 +1,11 @@
 .header {
     display: flex;
-    justify-content: space-between; /* Это выровняет все элементы с равными промежутками */
+    justify-content: space-between;
     padding: 12px 16px;
     width: 100%;
     align-items: center;
     height: 90px;
     background: var(--clr-default-100);
-
 }
 
 .headerInner {

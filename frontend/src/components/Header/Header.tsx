@@ -17,7 +17,9 @@ const Header = ({className}: { className?: string }) => {
         <div className={styles.header_buttons}>
         <div className={styles.header_titles}>
           <h2 className={styles.subtitles}>главная</h2>
+          <Link href={'/polling'}>
           <h2 className={styles.subtitles}>подобрать фильм</h2>
+          </Link>
           <h2 className={styles.subtitles}>скрестить фильмы</h2>
           <h2 className={styles.subtitles}>подборки</h2>
         </div>
