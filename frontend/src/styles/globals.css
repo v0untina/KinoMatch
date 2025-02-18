@@ -1,6 +1,5 @@
 @import "@/assets/fonts/MSR/stylesheet.css";
 @import "scrollbar.css";
-@import "month_default.css";
 
 @tailwind base;
 @tailwind components;
@@ -22,19 +21,13 @@
     --clr-default-150: rgb(253, 253, 253);
     --clr-default-200: rgb(250, 250, 250);
     --clr-default-500: rgb(0, 0, 0);
-    --bg-gradient: linear-gradient(90deg, #ffffff, #eeeeef);
-    --bg-circle1: radial-gradient(circle, hsl(var(--nextui-primary-200)) 0%, rgba(252, 70, 107, 0) 80%);
-    --bg-circle2: radial-gradient(circle, hsl(var(--nextui-danger-300)) 0%, rgba(252, 70, 107, 0) 80%);
 }
 
 html.dark {
-    --clr-default-100: #161a2c !important;
+    --clr-default-100: #16181E !important;
     --clr-default-120: #242844;
     --clr-default-130: #161a2c;
     --clr-default-150: #191c30 !important;
     --clr-default-200: #1f203c !important;
     --clr-default-500: #ffffff;
-    --bg-gradient: linear-gradient(90deg, #21172C, #121014) !important;
-    --bg-circle1: radial-gradient(circle, rgba(92, 13, 128, 0.7) 0%, rgba(252, 70, 107, 0) 80%) !important;
-    --bg-circle2: radial-gradient(circle, rgba(92, 13, 128, 0.7) 0%, rgba(252, 70, 107, 0) 80%) !important;
 }

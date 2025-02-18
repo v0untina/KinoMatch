@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
 import google.generativeai as genai
-from flask_cors import CORS 
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-API_KEY = "AIzaSyBlpcDVPCIFRsBKbVkBeT3pOGvvJgfiWJw" 
+API_KEY = "AIzaSyBlpcDVPCIFRsBKbVkBeT3pOGvvJgfiWJw"  # Замените на ваш ключ
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-2.0-flash-thinking-exp-01-21')
 
@@ -55,12 +55,82 @@ def recommend_movie():
         response = model.generate_content(user_query)
         recommendation_text = response.text
 
-        return jsonify({'recommendation': recommendation_text}) 
+        return jsonify({'recommendation': recommendation_text})
 
     except Exception as e:
         print(f"Ошибка в API: {e}")
-        return jsonify({'error': 'Произошла ошибка при обработке запроса.', 'details': str(e)}), 500 
+        return jsonify({'error': 'Произошла ошибка при обработке запроса.', 'details': str(e)}), 500
+
+
+@app.route('/api/submit_poll', methods=['POST'])
+def submit_poll():
+    """
+    API endpoint для приема ответов на опрос о предпочтениях фильмов.
+    Принимает JSON запрос с ответами пользователя.
+    В будущем будет использоваться для подбора фильмов.
+    """
+    print(">>> Функция submit_poll() вызвана!")
+    try:
+        poll_answers = request.get_json()
+
+        if not poll_answers:
+            return jsonify({'error': 'Нет данных об ответах на опрос в JSON запросе.'}), 400
+
+        print("----- Получены ответы на опрос: -----")
+        print(poll_answers)
+        print("-------------------------------------")
+
+        # Формирование запроса к нейросети на основе ответов
+        user_preferences = ""
+        for question_id, answer in poll_answers.items():
+            question_id = int(question_id) # Преобразуем ID вопроса в целое число
+            if question_id == 0:
+                user_preferences += f"Я хочу испытать настроение: {answer}. "
+            elif question_id == 1:
+                if isinstance(answer, list):
+                    user_preferences += f"Мне интересны жанры: {', '.join(answer)}. "
+                else:
+                    user_preferences += f"Мне интересен жанр: {answer}. "
+            elif question_id == 2:
+                user_preferences += f"Я предпочитаю смотреть фильмы: {answer}ом. "
+            elif question_id == 3:
+                user_preferences += f"Мне нравится {answer} стиль. "
+            elif question_id == 4:
+                user_preferences += f"Мне нравится  {answer} сюжет. "
+            elif question_id == 5:
+                user_preferences += f"Мне нравится  {answer} главный герой. "
+            elif question_id == 6:
+                user_preferences += f"Мне нравится {answer} элемент фильма. "
+            elif question_id == 7:
+                user_preferences += f"Для меня важен {answer} элемент фильма. "
+            elif question_id == 8:
+                user_preferences += f"Мне нравится смотреть в {answer}. "
+            elif question_id == 9:
+                user_preferences += f"Мне нравится  {answer} уровень реализма. "
+
+        prompt = f"""
+        Порекомендуй мне один фильм на основе следующих предпочтений:
+        {user_preferences}
+        Дай только название фильма и год выпуска.
+        """
+
+
+
+        # Отправка запроса к нейросети
+        try:
+            response = model.generate_content(prompt)
+            recommendation = response.text
+
+        except Exception as inner_e:
+            print(f"Внутренняя ошибка при вызове нейросети: {inner_e}")
+            recommendation = "Ошибка при получении рекомендации от нейросети."
+
+        print("<<< Функция submit_poll() успешно завершена!")
+        return jsonify({'success': True, 'recommendation': recommendation}), 200
+    except Exception as e:
+        print(f"Внешняя ошибка при обработке ответов на опрос: {e}")
+        return jsonify({'error': 'Произошла ошибка при обработке ответов на опрос.', 'details': str(e)}), 500
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    app.run(debug=True, port=5000)

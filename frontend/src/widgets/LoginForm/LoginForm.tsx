@@ -63,7 +63,7 @@ const Login: React.FC = () => {
   return (
     <AuthLayout>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <Logo size={"medium"} colored/>
+        <Logo size={"small"} colored/>
         <span className={styles.title}>Авторизация</span>
         <Input type="username" isInvalid={!isUsernameValid} disabled={responsePending} label="Имя пользователя"
                onChange={(e) => setFormData({...formData, username: e.target.value})}/>

@@ -4,13 +4,12 @@ import "@/styles/globals.css";
 import 'animate.css';
 import {Providers} from "@/providers";
 import PagePreloader from "@/components/PagePreloader/PagePreloader";
-import BackgroundsCircles from "@/widgets/BackgroundsCircles/BackgroundsCircles";
 
 export const metadata: Metadata = {
-  title: "KinoMatch",
+  title: "КиноMatch",
   description: "VO",
   openGraph: {
-    title: 'Kinomatch',
+    title: 'КиноMatch',
     description: "VO"
   }
 };
@@ -31,7 +30,6 @@ export default function RootLayout({children,}: Readonly<{ children: React.React
     <body>
     <Providers>
       <PagePreloader/>
-      <BackgroundsCircles/>
       {children}
     </Providers>
     </body>

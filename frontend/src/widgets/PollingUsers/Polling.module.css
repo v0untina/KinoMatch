@@ -1,0 +1,96 @@
+.main {
+  height: 1200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 50px;
+  font-weight: 600;
+  text-align: center;
+  color: #ffffff; /* Для лучшей видимости на темном фоне */
+}
+
+.questions_container {
+  width: 800px;
+  height: 800px;
+  background-color: #21242D;
+  border-radius: 26px;
+  margin-bottom: 50px;
+  margin-top: 50px;
+  box-shadow: 0px 8px 15px rgb(58, 62, 75);
+  padding: 20px; /* Добавим немного отступов для контента */
+}
+
+.h2 {
+  font-size: 32px; /* Увеличиваем размер шрифта заголовка */
+  font-weight: 700; /* Заголовки жирные */
+  text-align: center;
+  color: #ffffff; 
+  margin-bottom: 20px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.option_item {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+}
+
+.option_item input[type="checkbox"] {
+  margin-right: 10px; /* Отступ между чекбоксом и текстом */
+  width: 20px;
+  height: 20px;
+  accent-color: green; /* Зеленый цвет для чекбоксов */
+}
+
+.option_item label {
+  font-size: 20px; /* Увеличиваем шрифт для текста */
+  color: #ffffff; /* Белый цвет текста */
+}
+
+.next_button {
+  background-color: #4caf50;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  cursor: pointer;
+  font-size: 20px; /* Увеличиваем шрифт для кнопки */
+  border-radius: 5px;
+  margin-top: 30px;
+}
+
+.next_button:hover {
+  background-color: #45a049;
+}
+
+.recommendation {
+  margin-top: 40px; /* Увеличим отступ сверху */
+  padding: 20px; /* Увеличим внутренний отступ */
+  border: 2px solid #3498db; /* Изменим цвет границы */
+  border-radius: 10px; /* Сделаем границу более скругленной */
+  background-color: #ecf0f1; /* Изменим цвет фона */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Добавим тень */
+  text-align: center; /* Выровняем текст по центру */
+}
+
+.recommendation h2 {
+  font-size: 1.5em; /* Увеличим размер заголовка */
+  margin-bottom: 15px;
+  color: #2c3e50; /* Изменим цвет заголовка */
+}
+
+.recommendation p {
+  font-size: 1.2em; /* Увеличим размер текста */
+  color: #34495e; /* Изменим цвет текста */
+  font-style: italic; /* Добавим курсив */
+}

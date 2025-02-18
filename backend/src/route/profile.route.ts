@@ -4,48 +4,42 @@ import { ProfileParamsBodyDto, ProfileResponseDto } from "../dto/Auth.dto";
 import { DefaultResponseDto, OffsetLengthQueryDto } from "../dto/Response.dto.ts";
 import { UserProvider } from "../providers/user.provider.ts";
 import prisma from "../util/prisma.ts";
-import { jwt } from '@elysiajs/jwt';
-import { MovieIdParamsDto } from '../dto/Movie.dto.ts'; // Убедись, что путь правильный!
+import { jwt } from '@elysiajs/jwt'; //  Убедитесь, что импортируете jwt
+import { MovieIdParamsDto } from '../dto/Movie.dto.ts';
 
-// Определяем тип для JWT payload. ЗАМЕНИ НА СВОЙ!
-// Этот тип ДОЛЖЕН совпадать с тем, что ты помещаешь в JWT в auth.route.ts
+// Определяем тип для JWT payload.  ЭТО ДОЛЖНО СОВПАДАТЬ С ТЕМ, ЧТО ВЫ ПОМЕЩАЕТЕ В JWT!
 type JWTPayload = {
     username: string;
-    userId: number; // Добавь, если есть userId в токене
-    // ... другие поля из твоего JWT
+    userId: number; // ДОБАВЬТЕ userId, если он есть в токене.
+    // ... другие поля из вашего JWT
 };
 
 const profileRoutes = new Elysia({ prefix: "/profile", detail: { tags: ["Profile"] } });
-
-// Вспомогательная функция для создания ответов с ошибками
-const createErrorResponse = (message: string, status: number = 500) => {
-    return new Response(JSON.stringify({ success: false, message }), {
-        status: status,
-        headers: { 'Content-Type': 'application/json' }
-    });
-};
 
 // Endpoint для получения своего профиля
 profileRoutes.get('/', async (ctx) => {
     const verification = await ctx.jwt.verify(ctx.headers.authorization);
     if (!verification) {
-        return createErrorResponse('Invalid token', 401); // Возвращаем ошибку 401
+        return { 401: { success: false, message: "Unauthorized" } }; // Возвращаем ошибку 401
     }
 
-    // Используем type assertion, чтобы указать TypeScript тип verification
-    const { username } = verification as JWTPayload;
+    // Используем type assertion и извлекаем userId.
+    const { userId } = verification as JWTPayload;
 
-    let userData = await UserProvider.getByUsername(username);
+    const userData = await UserProvider.getByID(userId); // Исправлено: getByID (с заглавной D)
     if (!userData) {
-        return createErrorResponse('User not found', 404); // Возвращаем ошибку 404
+        return { 404: { success: false, message: "User not found" } };
+    } else { // Добавлен else
+        return { 200: { success: true, data: userData } };
     }
-    return { success: true, data: userData };
 }, {
-    response: ProfileResponseDto, // DTO для ответа
-    beforeHandle: async (ctx) => {
-        // Проверка JWT перед выполнением основного обработчика
+    response: t.Object({ // ЯВНО указываем схему ответа.
+        success: t.Boolean(),
+        data: t.Optional(t.Any())  // ЗАМЕНИТЕ t.Any на более конкретный тип вашего профиля!
+    }),
+    beforeHandle: async (ctx) => { // beforeHandle не должен ничего возвращать
         if (!await ctx.jwt.verify(ctx.headers.authorization)) {
-            return createErrorResponse("Unauthorized", 401);
+            return { 401: { success: false, message: "Unauthorized" } };
         }
     }
 });
@@ -54,21 +48,21 @@ profileRoutes.get('/', async (ctx) => {
 profileRoutes.get('/favorites', async (ctx) => {
     const verification = await ctx.jwt.verify(ctx.headers.authorization);
     if (!verification) {
-        return createErrorResponse('Invalid token', 401); // Возвращаем ошибку 401
+        return { 401: { success: false, message: "Unauthorized" } };
     }
 
-    const { username } = verification as JWTPayload;
+    const { userId } = verification as JWTPayload;
 
     try {
-        let userData = await UserProvider.getByUsername(username);
+        const userData = await UserProvider.getByID(userId); // Исправлено: getByID
         if (!userData) {
-            return createErrorResponse('User not found', 404);
+            return { 404: { success: false, message: "User not found" } };
         }
 
-        let length = parseInt(ctx.query.length || "20");
-        let offset = parseInt(ctx.query.offset || "0");
+        const length = parseInt(ctx.query.length || "20");
+        const offset = parseInt(ctx.query.offset || "0");
 
-        let eventsData = await prisma.user_movie_favorites.findMany({
+        const eventsData = await prisma.user_movie_favorites.findMany({
             where: {
                 user_id: userData.id
             },
@@ -79,27 +73,41 @@ profileRoutes.get('/favorites', async (ctx) => {
             skip: offset
         });
         if (!eventsData) {
-            return createErrorResponse("Favorites not found", 404);
+            return { 404: { success: false, message: "Favorites not found" } };
         }
 
         return {
-            success: true,
-            pagination: {
-                length: length,
-                offset: offset
-            },
-            data: eventsData
+            200: { // Используем 200 OK
+                success: true,
+                pagination: {
+                    length: length,
+                    offset: offset
+                },
+                data: eventsData
+            }
         };
     } catch (e) {
         console.error(e);
-        return createErrorResponse('An error occurred', 500); // Возвращаем ошибку 500
+        return { 500: { success: false, message: "An error occurred" } }; // Возвращаем ошибку 500
     }
 }, {
     query: OffsetLengthQueryDto, // DTO для query параметров
-    response: DefaultResponseDto, // DTO для ответа
-    beforeHandle: async (ctx) => {
+    response: t.Object({ // ЯВНО указываем схему ответа.
+        success: t.Boolean(),
+        data: t.Optional(t.Any()), // ЗАМЕНИТЕ t.Any на более конкретный тип!
+        message: t.Optional(t.Object({
+            code: t.Optional(t.String()),
+            text: t.String(),
+            message: t.String()
+        })),
+        pagination: t.Optional(t.Object({
+            length: t.Number(),
+            offset: t.Number()
+        }))
+    }),
+    beforeHandle: async (ctx) => { // beforeHandle не должен ничего возвращать
         if (!await ctx.jwt.verify(ctx.headers.authorization)) {
-            return createErrorResponse("Unauthorized", 401);
+            return { 401: { success: false, message: "Unauthorized" } };
         }
     }
 });
@@ -108,14 +116,14 @@ profileRoutes.get('/favorites', async (ctx) => {
 profileRoutes.post('/favorites/:movieId', async (ctx) => {
     const verification = await ctx.jwt.verify(ctx.headers.authorization);
     if (!verification) {
-        return createErrorResponse('Invalid token', 401);
+        return { 401: { success: false, message: "Unauthorized" } };
     }
 
-    const { username } = verification as JWTPayload;
+    const { userId } = verification as JWTPayload;
 
-    let userData = await UserProvider.getByUsername(username);
+    const userData = await UserProvider.getByID(userId); // Исправлено: getByID
     if (!userData) {
-        return createErrorResponse("User not found", 404)
+        return { 404: { success: false, message: "User not found" } };
     }
 
     try {
@@ -125,17 +133,20 @@ profileRoutes.post('/favorites/:movieId', async (ctx) => {
                 movie_id: parseInt(ctx.params.movieId) // Преобразуем movieId в число
             }
         });
-        return { success: true };
+        return { 200: { success: true } }; // Используем 200 OK
     } catch (e) {
         console.error(e);
-        return createErrorResponse('An error occurred', 500);
+        return { 500: { success: false, message: "An error occurred" } };
     }
 }, {
     params: MovieIdParamsDto, // DTO для параметров
-    response: ProfileResponseDto,  // DTO для ответа
-    beforeHandle: async (ctx) => {
+    response: t.Object({ // ЯВНО указываем схему ответа.
+        success: t.Boolean(),
+        data: t.Optional(t.Any()) // ЗАМЕНИТЕ t.Any на более конкретный тип!
+    }),
+    beforeHandle: async (ctx) => { // beforeHandle не должен ничего возвращать
         if (!await ctx.jwt.verify(ctx.headers.authorization)) {
-            return createErrorResponse("Unauthorized", 401);
+            return { 401: { success: false, message: "Unauthorized" } };
         }
     }
 });
@@ -144,47 +155,51 @@ profileRoutes.post('/favorites/:movieId', async (ctx) => {
 profileRoutes.delete('/favorites/:movieId', async (ctx) => {
     const verification = await ctx.jwt.verify(ctx.headers.authorization);
     if (!verification) {
-        return createErrorResponse('Invalid token', 401);
+        return { 401: { success: false, message: "Unauthorized" } };
     }
 
-    const { username } = verification as JWTPayload;
+    const { userId } = verification as JWTPayload;
 
-    let userData = await UserProvider.getByUsername(username);
+    const userData = await UserProvider.getByID(userId); // Исправлено: getByID
     if (!userData) {
-        return createErrorResponse("User not found", 404)
+        return { 404: { success: false, message: "User not found" } };
     }
+
     try {
         await prisma.user_movie_favorites.delete({
             where: {
-                user_id_movie_id: {  // Используем правильное имя составного ключа
+                user_id_movie_id: {
                     user_id: userData.id,
                     movie_id: parseInt(ctx.params.movieId) // Преобразуем movieId в число
                 }
             }
         });
-        return { success: true };
+        return { 200: { success: true } }; // Используем 200 OK
     } catch (e) {
         console.error(e);
-        return createErrorResponse('An error occurred', 500);
+        return { 500: { success: false, message: "An error occurred" } };
     }
 }, {
     params: MovieIdParamsDto, // DTO для параметров
-    response: ProfileResponseDto,  // DTO для ответа
-    beforeHandle: async (ctx) => {
+    response: t.Object({  // ЯВНО указываем схему ответа
+        success: t.Boolean(),
+        data: t.Optional(t.Any()) // ЗАМЕНИТЕ t.Any на более конкретный тип!
+    }),
+    beforeHandle: async (ctx) => { // beforeHandle не должен ничего возвращать
         if (!await ctx.jwt.verify(ctx.headers.authorization)) {
-            return createErrorResponse("Unauthorized", 401);
+            return { 401: { success: false, message: "Unauthorized" } };
         }
     }
 });
 
 // Роут для получения списка актеров (не требует JWT)
-profileRoutes.get("/actors", async () => {
+profileRoutes.get("/actors", async () => { //  Добавил ctx, хоть он и не используется
     try {
         const actors = await prisma.actors.findMany();
-        return { actors };
+        return { 200: { actors } }; // Оборачиваем в объект с кодом 200
     } catch (error) {
         console.error("Error fetching actors:", error);
-        return createErrorResponse('Failed to fetch actors', 500);
+        return { 500: { success: false, message: 'Failed to fetch actors' } };
     }
 });
 
