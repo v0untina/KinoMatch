@@ -3,7 +3,6 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
 }
 
@@ -11,26 +10,29 @@
   font-size: 50px;
   font-weight: 600;
   text-align: center;
-  color: #ffffff; /* Для лучшей видимости на темном фоне */
+  color: var(--clr-default-500); 
+  width: 1783px;
+  margin-top: 10px;
 }
 
 .questions_container {
   width: 800px;
-  height: 800px;
-  background-color: #21242D;
+  height: 700px;
+  background-color: var(--clr-default-100);
   border-radius: 26px;
-  margin-bottom: 50px;
   margin-top: 50px;
-  box-shadow: 0px 8px 15px rgb(58, 62, 75);
-  padding: 20px; /* Добавим немного отступов для контента */
+  box-shadow: 0px 8px 15px var(--clr-default-550);
+  padding: 20px; 
 }
 
 .h2 {
-  font-size: 32px; /* Увеличиваем размер шрифта заголовка */
-  font-weight: 700; /* Заголовки жирные */
+  font-size: 32px; 
+  font-weight:bolder; 
   text-align: center;
-  color: #ffffff; 
-  margin-bottom: 20px;
+  color: var(--clr-default-500); 
+  margin-bottom: 40px;
+  text-transform: uppercase;
+
 }
 
 .options {
@@ -41,34 +43,66 @@
 }
 
 .option_item {
+  font-size: 35px;
   margin: 15px 0;
   display: flex;
-  align-items: center;
+  text-align: left;
+
 }
 
 .option_item input[type="checkbox"] {
-  margin-right: 10px; /* Отступ между чекбоксом и текстом */
-  width: 20px;
-  height: 20px;
-  accent-color: green; /* Зеленый цвет для чекбоксов */
+  appearance: none; 
+  margin-right: 15px;
+  width: 30px;
+  height: 30px;
+  border: 2px solid #00B9AE; 
+  border-radius: 50%; 
+  background-color: transparent; 
+  cursor: pointer;
+  position: relative;
+}
+
+.option_item input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 17px;
+  height: 17px;
+  background-color: #00B9AE; 
+  border-radius: 50%; 
 }
 
 .option_item label {
-  font-size: 20px; /* Увеличиваем шрифт для текста */
-  color: #ffffff; /* Белый цвет текста */
+  font-size: 35px; 
+  color: var(--clr-default-500); 
+  text-transform: uppercase;
+}
+
+.button_layout{
+  display: flex;
+  justify-content: center;
 }
 
 .next_button {
-  background-color: #4caf50;
+  margin-top: 51px;
+  width: 200px;
+  height: 60px;
+  background-color: #00B9AE;
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 40px;
   color: white;
-  padding: 15px 30px;
-  border: none;
-  cursor: pointer;
-  font-size: 20px; /* Увеличиваем шрифт для кнопки */
-  border-radius: 5px;
-  margin-top: 30px;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  animation-delay: 4.6s;
+  transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .next_button:hover {
-  background-color: #45a049;
+  background-color: #25cfc4;
+  cursor: pointer;
+  transform: scale(1.05);
+
 }

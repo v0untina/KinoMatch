@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import styles from "./Polling.module.css";
 
 export default function Pollingusers() {
-  // Список вопросов и вариантов ответов
   const questions = [
     {
       question: "Какое настроение вы хотите испытать после просмотра фильма?",
@@ -12,18 +11,15 @@ export default function Pollingusers() {
         "Напряжение и волнение",
         "Глубокие размышления",
         "Ностальгия",
-        "Успокоение и расслабление",
       ],
       multipleChoice: false,
     },
     {
       question: "Какой жанр вам ближе всего в данный момент? (выберите несколько)",
       options: [
-        "Драма",
         "Комедия",
         "Ужасы",
         "Научная фантастика",
-        "Приключения",
         "Романтика",
         "Документальный",
       ],
@@ -38,8 +34,8 @@ export default function Pollingusers() {
       question: "Какой стиль повествования вам больше нравится?",
       options: [
         "Линейный (по порядку)",
-        "Нелинейный (с флешбэками и перескоками)",
-        "Антология (несколько историй в одном фильме)",
+        "Нелинейный",
+        "Антология",
         "Документальный стиль",
       ],
       multipleChoice: false,
@@ -48,13 +44,14 @@ export default function Pollingusers() {
       question: "Какой уровень сложности сюжета вы предпочитаете?",
       options: [
         "Легкий и предсказуемый",
-        "Умеренно сложный, с интригующими поворотами",
-        "Сложный, требующий внимательного анализа",
+        "Умеренно сложный",
+        "Требующий анализа",
+        "Сложный",
       ],
       multipleChoice: false,
     },
     {
-      question: "Какой тип главного героя вам ближе?",
+      question: "Какой тип главного героя вам ближе всего по духу?",
       options: [
         "Антигерой",
         "Обычный человек",
@@ -80,7 +77,6 @@ export default function Pollingusers() {
         "Актерская игра",
         "Визуальные эффекты",
         "Музыка и звуковое оформление",
-        "Режиссура",
       ],
       multipleChoice: false,
     },
@@ -95,21 +91,20 @@ export default function Pollingusers() {
       multipleChoice: false,
     },
     {
-      question: "Какой уровень реализма вы предпочитаете?",
+      question: "Какой уровень реализма вы больше предпочитаете?",
       options: [
         "Полностью реалистичный",
         "С элементами фантастики",
         "Абсурдный и сюрреалистичный",
+        "Психологический реализм"
       ],
       multipleChoice: false,
     },
   ];
 
-  // Состояние для текущего вопроса и выбранных ответов
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
 
-  // Функция для обработки выбора ответа
   const handleAnswerSelect = (answer) => {
     setAnswers((prevAnswers) => ({
       ...prevAnswers,
@@ -117,7 +112,6 @@ export default function Pollingusers() {
     }));
   };
 
-  // Функция для обработки выбора нескольких ответов
   const handleMultipleChoiceSelect = (answer) => {
     setAnswers((prevAnswers) => {
       const currentAnswers = prevAnswers[currentQuestionIndex] || [];
@@ -135,22 +129,25 @@ export default function Pollingusers() {
     });
   };
 
-  // Функция для перехода к следующему вопросу
   const handleNext = () => {
+    const currentAnswers = answers[currentQuestionIndex];
+    if (!currentAnswers || (Array.isArray(currentAnswers) && currentAnswers.length === 0)) {
+      alert("Пожалуйста, выберите хотя бы один вариант ответа.");
+      return;
+    }
+
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      alert( JSON.stringify(answers));
+      alert(JSON.stringify(answers));
     }
   };
 
-  // Получаем текущий вопрос и его варианты
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <main className={styles.main}>
-      <h1 className={styles.title}>Найдите идеальный фильм за считанные минуты с помощью нашего опроса</h1>
-
+      <h1 className={styles.title}>Найдите идеальный фильм за считанные минуты <br />с помощью нашего опроса</h1>
       <div className={styles.questions_container}>
         <h2 className={styles.h2}>{currentQuestion.question}</h2>
         <div className={styles.options}>
@@ -170,7 +167,8 @@ export default function Pollingusers() {
                   className={styles.option_button}
                   onClick={() => handleAnswerSelect(option)}
                   style={{
-                    backgroundColor: answers[currentQuestionIndex] === option ? "lightblue" : "",
+                    color: answers[currentQuestionIndex] === option ? "#00B9AE" : "",
+                    textTransform:"uppercase",
                   }}
                 >
                   {option}
@@ -179,10 +177,11 @@ export default function Pollingusers() {
             </div>
           ))}
         </div>
-
+        <div className={styles.button_layout}>
         <button className={styles.next_button} onClick={handleNext}>
           Далее
         </button>
+        </div>
       </div>
     </main>
   );

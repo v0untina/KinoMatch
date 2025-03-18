@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./Footer.module.css"
+import { Link } from "@nextui-org/react";
 
 export default function Footer(){
   return(

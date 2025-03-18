@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useEffect, useState, useRef } from "react";
 import styles from "./CrossingFilms.module.css";
 import { Link } from "@nextui-org/react";
