@@ -3,39 +3,26 @@
     font-weight: 800;
     width: max-content;
     height: max-content;
-}
-
-.logo * {
-    font-size: 28pt;
+    display: flex;
 }
 
 :global(.dark) .mainText {
     color: white;
 }
 
-/* Размеры */
 .logo.small * {
-    font-size: 23pt;
+    font-size: 25pt;
 }
 
 .logo.big * {
-    font-size: 34pt;
+    font-size: 35pt;
 }
 
-/* Цветное */
 .mainText {
     color: black;
+    text-transform: uppercase;
 }
 
-.red {
-    color: hsl(var(--nextui-danger-500));
-}
-
-.blue {
-    color: hsl(var(--nextui-primary-500));
-}
-
-/* Враппер */
 .wrapper {
     display: flex;
     align-items: center;

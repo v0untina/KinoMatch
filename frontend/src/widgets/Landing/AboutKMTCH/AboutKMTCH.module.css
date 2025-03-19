@@ -1,0 +1,144 @@
+.main {
+  width: 100%;
+  height: 100vh;
+  padding: 20px;
+  position: relative;
+}
+
+.title {
+  font-size: 60px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-bottom: 50px;
+  opacity: 0;
+  animation: fadeInTitle 1s forwards;
+  animation-delay: 1.5s; 
+}
+
+@keyframes fadeInTitle {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.gologin {
+  margin: 20px 0px 0px 100px;
+}
+
+.customList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.customList li {
+  padding-left: 45px;
+  background-image: url('/Bookmark.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 45px 55px;
+  font-size: 35px;
+  line-height: 3;
+  opacity: 0; 
+  animation: fadeIn 1s forwards; 
+}
+
+.customList li:nth-child(1) {
+  animation-delay: 2s; 
+}
+.customList li:nth-child(2) {
+  animation-delay: 2.8s; 
+}
+.customList li:nth-child(3) {
+  animation-delay: 3.4s; 
+}
+.customList li:nth-child(4) {
+  animation-delay: 4s; 
+}
+
+.robot {
+  margin-left: 250px;
+  position: absolute;
+  right: 180px;
+  top: 180px;
+  opacity: 0;
+  animation: fadeInRobot 1s forwards;
+  animation-delay: 1.5s;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.robot:hover{
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+@keyframes fadeInRobot {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loginbutton {
+  margin-top: 51px;
+  width: 300px;
+  height: 60px;
+  background-color: #00B9AE;
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 40px;
+  color: white;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  opacity: 0;
+  animation: fadeInButton 1s forwards;
+  animation-delay: 4.6s;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+@keyframes fadeInButton {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loginbutton:hover {
+  background-color: #25cfc4;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@media (width < 1668px) {
+  .robot{
+    display: none;
+  }
+  .main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (width < 1130px) {
+  .customList{
+    display: none;
+  }
+}
