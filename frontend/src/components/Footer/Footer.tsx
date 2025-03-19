@@ -18,8 +18,12 @@ export default function Footer(){
       </div>
       <div className={styles.about_kinomatch}>
         <h1 className={styles.title}>КиноMatch</h1>
-        <p className={styles.paragraph}>Контакты</p>
-        <p className={styles.paragraph}>Документы</p>
+        <Link href={'/contacts'}>
+           <p className={styles.paragraph}>Контакты</p>
+        </Link>
+        <Link href={'/documents'}>
+           <p className={styles.paragraph}>Документы</p>
+        </Link>
         <p className={styles.paragraph}>Пользовательское соглашение</p>
         <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
       </div>
