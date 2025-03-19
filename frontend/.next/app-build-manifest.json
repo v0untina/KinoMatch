@@ -12,6 +12,12 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
+    "/documents/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/documents/page.css",
+      "static/chunks/app/documents/page.js"
+    ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
