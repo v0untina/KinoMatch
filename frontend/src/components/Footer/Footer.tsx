@@ -24,8 +24,12 @@ export default function Footer(){
         <Link href={'/documents'}>
            <p className={styles.paragraph}>Документы</p>
         </Link>
-        <p className={styles.paragraph}>Пользовательское соглашение</p>
-        <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
+        <Link href={'/termsofuse'}>
+           <p className={styles.paragraph}>Пользовательское соглашение</p>
+        </Link>
+        <Link href={'/recommendationpolicy'}>
+           <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
+        </Link>
       </div>
     </footer>
   )

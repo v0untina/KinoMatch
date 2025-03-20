@@ -14,8 +14,8 @@
     margin-top: 10px;
 }
   
-.email {
-    font-size: 25px;
+.text {
+    font-size: 20px;
     font-weight: 300;
     text-align: center;
     color: var(--clr-default-500);
