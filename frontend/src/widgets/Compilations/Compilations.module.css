@@ -1,0 +1,48 @@
+.main {
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center; 
+  }
+  
+  .places__list {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 3 карточки в строке */
+    gap: 30px; 
+    max-width: 1200px; 
+    width: 100%;
+    height: 100%; 
+  }
+  
+  .places__item {
+    width: 100%; 
+  }
+  
+  .card__image {
+    width: 400px; 
+    border-radius: 20px;
+    height: auto; 
+  }
+  
+  .card__description {
+    padding: 10px;
+  }
+  
+  .card__title {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  @media (max-width: 900px) {
+    .places__list {
+      grid-template-columns: repeat(2, 1fr); /* 2 карточки в строке */
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .places__list {
+      grid-template-columns: repeat(1, 1fr); /* 1 карточка в строке */
+    }
+  }

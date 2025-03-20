@@ -55,19 +55,19 @@ export default function BestFilms() {
         </h2>
         <div className={`${styles.new_films} ${isNewFilmsVisible ? styles.slideUp : ''}`}>
           <div className={styles.card_film}>
-            <img className={styles.image} src="/posters/thor.jpeg" alt="" />
+            <img className={styles.image} src="posters/thor.jpeg" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image} src="/posters/thor.jpeg" alt="" />
+            <img className={styles.image} src="posters/thor.jpeg" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image} src="/posters/thor.jpeg" alt="" />
+            <img className={styles.image} src="posters/thor.jpeg" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image} src="/posters/thor.jpeg" alt="" />
+            <img className={styles.image} src="posters/thor.jpeg" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <button className={styles.button_next}>></button>
@@ -80,19 +80,19 @@ export default function BestFilms() {
         </h2>
         <div className={`${styles.new_films} ${isBestFilmsVisible ? styles.slideUp : ''}`}>
           <div className={styles.card_film}>
-            <img className={styles.image_f} src="/posters/loki.png" alt="" />
+            <img className={styles.image_f} src="posters/loki.png" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image_f} src="/posters/loki.png" alt="" />
+            <img className={styles.image_f} src="posters/loki.png" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image_f} src="/posters/loki.png" alt="" />
+            <img className={styles.image_f} src="posters/loki.png" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <div className={styles.card_film}>
-            <img className={styles.image_f} src="/posters/loki.png" alt="" />
+            <img className={styles.image_f} src="posters/loki.png" alt="" />
             <span className={styles.film_title}>Просто название фильма</span>
           </div>
           <button className={styles.button_next}>></button>

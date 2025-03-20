@@ -124,3 +124,21 @@
     opacity: 1;
   }
 }
+
+@media (width < 1668px) {
+  .robot{
+    display: none;
+  }
+  .main{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (width < 1130px) {
+  .customList{
+    display: none;
+  }
+}

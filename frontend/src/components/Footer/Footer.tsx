@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./Footer.module.css"
+import { Link } from "@nextui-org/react";
 
 export default function Footer(){
   return(
@@ -17,10 +18,18 @@ export default function Footer(){
       </div>
       <div className={styles.about_kinomatch}>
         <h1 className={styles.title}>КиноMatch</h1>
-        <p className={styles.paragraph}>Контакты</p>
-        <p className={styles.paragraph}>Документы</p>
-        <p className={styles.paragraph}>Пользовательское соглашение</p>
-        <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
+        <Link href={'/contacts'}>
+           <p className={styles.paragraph}>Контакты</p>
+        </Link>
+        <Link href={'/documents'}>
+           <p className={styles.paragraph}>Документы</p>
+        </Link>
+        <Link href={'/termsofuse'}>
+           <p className={styles.paragraph}>Пользовательское соглашение</p>
+        </Link>
+        <Link href={'/recommendationpolicy'}>
+           <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
+        </Link>
       </div>
     </footer>
   )

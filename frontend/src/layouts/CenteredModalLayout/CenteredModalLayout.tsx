@@ -10,10 +10,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
 
   // Список всех фильмов
   const films = [
-    { title: "Локи", image: "/posters/ved'ma.jpg" },
-    { title: "Chernobyl", image: "/posters/loki.png" },
-    { title: "The Dark Knight", image: "/posters/chernobyl.png" },
-    { title: "Rick and Morty", image: "/posters/dark knight.png" }
+    { title: "Локи", image: "posters/ved'ma.jpg" },
+    { title: "Chernobyl", image: "posters/loki.png" },
+    { title: "The Dark Knight", image: "posters/chernobyl.png" },
+    { title: "Rick and Morty", image: "posters/dark knight.png" }
   ];
 
   // Используем useEffect для автоматического переключения изображений
@@ -46,22 +46,22 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         <div className={styles.popular_films}>
           <div className={styles.film}>
             <h1 className={styles.image_title}>Локи</h1>        
-            <img className={styles.bf_image} src="/posters/loki.png" alt="" />
+            <img className={styles.bf_image} src="posters/loki.png" alt="" />
             <button className={styles.button_image}>Смотреть</button> 
           </div>
           <div className={styles.film}>
             <h1 className={styles.image_title}>Chernobyl</h1>        
-            <img className={styles.bf_image} src="/posters/chernobyl.png" alt="" />
+            <img className={styles.bf_image} src="posters/chernobyl.png" alt="" />
             <button className={styles.button_image}>Смотреть</button> 
           </div>
           <div className={styles.film}>
             <h1 className={styles.image_title}>The Dark Knight</h1>        
-            <img className={styles.bf_image} src="/posters/dark knight.png" alt="" />
+            <img className={styles.bf_image} src="posters/dark knight.png" alt="" />
             <button className={styles.button_image}>Смотреть</button> 
           </div>
           <div className={styles.film}>
             <h1 className={styles.image_title}>Rick and Morty</h1>        
-            <img className={styles.bf_image} src="/posters/ram.png" alt="" />
+            <img className={styles.bf_image} src="posters/ram.png" alt="" />
             <button className={styles.button_image}>Смотреть</button> 
           </div>
         </div>
