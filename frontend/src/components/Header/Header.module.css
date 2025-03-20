@@ -1,107 +1,200 @@
 .header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px 0px 20px;
+  width: 100%;
+  height: 90px;
+  background: var(--clr-default-100);
+  position: relative;
+  z-index: 10;
+}
+
+.logo_header{
+  margin-right: 20px;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.ticket {
+  margin-left: 11px;
+  width: 61px;
+  height: 59px;
+}
+
+.header_buttons{
+  display: flex;
+  gap: 20px;
+  justify-content: space-around;
+}
+
+.header_titles {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 899px;
+}
+
+.header_buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.subtitles {
+  text-transform: uppercase;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.login_buttons {
+  text-transform: uppercase;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.subtitles,
+.login {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--clr-default-500);
+}
+
+.theme {
+  margin-left: auto;
+}
+
+.burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--clr-default-500);
+}
+
+.sidebar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .header_titles,
+  .login_buttons {
+    display: none;
+  }
+
+  .sidebar .header_titles,
+  .sidebar .login_buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .login_image {
+    display: none;
+  }
+
+  .burger {
+    display: block;
+  }
+
+  .headerInner {
+    width: 100%;
+    padding: 20px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    width: 100%;
-    height: 90px;
+  }
+
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 300px;
+    height: 100%;
     background: var(--clr-default-100);
-    position: relative;
-    z-index: 10;
+    transition: right 0.3s ease;
+    box-shadow: -4px 0 6px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    z-index: 20;
   }
-  
-  .headerInner {
+
+  .sidebar.open {
+    right: 0;
+  }
+
+  .sidebarInner {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 20px;
   }
-  
-  .ticket {
-    margin-left: 11px;
-    width: 61px;
-    height: 59px;
-  }
-  
-  .header_titles {
-    display: flex;
-    justify-content: space-around;
-    width: 899px;
-  }
-  
-  .header_buttons {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-  }
-  
-  .subtitles {
-    text-transform: uppercase;
-    font-size: 21px;
-    font-weight: 700;
-  }
-  
-  .login_buttons {
-    text-transform: uppercase;
-    display: flex;
-    gap: 5px;
-  }
-  
+
   .login {
-    font-size: 21px;
-    font-weight: 700;
-    color: var(--clr-default-500);
+    font-size: 20px;
   }
-  
-  .theme {
-    margin-left: auto;
-  }
-  
-  /* Адаптивность */
-  .burger {
+
+  .span_login {
     display: none;
+  }
+}
+  .closeButton {
     background: none;
     border: none;
     cursor: pointer;
     color: var(--clr-default-500);
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 30; 
   }
-  
+
+  .closeButton:hover {
+    color: var(--clr-default-700); 
+  }
+
+@media (width < 426px) {
+  .ticket {
+    display: none;
+  }
+
+  .headerInner {
+    padding: 0px;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+  .theme{
+    display: none;
+  }
+}
+
+@media (width > 769px) {
+  .header_titles {
+    display: flex; 
+    justify-content: space-around;
+    width: 100%;
+    max-width: 899px;
+  }
+
+  .login_buttons {
+    display: flex; 
+    gap: 5px;
+    align-items: center;
+  }
+
+  .burger {
+    display: none; 
+  }
+
   .sidebar {
     display: none;
   }
-  
-  @media (max-width: 768px) {
-    .header_titles,
-    .login_buttons {
-      display: none;
-    }
-  
-    .burger {
-      display: block;
-    }
-  
-    .sidebar {
-      display: flex;
-      flex-direction: column;
-      justify-content: start;
-      position: fixed;
-      top: 0;
-      right: -100%;
-      width: 250px;
-      height: 100%;
-      background: var(--clr-default-100);
-      transition: right 0.3s ease;
-      box-shadow: -4px 0 6px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      z-index: 20;
-    }
-  
-    .sidebar.open {
-      right: 0;
-    }
-  
-    .sidebarInner {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-  }
-  
+}
