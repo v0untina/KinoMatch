@@ -12,17 +12,19 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
-<<<<<<< HEAD
-    "/contacts/page": [
-=======
-    "/documents/page": [
+    "/termsofuse/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/documents/page.css",
-      "static/chunks/app/documents/page.js"
+      "static/css/app/termsofuse/page.css",
+      "static/chunks/app/termsofuse/page.js"
     ],
-    "/_not-found/page": [
->>>>>>> origin/main
+    "/recommendationpolicy/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/recommendationpolicy/page.css",
+      "static/chunks/app/recommendationpolicy/page.js"
+    ],
+    "/contacts/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/contacts/page.css",
