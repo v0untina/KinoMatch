@@ -32,7 +32,6 @@ export default function BestFilms() {
       },
       { threshold: 0.5 }
     );
-
     const observerBestFilms = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

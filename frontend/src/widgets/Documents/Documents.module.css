@@ -23,14 +23,12 @@
     margin-bottom: 10px;
 }
 
-/* Стили для ссылки внутри .text */
 .text a {
     color: #007BFF; 
     text-decoration: underline; 
     cursor: pointer; 
 }
 
-/* Дополнительно: стили при наведении */
 .text a:hover {
     color: #0056b3; 
     text-decoration: none; 

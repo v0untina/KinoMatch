@@ -1,4 +1,3 @@
-//frontend/src/layouts/MainLayout/MainLayout.tsx
 import React from "react";
 import About from '@/widgets/Landing/AboutKMTCH/AboutKMTCH';
 import Header from "@/components/Header/Header";
