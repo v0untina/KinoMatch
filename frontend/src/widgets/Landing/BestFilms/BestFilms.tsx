@@ -2,8 +2,21 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./BestFilms.module.css";
+import axios from "axios";
+
+interface Movie {
+  movie_id: number;
+  title: string;
+  poster_filename: string | null;
+}
 
 export default function BestFilms() {
+  const [newMovies, setNewMovies] = useState<Movie[]>([]);
+  const [bestMovies, setBestMovies] = useState<Movie[]>([]);
+  const [isLoadingNew, setIsLoadingNew] = useState(true);
+  const [isLoadingBest, setIsLoadingBest] = useState(true);
+  const [errorNew, setErrorNew] = useState<string | null>(null);
+  const [errorBest, setErrorBest] = useState<string | null>(null);
   const [isNewFilmsVisible, setIsNewFilmsVisible] = useState(false);
   const [isBestFilmsVisible, setIsBestFilmsVisible] = useState(false);
 
@@ -19,7 +32,6 @@ export default function BestFilms() {
       },
       { threshold: 0.5 }
     );
-    
     const observerBestFilms = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -47,54 +59,67 @@ export default function BestFilms() {
     };
   }, []);
 
+  const fetchMovies = async (url: string, setMovies: (movies: Movie[]) => void, setIsLoading: (loading: boolean) => void, setError: (error: string | null) => void) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+        // Используем переменную окружения для базового URL API
+        const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL; // Получаем базовый URL из env
+        const response = await axios.get(`${baseURL}/movies${url}`); // !!! ВАЖНО: добавляем /movies к baseURL один раз
+        setMovies(response.data);
+    } catch (e: any) {
+        console.error("Ошибка при загрузке фильмов:", e);
+        setError("Не удалось загрузить фильмы. Попробуйте позже.");
+    } finally {
+        setIsLoading(false);
+    }
+};
+
+  useEffect(() => {
+    fetchMovies("/new", setNewMovies, setIsLoadingNew, setErrorNew);
+    fetchMovies("/top_rated", setBestMovies, setIsLoadingBest, setErrorBest);
+  }, []);
+
   return (
     <main className={styles.main}>
       <div className={styles.container_new_films} ref={newFilmsRef}>
         <h2 className={`${styles.subtitle} ${isNewFilmsVisible ? styles.fadeIn : ''}`}>
           популярные новинки
         </h2>
+        {isLoadingNew && <p>Загрузка новинок...</p>}
+        {errorNew && <p className={styles.error}>{errorNew}</p>}
         <div className={`${styles.new_films} ${isNewFilmsVisible ? styles.slideUp : ''}`}>
-          <div className={styles.card_film}>
-            <img className={styles.image} src="/thor.jpeg" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image} src="/thor.jpeg" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image} src="/thor.jpeg" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image} src="/thor.jpeg" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
+          {!isLoadingNew && !errorNew && newMovies.map((movie) => (
+            <div className={styles.card_film} key={movie.movie_id}>
+              <img
+                className={styles.image}
+                src={movie.poster_filename ? `/posters/${movie.poster_filename}` : "/interface/defaultAvatar.webp"}
+                alt={movie.title}
+              />
+              <span className={styles.film_title}>{movie.title}</span>
+            </div>
+          ))}
           <button className={styles.button_next}>></button>
         </div>
       </div>
-      
+
       <div className={styles.best_films} ref={bestFilmsRef}>
         <h2 className={`${styles.subtitle} ${isBestFilmsVisible ? styles.fadeIn : ''}`}>
           топ рейтинга
         </h2>
+        {isLoadingBest && <p>Загрузка топа рейтинга...</p>}
+        {errorBest && <p className={styles.error}>{errorBest}</p>}
         <div className={`${styles.new_films} ${isBestFilmsVisible ? styles.slideUp : ''}`}>
-          <div className={styles.card_film}>
-            <img className={styles.image_f} src="/loki.png" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image_f} src="/loki.png" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image_f} src="/loki.png" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
-          <div className={styles.card_film}>
-            <img className={styles.image_f} src="/loki.png" alt="" />
-            <span className={styles.film_title}>Просто название фильма</span>
-          </div>
+          {!isLoadingBest && !errorBest && bestMovies.map((movie) => (
+            <div className={styles.card_film} key={movie.movie_id}>
+              <img
+                className={styles.image_f}
+                src={movie.poster_filename ? `/posters/${movie.poster_filename}` : "/interface/defaultAvatar.webp"}
+                alt={movie.title}
+              />
+              <span className={styles.film_title}>{movie.title}</span>
+            </div>
+          ))}
           <button className={styles.button_next}>></button>
         </div>
       </div>

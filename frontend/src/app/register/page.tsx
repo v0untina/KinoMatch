@@ -1,3 +1,4 @@
+// register/page.tsx
 import React from 'react';
 import RegisterForm from "@/widgets/RegisterForm/RegisterForm";
 

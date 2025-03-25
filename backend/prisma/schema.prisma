@@ -3,26 +3,105 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// Юзер
-model User {
-  id    Int       @unique @default(autoincrement())
-  email String
-  otp   OTPCode[]
+model actors {
+  actor_id       Int            @id @default(autoincrement())
+  name           String         @db.VarChar(255)
+  bio            String?
+  country_id     Int?
+  photo_filename String?        @db.VarChar(255)
+  countries      countries?     @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+  movie_actors   movie_actors[]
 }
 
-// OTP-код
-model OTPCode {
-  id     Int  @unique @default(autoincrement())
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
-  code   Int
+model countries {
+  country_id Int         @id @default(autoincrement())
+  name       String      @unique @db.VarChar(100)
+  actors     actors[]
+  directors  directors[]
+  movies     movies[]
+}
 
-  expirationDate DateTime
-  expired        Boolean
+model directors {
+  director_id     Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  bio             String?
+  country_id      Int?
+  photo_filename  String?           @db.VarChar(255)
+  countries       countries?        @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+  movie_directors movie_directors[]
+}
 
-  @@unique([userId, code])
+model genres {
+  genre_id     Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(50)
+  movie_genres movie_genres[]
+}
+
+model movie_actors {
+  movie_id       Int
+  actor_id       Int
+  character_name String? @db.VarChar(255)
+  actors         actors  @relation(fields: [actor_id], references: [actor_id], onDelete: NoAction, onUpdate: NoAction)
+  movies         movies  @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([movie_id, actor_id])
+}
+
+model movie_directors {
+  movie_id    Int
+  director_id Int
+  directors   directors @relation(fields: [director_id], references: [director_id], onDelete: NoAction, onUpdate: NoAction)
+  movies      movies    @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([movie_id, director_id])
+}
+
+model movie_genres {
+  movie_id Int
+  genre_id Int
+  genres   genres @relation(fields: [genre_id], references: [genre_id], onDelete: NoAction, onUpdate: NoAction)
+  movies   movies @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([movie_id, genre_id])
+}
+
+model movies {
+  movie_id             Int                    @id @default(autoincrement())
+  title                String                 @db.VarChar(255)
+  original_title       String?                @db.VarChar(255)
+  year                 Int?
+  description          String?
+  kinomatch_rating     Decimal?               @db.Decimal(3, 1)
+  imdb_rating          Decimal?               @db.Decimal(3, 1)
+  country_id           Int?
+  poster_filename      String?                @db.VarChar(255)
+  trailer_filename     String?                @db.VarChar(255)
+  movie_actors         movie_actors[]
+  movie_directors      movie_directors[]
+  movie_genres         movie_genres[]
+  countries            countries?             @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
+  user_movie_favorites user_movie_favorites[]
+}
+
+model user_movie_favorites {
+  user_id  Int
+  movie_id Int
+  added_at DateTime? @default(now()) @db.Timestamp(6)
+  movies   movies    @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+  users    users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([user_id, movie_id])
+}
+
+model users {
+  user_id              Int                    @id @default(autoincrement())
+  username             String                 @unique @db.VarChar(50)
+  email                String                 @unique @db.VarChar(255)
+  password_hash        String                 @db.VarChar(255)
+  registration_date    DateTime?              @default(now()) @db.Timestamp(6)
+  user_movie_favorites user_movie_favorites[]
 }

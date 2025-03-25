@@ -1,42 +1,143 @@
-import {Elysia} from 'elysia';
-import {ChangePasswordBodyDto, LoginBodyDto, LoginResponseDto, RegisterBodyDto} from "../dto/Auth.dto";
-import {AuthService} from "../service/auth.service.ts";
-import {DefaultResponseDto} from "../dto/Response.dto.ts";
+import { Elysia, t } from 'elysia';
+import { ChangePasswordBodyDto, LoginBodyDto, LoginResponseDto, RegisterBodyDto } from "../dto/Auth.dto";
+import { AuthService } from "../service/auth.service.ts";
+import { DefaultResponseDto } from "../dto/Response.dto.ts";
 
-const authRoutes = new Elysia({prefix: "/auth", detail: {tags: ["Auth"]}});
+const authRoutes = new Elysia({ prefix: "/auth", detail: { tags: ["Auth"] } });
 
-// Endpoint для входа в аккаунт
+// Endpoint для входа в аккаунт (логин)
 authRoutes.post('/login', async (ctx) => {
-  let userData = await AuthService.login(ctx.body.username, ctx.body.password);
-  if (!userData) return ctx.error(401, "Unauthorized");
+    const { username, password } = ctx.body;
+    const result = await AuthService.login(username, password);
 
-  // Подписываем JWT-токен
-  let token = await ctx.jwt.sign({username: ctx.body.username});
+    if (!result.success) {
+        // Ошибка авторизации
+        return { 401: { success: false, message: result.message } }; // Оставляем как было
+    } else {
+        // Успешная авторизация
+        const token = await ctx.jwt.sign({ username: username, userId: result.data.user_id }); // !!! ВОЗВРАЩАЕМ JWT !!!
 
-  // Возвращаем токен
-  return {success: true, data: {token}};
-}, {body: LoginBodyDto, response: LoginResponseDto});
+        // !!! ИЗМЕНЕНИЕ: Возвращаем объект с success и data на верхнем уровне !!!
+        ctx.set.status = 200; // Устанавливаем статус явно
+        return {
+            success: true,
+            data: {
+                token: token, // !!! ВОЗВРАЩАЕМ TOKEN !!!
+                user: result.data
+            }
+        };
+    }
+}, {
+    body: LoginBodyDto,
+    response: {
+        200: t.Object({
+            success: t.Boolean(), //  t.Boolean()
+            data: t.Object({
+                token: t.String(),
+                user: t.Object({
+                    user_id: t.Number(),
+                    username: t.String(),
+                    email: t.String()
+                })
+            })
+        }),
+        401: t.Object({
+            success: t.Boolean(), //  t.Boolean()
+            message: t.String()
+        })
+    }
+});
 
-// Endpoint для создания аккаунта
+// Endpoint для создания аккаунта (регистрация)
 authRoutes.post('/register', async (ctx) => {
-  let regResult = await AuthService.register(ctx.body.username, ctx.body.email, ctx.body.password);
-  if (!regResult) return {success: false};
+    const { username, email, password } = ctx.body;
 
-  // Регистрация прошла успешно
-  return {success: true};
-}, {body: RegisterBodyDto, response: DefaultResponseDto});
+    console.log("Register endpoint called with:", { username, email, password });
+
+    const regResult = await AuthService.register(username, email, password);
+
+    console.log("Register result from AuthService:", regResult);
+
+    if (!regResult.success) {
+        // Ошибка регистрации (например, пользователь уже существует)
+        const errorResponse = {
+            422: { // Используем 422 Unprocessable Entity
+                success: false,
+                message: {
+                    message: regResult.message || "Ошибка регистрации",
+                    text: regResult.message || "Ошибка регистрации"
+                }
+            }
+        };
+        console.log("Register API response (error):", errorResponse);
+        return errorResponse;
+
+    } else {
+        // Успешная регистрация
+        const loginResult = await AuthService.login(username, password);
+        if (loginResult.success) {
+            const token = await ctx.jwt.sign({ username: username, userId: loginResult.data.user_id });
+            ctx.set.status = 201; // Устанавливаем статус 201 Created
+            return { success: true, data: { token, user: loginResult.data } }; // Возвращаем данные
+        } else {
+			const serverErrorResponse = { 500: { success: false, message: { message: "Регистрация прошла успешно, но не удалось автоматически войти. Пожалуйста, попробуйте войти вручную.", text: "Регистрация прошла успешно, но не удалось автоматически войти. Пожалуйста, попробуйте войти вручную." } } };
+            console.log("Register API response (server error):", serverErrorResponse);
+            return serverErrorResponse;
+        }
+    }
+}, {
+    body: RegisterBodyDto,
+    response: { // Явное описание структуры ответов для 201 и 422
+        201: t.Object({
+            success: t.Boolean(),
+            data: t.Object({
+                token: t.String(),
+                user: t.Object({
+                    user_id: t.Number(),
+                    username: t.String(),
+                    email: t.String()
+                })
+            })
+        }),
+        422: t.Object({
+            success: t.Boolean(),
+            message: t.Object({
+                message: t.String(),
+                text: t.String()
+            })
+        })
+    }
+});
 
 // Endpoint для смены пароля
 authRoutes.post('/changePassword', async (ctx) => {
-  const {username} = await ctx.jwt.verify(ctx.headers["authorization"]);
+    const authorizationHeader = ctx.headers.authorization;
+    const verification = await ctx.jwt.verify(authorizationHeader);
+    if (!verification) {
+        return { 401: { success: false, message: 'Invalid token' } };
+    }
 
-  // Меняем пароль
-  let changeResult = await AuthService.changePassword(username, ctx.body.oldPassword, ctx.body.newPassword);
-  if (!changeResult) return {success: false};
+    const { username } = verification as { username: string; userId: number };
 
-  // Регистрация прошла успешно
-  return {success: true};
-}, {body: ChangePasswordBodyDto, response: DefaultResponseDto});
+    const changeResult = await AuthService.changePassword(username, ctx.body.oldPassword, ctx.body.newPassword);
 
-// Экспорт маршрутов
+    if (!changeResult.success) {
+        return { 400: { success: false, message: changeResult.message } };
+    } else {
+        return { 200: { success: true, message: "Пароль успешно изменен" } };
+    }
+}, {
+    body: ChangePasswordBodyDto,
+    response: t.Object({
+        success: t.Boolean(),
+        message: t.Optional(t.String())
+    }),
+    beforeHandle: async (ctx) => {
+        const authorizationHeader = ctx.headers.authorization;
+        if (!authorizationHeader || !await ctx.jwt.verify(authorizationHeader)) {
+            return { 401: { success: false, message: "Unauthorized" } };
+        }
+    }
+});
+
 export default authRoutes;

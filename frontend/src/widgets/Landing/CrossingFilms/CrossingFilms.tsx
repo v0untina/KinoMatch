@@ -52,17 +52,17 @@ export default function CrossingFilms() {
           className={`${styles.crossing} ${areCardsVisible ? styles.fadeIn : ''}`}
         >
           <div className={`${styles.crossing_card} ${areCardsVisible ? styles.cardAnimation : ''}`}>
-            <img className={styles.card_image} src="/chernobyl.png" alt="" />
+            <img className={styles.card_image} src="posters/chernobyl.png" alt="" />
             <span className={styles.crossing_film_title}>Чернобыль: Зона отчуждения</span>
           </div>
           <img
             ref={crossingImageRef}
             className={`${styles.crossing_image} ${isCrossingImageVisible ? styles.crossingImageAnimation : ''}`}
-            src="/crossing.png"
+            src="interface/crossing.png"
             alt=""
           />
           <div className={`${styles.crossing_card} ${areCardsVisible ? styles.cardAnimation : ''}`}>
-            <img className={styles.card_image} src="/ram.png" alt="" />
+            <img className={styles.card_image} src="posters/ram.png" alt="" />
             <span className={styles.crossing_film_title}>Рик и Морти / Rick and Morty</span>
           </div>
         </div>

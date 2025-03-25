@@ -1,5 +1,5 @@
 .main {
-    height: 100vhs;
+    height: 100vh;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -21,4 +21,15 @@
     color: var(--clr-default-500);
     margin-top: 30px;
     margin-bottom: 10px;
+}
+
+.text a {
+    color: #007BFF; 
+    text-decoration: underline; 
+    cursor: pointer; 
+}
+
+.text a:hover {
+    color: #0056b3; 
+    text-decoration: none; 
 }

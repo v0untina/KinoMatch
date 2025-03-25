@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import {AuthProvider} from '@/context/auth.context';
 import React from "react";
@@ -7,6 +7,7 @@ import {Toaster} from "react-hot-toast";
 import {ThemeProvider as NextThemesProvider} from "next-themes";
 
 export function Providers({children}: { children: React.ReactNode }) {
+  console.log("Rendering Providers"); // !!! ДОБАВЬ ЭТО !!!
   return (
     <>
       <AuthProvider>

@@ -7,7 +7,11 @@ export default function Documents() {
         <main className={styles.main}>
             <h1 className={styles.title}>Основные документы сайта:</h1>
             <p className={styles.text}>Положение о конфиденциальности</p>
-            <p className={styles.text}>Пользовательское соглашение</p>
+            <p className={styles.text}>
+                <a href="/TermsOfUse.pdf" target="_blank" rel="noopener noreferrer">
+                    Пользовательское соглашение
+                </a>
+            </p>
             <p className={styles.text}>Лицензионное соглашение</p>
         </main>
     );

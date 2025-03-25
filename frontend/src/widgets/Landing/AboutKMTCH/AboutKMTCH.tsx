@@ -14,7 +14,7 @@ export default function About() {
           <li>Делитесь впечатлениями с другими киноманами</li>
           <li>Открывайте новые подборки на любой вкус!</li>
         </ul>
-        <img className={styles.robot} src="/robot.png" alt="" />
+        <img className={styles.robot} src="interface/robot.png" alt="" />
         <Link href={'/login'}>
         <button className={styles.loginbutton}>присоединяйтесь</button>
         </Link>

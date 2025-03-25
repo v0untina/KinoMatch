@@ -1,20 +1,21 @@
-import type {Metadata} from "next";
+// frontend/src/app/layout.tsx
+import type { Metadata } from "next";
 import React from 'react';
 import "@/styles/globals.css";
 import 'animate.css';
-import {Providers} from "@/providers";
+import { Providers } from "@/providers";
 import PagePreloader from "@/components/PagePreloader/PagePreloader";
 
 export const metadata: Metadata = {
-  title: "КиноMatch",
-  description: "VO",
-  openGraph: {
-    title: 'КиноMatch',
-    description: "VO"
-  }
+    title: "КиноMatch",
+    description: "VO",
+    openGraph: {
+        title: 'КиноMatch',
+        description: "VO"
+    }
 };
 
-export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
+export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
 
   return (
     <html lang="ru">
