@@ -1,4 +1,3 @@
-// backend/src/route/auth.route.ts
 import { Elysia, t } from 'elysia';
 import { ChangePasswordBodyDto, LoginBodyDto, LoginResponseDto, RegisterBodyDto } from "../dto/Auth.dto";
 import { AuthService } from "../service/auth.service.ts";
@@ -12,74 +11,132 @@ authRoutes.post('/login', async (ctx) => {
     const result = await AuthService.login(username, password);
 
     if (!result.success) {
-        // Возвращаем ошибку 401, если аутентификация не удалась.
-        // Используем объект с числовым кодом состояния, как требует Elysia.
-        return { 401: { success: false, message: result.message } };
-    } else { // Явно используем 'else' для четкого разделения путей возврата.
-        // Подписываем JWT-токен, ВКЛЮЧАЯ userId.
-        const token = await ctx.jwt.sign({ username: username, userId: result.data.id });
+        // Ошибка авторизации
+        return { 401: { success: false, message: result.message } }; // Оставляем как было
+    } else {
+        // Успешная авторизация
+        const token = await ctx.jwt.sign({ username: username, userId: result.data.user_id }); // !!! ВОЗВРАЩАЕМ JWT !!!
 
-        // Возвращаем токен в случае успеха.
-        // Используем объект с числовым кодом состояния (200 OK).
-        return { 200: { success: true, data: { token } } };
+        // !!! ИЗМЕНЕНИЕ: Возвращаем объект с success и data на верхнем уровне !!!
+        ctx.set.status = 200; // Устанавливаем статус явно
+        return {
+            success: true,
+            data: {
+                token: token, // !!! ВОЗВРАЩАЕМ TOKEN !!!
+                user: result.data
+            }
+        };
     }
 }, {
-    body: LoginBodyDto,  // DTO для тела запроса
-    response: t.Object({ // ЯВНО указываем схему ответа.  Это КЛЮЧЕВОЙ момент для Elysia.
-        success: t.Boolean(),
-        data: t.Optional(t.Object({
-            token: t.String()
-        }))
-    })
+    body: LoginBodyDto,
+    response: {
+        200: t.Object({
+            success: t.Boolean(), //  t.Boolean()
+            data: t.Object({
+                token: t.String(),
+                user: t.Object({
+                    user_id: t.Number(),
+                    username: t.String(),
+                    email: t.String()
+                })
+            })
+        }),
+        401: t.Object({
+            success: t.Boolean(), //  t.Boolean()
+            message: t.String()
+        })
+    }
 });
 
 // Endpoint для создания аккаунта (регистрация)
 authRoutes.post('/register', async (ctx) => {
     const { username, email, password } = ctx.body;
+
+    console.log("Register endpoint called with:", { username, email, password });
+
     const regResult = await AuthService.register(username, email, password);
 
+    console.log("Register result from AuthService:", regResult);
+
     if (!regResult.success) {
-        // Возвращаем ошибку 400, если регистрация не удалась.
-        return { 400: { success: false, message: regResult.message } };
-    } else { // Явно используем 'else'.
-        return { 200: { success: true } };
+        // Ошибка регистрации (например, пользователь уже существует)
+        const errorResponse = {
+            422: { // Используем 422 Unprocessable Entity
+                success: false,
+                message: {
+                    message: regResult.message || "Ошибка регистрации",
+                    text: regResult.message || "Ошибка регистрации"
+                }
+            }
+        };
+        console.log("Register API response (error):", errorResponse);
+        return errorResponse;
+
+    } else {
+        // Успешная регистрация
+        const loginResult = await AuthService.login(username, password);
+        if (loginResult.success) {
+            const token = await ctx.jwt.sign({ username: username, userId: loginResult.data.user_id });
+            ctx.set.status = 201; // Устанавливаем статус 201 Created
+            return { success: true, data: { token, user: loginResult.data } }; // Возвращаем данные
+        } else {
+			const serverErrorResponse = { 500: { success: false, message: { message: "Регистрация прошла успешно, но не удалось автоматически войти. Пожалуйста, попробуйте войти вручную.", text: "Регистрация прошла успешно, но не удалось автоматически войти. Пожалуйста, попробуйте войти вручную." } } };
+            console.log("Register API response (server error):", serverErrorResponse);
+            return serverErrorResponse;
+        }
     }
 }, {
-    body: RegisterBodyDto, // DTO для тела запроса
-    response: DefaultResponseDto // DTO для ответа (убедитесь, что DefaultResponseDto тоже использует числовые коды!)
+    body: RegisterBodyDto,
+    response: { // Явное описание структуры ответов для 201 и 422
+        201: t.Object({
+            success: t.Boolean(),
+            data: t.Object({
+                token: t.String(),
+                user: t.Object({
+                    user_id: t.Number(),
+                    username: t.String(),
+                    email: t.String()
+                })
+            })
+        }),
+        422: t.Object({
+            success: t.Boolean(),
+            message: t.Object({
+                message: t.String(),
+                text: t.String()
+            })
+        })
+    }
 });
 
 // Endpoint для смены пароля
 authRoutes.post('/changePassword', async (ctx) => {
-    // Проверяем JWT токен.
-    const verification = await ctx.jwt.verify(ctx.headers.authorization);
+    const authorizationHeader = ctx.headers.authorization;
+    const verification = await ctx.jwt.verify(authorizationHeader);
     if (!verification) {
-        // Возвращаем ошибку 401, если токен недействителен.
         return { 401: { success: false, message: 'Invalid token' } };
     }
 
-    // Извлекаем username и userId из токена.
-    // Используем type assertion, чтобы указать TypeScript, что verification - объект.
-    const { username, userId } = verification as { username: string; userId: number };
+    const { username } = verification as { username: string; userId: number };
 
-    // Меняем пароль
     const changeResult = await AuthService.changePassword(username, ctx.body.oldPassword, ctx.body.newPassword);
 
     if (!changeResult.success) {
-        // Возвращаем ошибку 400, если смена пароля не удалась.
         return { 400: { success: false, message: changeResult.message } };
-    } else { // Явно используем 'else'.
-        return { 200: { success: true } };
+    } else {
+        return { 200: { success: true, message: "Пароль успешно изменен" } };
     }
 }, {
-    body: ChangePasswordBodyDto, // DTO для тела запроса
-    response: DefaultResponseDto, // DTO для ответа
-    beforeHandle: async (ctx) => { // beforeHandle в Elysia НЕ ДОЛЖЕН возвращать значение (кроме ошибки).
-        if (!await ctx.jwt.verify(ctx.headers.authorization)) {
-            // Возвращаем 401 ошибку, если JWT не прошел проверку
+    body: ChangePasswordBodyDto,
+    response: t.Object({
+        success: t.Boolean(),
+        message: t.Optional(t.String())
+    }),
+    beforeHandle: async (ctx) => {
+        const authorizationHeader = ctx.headers.authorization;
+        if (!authorizationHeader || !await ctx.jwt.verify(authorizationHeader)) {
             return { 401: { success: false, message: "Unauthorized" } };
         }
-        // Если JWT валиден, beforeHandle не должен ничего возвращать (или возвращать undefined).
     }
 });
 

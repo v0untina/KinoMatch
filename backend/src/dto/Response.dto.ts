@@ -1,3 +1,4 @@
+//Response.dto.ts
 import {t} from "elysia";
 
 // Body обычного ответа сервера
