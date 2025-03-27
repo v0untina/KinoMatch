@@ -18,17 +18,17 @@
       "static/css/app/polling/page.css",
       "static/chunks/app/polling/page.js"
     ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/login/page.css",
-      "static/chunks/app/login/page.js"
-    ],
     "/compilations/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/compilations/page.css",
       "static/chunks/app/compilations/page.js"
+    ],
+    "/contacts/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/contacts/page.css",
+      "static/chunks/app/contacts/page.js"
     ]
   }
 }

@@ -1,6 +1,6 @@
-// frontend/src/components/Header/Header.tsx
 "use client";
 import React, { useState, useContext } from 'react';
+import ReactDOM from 'react-dom';
 import styles from "./Header.module.css";
 import Logo from "@/components/Logo/Logo";
 import { Link } from "@nextui-org/react";
@@ -8,19 +8,35 @@ import { ThemeSwitcher } from "@/components/ThemeSwitch/ThemeSwitch";
 import { Menu, X } from "lucide-react";
 import AuthContext from '@/context/auth.context';
 
+// Компонент модального окна
+const Modal = ({ isOpen, onClose, children }: { isOpen: boolean, onClose: () => void, children: React.ReactNode }) => {
+  if (!isOpen) return null;
+
+  return ReactDOM.createPortal(
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <button className={styles.modalClose} onClick={onClose} aria-label="Закрыть модальное окно">
+          &times;
+        </button>
+        {children}
+      </div>
+    </div>,
+    document.body
+  );
+};
+
 const Header = ({ className }: { className?: string }) => {
-    console.log("Rendering Header"); // !!! ДОБАВЬ ЭТО !!!
+    console.log("Rendering Header");
     const [menuOpen, setMenuOpen] = useState(false);
-    const { user } = useContext(AuthContext);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const { user, logout } = useContext(AuthContext);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
     };
 
     const handleLogout = () => {
-        if (authContext) { //  ДОБАВИЛИ ПРОВЕРКУ
-            authContext.logout();
-        }
+        logout?.();
     };
 
     return (
@@ -40,8 +56,14 @@ const Header = ({ className }: { className?: string }) => {
                         <Link href={'/polling'}>
                             <h2 className={styles.subtitles}>подобрать фильм</h2>
                         </Link>
+                        <Link href={'/'} onClick={(e) => {
+                          e.preventDefault();
+                          setIsModalOpen(true);
+                        }}>
+                            <h2 className={styles.subtitles}>таблица рейтинга</h2>
+                        </Link>
                         <Link href={'/'}>
-                            <h2 className={styles.subtitles}>скрестить фильмы</h2>
+                            <h2 className={styles.subtitles}>скрестить фильм</h2>
                         </Link>
                         <Link href={'/compilations'}>
                             <h2 className={styles.subtitles}>подборки</h2>
@@ -89,10 +111,20 @@ const Header = ({ className }: { className?: string }) => {
                         <Link href={'/polling'}>
                             <h2 className={styles.subtitles}>подобрать фильм</h2>
                         </Link>
-                        <Link href={'/'}>
-                            <h2 className={styles.subtitles}>скрестить фильмы</h2>
+                        <Link href={'/'} onClick={(e) => {
+                          e.preventDefault();
+                          setIsModalOpen(true);
+                          setMenuOpen(false);
+                        }}>
+                            <h2 className={styles.subtitles}>таблица рейтинга</h2>
+                        </Link>
+                        <Link href={'/polling'}>
+                            <h2 className={styles.subtitles}>подобрать фильм</h2>
                         </Link>
                         <Link href={'/'}>
+                            <h2 className={styles.subtitles}>скрестить фильм</h2>
+                        </Link>
+                        <Link href={'/compilations'}>
                             <h2 className={styles.subtitles}>подборки</h2>
                         </Link>
                     </div>
@@ -120,6 +152,38 @@ const Header = ({ className }: { className?: string }) => {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+              <div className={styles.modal_main}>
+                <h1 className={styles.modal_title}>таблица рейтинга</h1>
+                <div className={styles.rating}>
+                  <div className={styles.modal_card_people}>
+                    <span className={styles.avatar}></span>
+                    <p className={styles.nickname}>1. Пользователь 1</p> 
+                    <p className={styles.count_point}>137</p>
+                  </div>
+                  <div className={styles.modal_card_people}>
+                    <span className={styles.avatar}></span>
+                    <p className={styles.nickname}>2. Пользователь 2</p> 
+                    <p className={styles.count_point}>120</p>
+                  </div>
+                  <div className={styles.modal_card_people}>
+                    <span className={styles.avatar}></span>
+                    <p className={styles.nickname}>3. Пользователь 3</p> 
+                    <p className={styles.count_point}>98</p>
+                  </div>
+                  <div className={styles.modal_card_people}>
+                    <span className={styles.avatar}></span>
+                    <p className={styles.nickname}>4. Пользователь 4</p> 
+                    <p className={styles.count_point}>75</p>
+                  </div>
+                  <div className={styles.modal_card_people}>
+                    <span className={styles.avatar}></span>
+                    <p className={styles.nickname}>5. Пользователь 5</p> 
+                    <p className={styles.count_point}>62</p>
+                  </div>
+                </div>
+              </div>
+            </Modal>
         </div>
     );
 };

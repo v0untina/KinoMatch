@@ -13,7 +13,6 @@ export default function Footer(){
       <div className={styles.help}>
         <h1 className={styles.title}>Помощь</h1>
         <p className={styles.paragraph}>Информация</p>
-        <p className={styles.paragraph}>Вопросы и ответы</p>
         <p className={styles.paragraph}>Общие вопросы</p>
       </div>
       <div className={styles.about_kinomatch}>
