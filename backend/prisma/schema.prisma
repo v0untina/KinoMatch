@@ -80,6 +80,7 @@ model movies {
   country_id           Int?
   poster_filename      String?                @db.VarChar(255)
   trailer_filename     String?                @db.VarChar(255)
+  collection_movies    collection_movies[]
   movie_actors         movie_actors[]
   movie_directors      movie_directors[]
   movie_genres         movie_genres[]
@@ -98,10 +99,29 @@ model user_movie_favorites {
 }
 
 model users {
-  user_id              Int                    @id @default(autoincrement())
-  username             String                 @unique @db.VarChar(50)
-  email                String                 @unique @db.VarChar(255)
-  password_hash        String                 @db.VarChar(255)
-  registration_date    DateTime?              @default(now()) @db.Timestamp(6)
-  user_movie_favorites user_movie_favorites[]
+  user_id                Int                      @id @default(autoincrement())
+  username               String                   @unique @db.VarChar(50)
+  email                  String                   @unique @db.VarChar(255)
+  password_hash          String                   @db.VarChar(255)
+  registration_date      DateTime?                @default(now()) @db.Timestamp(6)
+  rating                 Int?                     @default(0)
+  user_movie_collections user_movie_collections[]
+  user_movie_favorites   user_movie_favorites[]
+}
+
+model collection_movies {
+  collection_movie_id    Int                     @id @default(autoincrement())
+  collection_id          Int?
+  movie_id               Int?
+  user_movie_collections user_movie_collections? @relation(fields: [collection_id], references: [collection_id], onDelete: NoAction, onUpdate: NoAction)
+  movies                 movies?                 @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_movie_collections {
+  collection_id     Int                 @id @default(autoincrement())
+  user_id           Int?
+  title             String              @db.VarChar(255)
+  likes             Int?                @default(0)
+  collection_movies collection_movies[]
+  users             users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 }
