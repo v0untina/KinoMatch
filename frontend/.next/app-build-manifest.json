@@ -12,23 +12,17 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
-    "/polling/page": [
+    "/documents/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/polling/page.css",
-      "static/chunks/app/polling/page.js"
+      "static/css/app/documents/page.css",
+      "static/chunks/app/documents/page.js"
     ],
-    "/compilations/page": [
+    "/information/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/compilations/page.css",
-      "static/chunks/app/compilations/page.js"
-    ],
-    "/contacts/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/contacts/page.css",
-      "static/chunks/app/contacts/page.js"
+      "static/css/app/information/page.css",
+      "static/chunks/app/information/page.js"
     ]
   }
 }
