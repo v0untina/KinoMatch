@@ -23,3 +23,6 @@
 - ```bun run dev``` - запуск фронт + бэк
 - ```bun run dev:frontend``` - запуск онли фронт
 - ```bun run dev:backend``` - запуск онли бэк
+
+
+PRIVEEET

@@ -40,7 +40,6 @@ export default function BestFilms() {
       },
       { threshold: 0.5 }
     );
-
     if (newFilmsRef.current) {
       observerNewFilms.observe(newFilmsRef.current);
     }
@@ -84,7 +83,7 @@ export default function BestFilms() {
     <main className={styles.main}>
       <div className={styles.container_new_films} ref={newFilmsRef}>
         <h2 className={`${styles.subtitle} ${isNewFilmsVisible ? styles.fadeIn : ''}`}>
-          популярные новинки
+          популярные3 новинки
         </h2>
         {isLoadingNew && <p>Загрузка новинок...</p>}
         {errorNew && <p className={styles.error}>{errorNew}</p>}
