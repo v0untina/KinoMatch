@@ -199,18 +199,29 @@ export default function AboutMovie() {
           )}
         </div>
         
-          {//ЗАМЕНИИИИТЬ
-            <div className={styles.about_film}>
+        {movie.movie_genres && movie.movie_genres.length > 0 && movie.countries && ( // Проверка на наличие жанров и страны
+          <div className={styles.about_film}>
+              {movie.movie_genres.length > 0 && ( // Проверяем, есть ли жанры для отображения
                 <div className={styles.film_container}>
-                <img className={styles.image_anim} src="/Animation.png" alt="" /> 
-                <p className={styles.zhanr}>мультфильм, комедия</p>
+                  <img className={styles.image_anim} src="/Animation.png" alt="Жанры" /> {/* Используйте корректный путь к иконке жанра */}
+                  <p className={styles.zhanr}>
+                    {movie.movie_genres.map((mg, index) => ( // Мапим через массив жанров
+                      <React.Fragment key={mg.genres.genre_id}>
+                        {mg.genres.name}
+                        {index < movie.movie_genres.length - 1 ? ', ' : ''} {/* Разделитель между жанрами */}
+                      </React.Fragment>
+                    ))}
+                  </p>
                 </div>
+              )}
+              {movie.countries && ( // Проверяем, есть ли страна для отображения
                 <div className={styles.film_container}>
-                <img className={styles.image_country} src="/Earth Globe.png" alt="" />
-                <p className={styles.country}>Франция, США, Япония</p>
+                  <img className={styles.image_country} src="/Earth Globe.png" alt="Страна" /> {/* Используйте корректный путь к иконке страны */}
+                  <p className={styles.country}>{movie.countries.name}</p> {/* Отображаем название страны */}
                 </div>
-            </div>
-          }
+              )}
+          </div>
+        )}
 
         {movie.description && (
           <div className={styles.description}>
@@ -238,7 +249,7 @@ export default function AboutMovie() {
               {movie.movie_actors.map((ma) => (
                 <div key={ma.actors.actor_id} className={styles.person}>
                   <img
-                    src={ma.actors.photo_filename ? `/photos/actors/${ma.actors.photo_filename}` : "/interface/defaultAvatar.webp"}
+                    src={ma.actors.photo_filename ? `/actors/${ma.actors.photo_filename}` : "/interface/defaultAvatar.webp"}
                     alt={ma.actors.name}
                     className={styles.person_photo}
                   />

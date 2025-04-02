@@ -21,15 +21,17 @@ const MoviesRoute = new Elysia()
             return new Response("Internal Server Error", { status: 500 });
         }
     })
-    // 2. Получение информации о фильме по ID
-    .get('/movies/:id', async ({ params: { id } }) => {
+        // 2. Получение информации о фильме по ID (ИСПРАВЛЕННЫЙ МАРШРУТ - ТОЛЬКО SELECT)
+    .get('/movies/:id', async ({ params: { id } }) => { // Убрали query параметр, он больше не нужен
         try {
             const movieId = parseInt(id);
+
             const movie = await prisma.movies.findUnique({
                 where: {
-                    movie_id: movieId // !!! ИСПРАВЛЕНО: Добавлен movie_id в where clause !!!
+                    movie_id: movieId
                 },
-                select: {
+                // УБРАЛИ INCLUDE ПОЛНОСТЬЮ
+                select: { // Используем только select, и вложенные select для связей
                     movie_id: true,
                     title: true,
                     original_title: true,
@@ -39,6 +41,45 @@ const MoviesRoute = new Elysia()
                     imdb_rating: true,
                     poster_filename: true,
                     trailer_filename: true,
+                    movie_actors: { // Включаем movie_actors через вложенный select
+                        select: {
+                            character_name: true,
+                            actors: { // Включаем вложенных actors через вложенный select
+                                select: {
+                                    actor_id: true,
+                                    name: true,
+                                    photo_filename: true
+                                }
+                            }
+                        }
+                    },
+                    movie_directors: { // Включаем movie_directors через вложенный select
+                        select: {
+                            directors: { // Включаем вложенных directors через вложенный select
+                                select: {
+                                    director_id: true,
+                                    name: true,
+                                    photo_filename: true
+                                }
+                            }
+                        }
+                    },
+                    movie_genres: { // Включаем movie_genres через вложенный select
+                        select: {
+                            genres: { // Включаем вложенные genres через вложенный select
+                                select: {
+                                    genre_id: true,
+                                    name: true
+                                }
+                            }
+                        }
+                    },
+                    countries: { // Включаем countries через вложенный select
+                        select: {
+                            country_id: true,
+                            name: true
+                        }
+                    }
                 },
             });
 
