@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./BestFilms.module.css";
 import axios from "axios";
+import Link from "next/link";
 
 interface Movie {
   movie_id: number;
@@ -83,20 +84,20 @@ export default function BestFilms() {
     <main className={styles.main}>
       <div className={styles.container_new_films} ref={newFilmsRef}>
         <h2 className={`${styles.subtitle} ${isNewFilmsVisible ? styles.fadeIn : ''}`}>
-          популярные3 новинки
+          популярные новинки
         </h2>
         {isLoadingNew && <p>Загрузка новинок...</p>}
         {errorNew && <p className={styles.error}>{errorNew}</p>}
         <div className={`${styles.new_films} ${isNewFilmsVisible ? styles.slideUp : ''}`}>
           {!isLoadingNew && !errorNew && newMovies.map((movie) => (
-            <div className={styles.card_film} key={movie.movie_id}>
+            <Link href={`/films/${movie.movie_id}`} key={movie.movie_id} className={styles.card_film}>
               <img
                 className={styles.image}
                 src={movie.poster_filename ? `/posters/${movie.poster_filename}` : "/interface/defaultAvatar.webp"}
                 alt={movie.title}
               />
               <span className={styles.film_title}>{movie.title}</span>
-            </div>
+            </Link>
           ))}
           <button className={styles.button_next}>></button>
         </div>
@@ -110,14 +111,14 @@ export default function BestFilms() {
         {errorBest && <p className={styles.error}>{errorBest}</p>}
         <div className={`${styles.new_films} ${isBestFilmsVisible ? styles.slideUp : ''}`}>
           {!isLoadingBest && !errorBest && bestMovies.map((movie) => (
-            <div className={styles.card_film} key={movie.movie_id}>
+            <Link href={`/films/${movie.movie_id}`} key={movie.movie_id} className={styles.card_film}>
               <img
                 className={styles.image_f}
                 src={movie.poster_filename ? `/posters/${movie.poster_filename}` : "/interface/defaultAvatar.webp"}
                 alt={movie.title}
               />
               <span className={styles.film_title}>{movie.title}</span>
-            </div>
+            </Link>
           ))}
           <button className={styles.button_next}>></button>
         </div>

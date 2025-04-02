@@ -1,0 +1,300 @@
+.container {
+  min-height: 120vh;
+  width: 100%;
+  max-width: 1920px;
+  margin: 30px auto 0;
+  display: flex;
+  justify-content: center; 
+  gap: 143px;
+  padding: 0 20px; 
+  box-sizing: border-box;
+}
+
+.info_container {
+  width: 60%;
+  max-width: 1000px; 
+}
+
+.title {
+  font-size: 60px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.meta {
+  display: flex;
+  gap: 30px;
+}
+
+.imdb_rating {
+  font-size: 20px;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+
+.imdb_title {
+  background-color: rgba(0, 185, 174, 0.5);
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+
+.about_film {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.image_country {
+  width: 22px;
+  height: 27px;
+}
+
+.image_anim {
+  width: 22px;
+  height: 22px;
+  margin-top: 4px;
+}
+
+.film_container {
+  display: flex;
+  gap: 5px;
+}
+
+.description {
+  width: 100%;
+  max-width: 1000px;
+  margin-top: 20px;
+}
+
+.description_title {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.buttons_container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.poster_container {
+  width: 338px;
+  padding: 10px;
+  height: 100%;
+}
+
+.poster {
+  width: 100%;
+  height: 506px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  object-fit: cover;
+  transition: transform 0.3s ease; 
+}
+
+.poster:hover{
+  transform: scale(1.02);
+}
+
+.trailer_button, .favorites_button {
+  width: 100%;
+  height: 50px;
+  background-color: #00B9AE;
+  border-radius: 40px;
+  color: white;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  opacity: 0;
+  animation: fadeInButton 1s forwards;
+  animation-delay: 0.6s;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.favorites_button{
+  animation-delay: 1s;
+}
+
+@keyframes fadeInButton {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.trailer_button:hover, .favorites_button:hover {
+  background-color: #25cfc4;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.container_title {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.image_tv {
+  margin-bottom: 2px;
+}
+
+.images_kino {
+  display: flex;
+  gap: 30px;
+}
+
+.rating_container {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.kino_image{
+  width: 110px;
+  height: 109px;
+  transition: transform 0.3s ease; 
+}
+
+.kino_image:hover{
+  transform: scale(1.05);
+}
+
+.review_container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review_title {
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.reviews {
+  width: 100%;
+  max-width: 900px;
+  height: 500px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.review {
+  display: flex;
+  gap: 20px;
+  box-shadow: 0 0px 15px var(--clr-default-550);
+  padding: 15px;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0px 20px var(--clr-default-550);
+  cursor: pointer;
+}
+
+.image_user {
+  width: 39px;
+  height: 39px;
+  margin-top: 6px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.star {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 0 2px rgba(0, 185, 174, 0.5));
+}
+
+.star_partial_container {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.star_partial_container svg:first-child {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.rating_value {
+  margin-left: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  min-width: 30px;
+  display: inline-block;
+}
+
+.rating_container:hover .star {
+  transform: scale(1.1);
+}
+.rating_container:hover .star[style*="rgba(0, 185, 174"] {
+  filter: drop-shadow(0 0 4px rgba(1, 228, 213, 0.808));
+}
+
+@media (min-width: 1920px) {
+  .container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 1200px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+    padding: 0 20px;
+  }
+  
+  .info_container, .poster_container {
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  .description {
+    width: 100%;
+  }
+  
+  .reviews {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 40px;
+  }
+  
+  .meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .poster {
+    height: 400px;
+  }
+  
+  .star {
+    width: 32px;
+    height: 32px;
+  }
+}
