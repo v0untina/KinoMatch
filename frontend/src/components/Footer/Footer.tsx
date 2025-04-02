@@ -15,7 +15,9 @@ export default function Footer(){
         <Link href={'/information'}>
         <p className={styles.paragraph}>Информация</p>
         </Link>
+        <Link href={'/questions'}>
         <p className={styles.paragraph}>Общие вопросы</p>
+        </Link>
       </div>
       <div className={styles.about_kinomatch}>
         <h1 className={styles.title}>КиноMatch</h1>
@@ -24,9 +26,6 @@ export default function Footer(){
         </Link>
         <Link href={'/documents'}>
            <p className={styles.paragraph}>Документы</p>
-        </Link>
-        <Link href={'/termsofuse'}>
-           <p className={styles.paragraph}>Пользовательское соглашение</p>
         </Link>
         <Link href={'/recommendationpolicy'}>
            <p className={styles.paragraph}>Правила применения рекомендательных технологий</p>
