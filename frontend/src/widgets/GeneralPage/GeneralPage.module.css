@@ -1,55 +1,301 @@
 .container {
-    display: flex;
-    flex-direction: column;
-    max-width: 1536px;
-    margin: 0 auto;
-    height: 100vh;
-    padding: 20px;
-    gap: 20px;
-    align-items: center;
-  }
+  display: flex;
+  flex-direction: column;
+  max-width: 1536px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 20px;
+  gap: 20px;
+}
 
-  .posters_slide{
-    display: flex;
-  }
+.posters_slide {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  width: 100%;
+}
 
-  .poster_title{
-    position: absolute;
-    top: 40px;
-    left: 40px;
-    z-index: 1;
-    font-size: 96px;
-    font-weight: bold;
-  }
+.poster_title {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 1;
+  font-size: 96px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
 
-  .movieCard{
-    position: relative;
-  }
+.add_post_button,.modal_submit{
+  width: 200px;
+  height: 45px;
+  background-color: #00B9AE;
+  padding: 5px;
+  border-radius: 19px;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+}
 
-  .moviePoster {
-    width: 1536px;
-    height: 340px;
-    border-radius: 20px;
-  }
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #495064;
+  padding: 30px;
+  border-radius: 10px;
+  width: 500px;
+  max-width: 90%;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.modal_form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal_input, .modal_textarea {
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.modal_input{
+  background-color: #3A404F;
+  height: 200px;
+}
+
+.modal_textarea {
+  min-height: 200px;
+  resize: vertical;
+  background-color: #495064;
+  border: 3px dashed #3A404F;
+}
+
+.modal_buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal_close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 5px 10px;
+}
+
+.upload_image{
+  width: 50px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.add_post_button:hover, .modal_submit:hover{
+  background-color: #25cfc4;
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+.movie_card {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.movie_poster {
+  width: 1536px;
+  height: 340px;
+  border-radius: 20px;
+  object-fit: cover;
+}
+
+.image_upload_area {
+  min-height: 200px;
+  background-color: #495064;
+  border: 3px dashed #3A404F;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.image_upload_area.dragging {
+  border-color: #00B9AE;
+  background-color: rgba(0, 185, 174, 0.1);
+}
+
+.upload_placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #7a8195;
+  text-align: center;
+  padding: 20px;
+  pointer-events: none;
+}
+
+.upload_placeholder span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.image_preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.file_input {
+  display: none;
+}
+
+.main_content {
+  display: flex;
+  width: 100%;
+  gap: 20px;
+}
+
+.sidebar {
+  flex: 0 0 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  height: fit-content;
+}
+
+.sidebar_menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar_titles {
+  font-size: 23px;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: 5px;
+  transition: all 0.2s;
   
-  .sidebar {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 20%;
-  }
-  
-  .main_content{
-    display: flex;
-    width: 100%;
-  }
+}
 
-  .test{
-    width: 1480px;
-    background-color: red;
-    height: 400px;
-    flex: 2;
-  }
+.sidebar_titles:hover {
+  transform: scale(1.05);
+}
 
-  
+.sidebar_titles:active,
+.sidebar_titles.active {
+  background-color: rgba(1, 228, 213, 0.808);
+  border-radius: 12px;
+  color: white;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+}
+
+.content {
+  flex: 1;
+  min-height: 400px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.posts{
+  max-height: 800px;
+  margin-top: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.post{
+  min-height: 500px;
+  display: flex;
+  gap: 35px;
+}
+
+.about_post{
+  width: 65%;
+  height: 500px;
+  border: 1px solid red;
+}
+
+.comments{
+  width: 35%;
+  align-items: end;
+  height: 500px;
+  overflow-y: auto;
+}
+
+.reviews {
+  width: 100%;
+  max-width: 900px;
+  height: 500px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.review {
+  display: flex;
+  gap: 20px;
+  box-shadow: 0 0px 15px var(--clr-default-550);
+  padding: 15px;
+  border-radius: 8px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.review:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0px 20px var(--clr-default-550);
+  cursor: pointer;
+}
+
+.image_user {
+  width: 39px;
+  height: 39px;
+  margin-top: 6px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comments_title{
+  font-size: 22px;
+  text-transform: uppercase;
+  font-weight: bold;
+  margin-top: 10px;
+  height: 40px;
+}

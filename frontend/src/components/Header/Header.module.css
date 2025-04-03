@@ -193,28 +193,29 @@
     }
     .subtitles,
     .login {
-        font-size: 17px;
-    }
+        font-size: 19px;
+    } 
 }
 
 @media (max-width: 1530px) and (min-width: 1236px) {
-  .header_titles {
-      gap: 4px;
-      justify-content: space-around;
-      padding-left: 35px;
-  }
-  .login_buttons {
-      gap: 0px;
-      margin-right: 0px;
-      align-items: flex-end;
-  }
   .subtitles,
   .login {
-      font-size: 15px;
+      font-size: 19px;
   }
+
+  .ticket{
+    width: 51px;
+    height: 40px;
+    margin-left: 4px;
+  }
+
   .headerInner {
       padding-left: 5px;
       padding-right: 5px;
+  }
+  
+  .subtitles{
+    font-size: 17px;
   }
 }
 
@@ -231,7 +232,7 @@
   }
   .subtitles,
   .login {
-      font-size: 12px;
+      font-size: 15px;
   }
   .headerInner {
       padding-left: 5px;

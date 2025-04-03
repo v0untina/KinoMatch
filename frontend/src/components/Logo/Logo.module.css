@@ -1,4 +1,3 @@
-/* Лого */
 .logo {
     font-weight: 800;
     width: max-content;
@@ -9,18 +8,10 @@
 :global(.dark) .mainText {
     color: white;
 }
-
-.logo.small * {
-    font-size: 25pt;
-}
-
-.logo.big * {
-    font-size: 35pt;
-}
-
 .mainText {
     color: black;
     text-transform: uppercase;
+    font-size: 34px;
 }
 
 .wrapper {
@@ -28,4 +19,10 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
+}
+
+@media(width < 1488px){
+    .mainText{
+        font-size: 20px;
+    }
 }

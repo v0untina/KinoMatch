@@ -3,3 +3,4 @@ node_modules/
 .bun/
 bun.lockb
 package-lock.json
+frontend/.next/app-build-manifest.json

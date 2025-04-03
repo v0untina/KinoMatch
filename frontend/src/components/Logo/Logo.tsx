@@ -6,13 +6,10 @@ interface LogoProps {
   colored?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({size = 'medium', colored = false}) => {
-  const sizeClass = styles[size] || styles.medium;
-  const coloredClass = colored ? styles.logoColored : "";
-
+const Logo: React.FC<LogoProps> = () => {
   return (
     <div className={styles.wrapper}>
-      <span className={`${styles.logo} ${sizeClass} ${coloredClass}`}>
+      <span className={styles.logo} >
         <span className={styles.mainText}>киноmatch</span>
       </span>
     </div>
