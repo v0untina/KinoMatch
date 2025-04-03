@@ -17,6 +17,60 @@
       "static/chunks/main-app.js",
       "static/css/app/general/page.css",
       "static/chunks/app/general/page.js"
+    ],
+    "/contacts/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/contacts/page.css",
+      "static/chunks/app/contacts/page.js"
+    ],
+    "/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/login/page.css",
+      "static/chunks/app/login/page.js"
+    ],
+    "/polling/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/polling/page.css",
+      "static/chunks/app/polling/page.js"
+    ],
+    "/compilations/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/compilations/page.css",
+      "static/chunks/app/compilations/page.js"
+    ],
+    "/films/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/films/[id]/page.css",
+      "static/chunks/app/films/[id]/page.js"
+    ],
+    "/information/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/information/page.css",
+      "static/chunks/app/information/page.js"
+    ],
+    "/questions/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/questions/page.css",
+      "static/chunks/app/questions/page.js"
+    ],
+    "/documents/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/documents/page.css",
+      "static/chunks/app/documents/page.js"
+    ],
+    "/recommendationpolicy/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/recommendationpolicy/page.css",
+      "static/chunks/app/recommendationpolicy/page.js"
     ]
   }
 }

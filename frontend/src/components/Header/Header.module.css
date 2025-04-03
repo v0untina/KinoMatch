@@ -8,6 +8,7 @@
   background: var(--clr-default-100);
   position: relative;
   z-index: 10;
+  
 }
 
 .logo_header{
@@ -19,6 +20,7 @@
   align-items: center;  
   width: 100%;
   justify-content: space-between;
+  
 }
 
 .ticket {
@@ -30,8 +32,8 @@
 .header_titles {
   display: flex;
   justify-content: space-between;
-  min-width: 1000px;
   gap: 20px;
+  
 }
 
 .header_buttons {
@@ -51,6 +53,7 @@
   display: flex;
   gap: 5px;
   align-items: center;
+  
 }
 
 .subtitles,
@@ -58,6 +61,7 @@
   font-size: 21px;
   font-weight: 700;
   color: var(--clr-default-500);
+  flex-shrink: 1;
 }
 
 .theme {
@@ -170,26 +174,149 @@
   }
 }
 
-@media (width > 769px) {
+@media (max-width: 1920px) and (min-width: 1701px) {
+    .header_titles {
+        gap: 15px;
+    }
+    .subtitles,
+    .login {
+        font-size: 19px;
+    }
+}
+
+@media (max-width: 1700px) and (min-width: 1531px) {
+    .header_titles {
+        gap: 10px;
+    }
+    .login_buttons {
+        gap: 1px;
+    }
+    .subtitles,
+    .login {
+        font-size: 17px;
+    }
+}
+
+@media (max-width: 1530px) and (min-width: 1236px) {
   .header_titles {
-    display: flex; 
-    justify-content: space-around;
-    width: 100%;
-    max-width: 899px;
+      gap: 4px;
+      justify-content: space-around;
+      padding-left: 35px;
   }
-
   .login_buttons {
-    display: flex; 
-    gap: 5px;
-    align-items: center;
+      gap: 0px;
+      margin-right: 0px;
+      align-items: flex-end;
   }
+  .subtitles,
+  .login {
+      font-size: 15px;
+  }
+  .headerInner {
+      padding-left: 5px;
+      padding-right: 5px;
+  }
+}
 
+@media (max-width: 1236px) and (min-width: 1079px) {
+  .header_titles {
+      gap: 4px;
+      justify-content: space-around;
+      padding-left: 35px;
+  }
+  .login_buttons {
+      gap: 0px;
+      margin-right: 0px;
+      align-items: flex-end;
+  }
+  .subtitles,
+  .login {
+      font-size: 12px;
+  }
+  .headerInner {
+      padding-left: 5px;
+      padding-right: 5px;
+  }
+}
+
+@media (max-width: 1078px) and (min-width: 867px) {
+  .header_titles {
+      gap: 4px;
+      justify-content: space-around;
+      padding-left: 35px;
+  }
+  .login_buttons {
+      gap: 0px;
+      margin-right: 0px;
+      align-items: flex-end;
+  }
+  .subtitles,
+  .login {
+      font-size: 8px;
+  }
+  .headerInner {
+      padding-left: 5px;
+      padding-right: 5px;
+  }
+}
+
+@media (max-width: 866px) and (min-width: 778px) {
+  .header_titles {
+      gap: 4px;
+      justify-content: space-around;
+      padding-left: 35px;
+  }
+  .login_buttons {
+      gap: 0px;
+      margin-right: 0px;
+      align-items: flex-end;
+  }
+  .subtitles,
+  .login {
+      font-size: 6px;
+  }
+  .headerInner {
+      padding-left: 5px;
+      padding-right: 5px;
+  }
+}
+
+@media (max-width: 777px) and (min-width: 769px) {
+  .header_titles {
+      gap: 4px;
+      justify-content: space-around;
+      padding-left: 35px;
+  }
+  .login_buttons {
+      gap: 0px;
+      margin-right: 0px;
+      align-items: flex-end;
+  }
+  .subtitles,
+  .login {
+      font-size: 5px;
+  }
+  .headerInner {
+      padding-left: 5px;
+      padding-right: 5px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header_titles,
+  .login_buttons {
+      display: none;
+  }
   .burger {
-    display: none; 
+      display: block;
   }
-
-  .sidebar {
-    display: none;
+  .header {
+      padding-left: 10px;
+      padding-right: 10px;
+  }
+  .headerInner {
+      padding-left: 0px;
+      padding-right: 0px;
   }
 }
 
