@@ -1,0 +1,55 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 1536px;
+    margin: 0 auto;
+    height: 100vh;
+    padding: 20px;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .posters_slide{
+    display: flex;
+  }
+
+  .poster_title{
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    z-index: 1;
+    font-size: 96px;
+    font-weight: bold;
+  }
+
+  .movieCard{
+    position: relative;
+  }
+
+  .moviePoster {
+    width: 1536px;
+    height: 340px;
+    border-radius: 20px;
+  }
+  
+  .sidebar {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 20%;
+  }
+  
+  .main_content{
+    display: flex;
+    width: 100%;
+  }
+
+  .test{
+    width: 1480px;
+    background-color: red;
+    height: 400px;
+    flex: 2;
+  }
+
+  

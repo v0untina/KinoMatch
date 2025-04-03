@@ -50,7 +50,7 @@ const Header = ({ className }: { className?: string }) => {
                 </div>
                 <div className={styles.header_buttons}>
                     <div className={styles.header_titles}>
-                        <Link href={'/'}>
+                        <Link href={'/general'}>
                             <h2 className={styles.subtitles}>главная</h2>
                         </Link>
                         <Link href={'/polling'}>
