@@ -242,32 +242,44 @@ export default function AboutMovie() {
             </div>
           </div>
         }
-        {movie.movie_actors && movie.movie_actors.length > 0 && (
-          <div className={styles.actors}>
-            <h3>Актёры</h3>
-            <div className={styles.people_list}>
-              {movie.movie_actors.map((ma) => (
-                <div key={ma.actors.actor_id} className={styles.person}>
-                  <img
-                    src={ma.actors.photo_filename ? `/actors/${ma.actors.photo_filename}` : "/interface/defaultAvatar.webp"}
-                    alt={ma.actors.name}
-                    className={styles.person_photo}
-                  />
-                  <div className={styles.person_info}>
-                    <span className={styles.person_name}>{ma.actors.name}</span>
-                    {ma.character_name && (
-                      <span className={styles.character_name}>{ma.character_name}</span>
-                    )}
-                  </div>
+      {movie.movie_actors && movie.movie_actors.length > 0 && (
+        <div className={styles.actors}>
+          <h3 className={styles.actors_title}>Актёры</h3>
+          <div className={styles.people_list}>
+            {movie.movie_actors.map((ma, index) => (
+              <div 
+                key={ma.actors.actor_id} 
+                className={`${styles.person} ${styles.actor_enter}`}
+                style={{ animationDelay: `${index * 0.3}s` }}
+              >
+                <img
+                  src={ma.actors.photo_filename ? `/actors/${ma.actors.photo_filename}` : "/interface/defaultAvatar.webp"}
+                  alt={ma.actors.name}
+                  className={styles.person_photo}
+                />
+                <div className={styles.person_info}>
+                  <span className={styles.person_name}>{ma.actors.name}<br /></span>
+                  {ma.character_name && (
+                    <span className={styles.character_name}>{ma.character_name}</span>
+                  )}
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
+      )}
         {
           <div className={styles.review_container}>
             <h2 className={styles.review_title}>отзывы</h2>
             <div className={styles.reviews}>
+              <div className={styles.review}>
+                  <img  className={styles.image_user} src="/User.png" alt="" />
+                  <p className={styles.comment}>Я была приятно удивлена новым мультфильмом о Гринче! <br />Яркая анимация и забавные персонажи сделали просмотр настоящим удовольствием. Особенно понравилась музыкальная составляющая — песни были очень запоминающимися. Рекомендую всем, кто хочет поднять настроение!</p>
+              </div>
+              <div className={styles.review}>
+                  <img  className={styles.image_user} src="/User.png" alt="" />
+                  <p className={styles.comment}>Я была приятно удивлена новым мультфильмом о Гринче! <br />Яркая анимация и забавные персонажи сделали просмотр настоящим удовольствием. Особенно понравилась музыкальная составляющая — песни были очень запоминающимися. Рекомендую всем, кто хочет поднять настроение!</p>
+              </div>
               <div className={styles.review}>
                   <img  className={styles.image_user} src="/User.png" alt="" />
                   <p className={styles.comment}>Я была приятно удивлена новым мультфильмом о Гринче! <br />Яркая анимация и забавные персонажи сделали просмотр настоящим удовольствием. Особенно понравилась музыкальная составляющая — песни были очень запоминающимися. Рекомендую всем, кто хочет поднять настроение!</p>
