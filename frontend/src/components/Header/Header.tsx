@@ -62,7 +62,7 @@ const Header = ({ className }: { className?: string }) => {
                         }}>
                             <h2 className={styles.subtitles}>таблица рейтинга</h2>
                         </Link>
-                        <Link href={'/'}>
+                        <Link href={'/crossing'}>
                             <h2 className={styles.subtitles}>скрестить фильм</h2>
                         </Link>
                         <Link href={'/compilations'}>
