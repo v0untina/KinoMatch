@@ -8,15 +8,19 @@ import colors from "colors";
 import packageJSON from "./../package.json";
 import { Logestic } from 'logestic';
 import fs from 'node:fs/promises';
+import cron from 'node-cron'; // Импорт node-cron
+import { updateSystemCompilationsByGenre } from './service/compilations.service'; // Импорт функции обновления
+import { Context } from 'elysia';
 
-// Импорт Elysia роутов (ВНИМАНИЕ: импортируем Elysia роуты, а не Express)
-import AuthRoute from "./route/auth.route.ts"; // Пока предположим, что AuthRoute тоже переписан на Elysia
-import ProfileRoute from "./route/profile.route.ts"; // ... и ProfileRoute
-import ActorsRoute from './route/actors.route.ts'; // ... и ActorsRoute
-import MoviesRoute from './route/movies.route.ts'; // Импортируем Elysia версию MoviesRoute
-import GenresRoute from './route/genres.route.ts'; // ... и т.д.
+// Импорт Elysia роутов
+import AuthRoute from "./route/auth.route.ts";
+import ProfileRoute from "./route/profile.route.ts";
+import ActorsRoute from './route/actors.route.ts';
+import MoviesRoute from './route/movies.route.ts';
+import GenresRoute from './route/genres.route.ts';
 import DirectorsRoute from './route/directors.route.ts';
 import CountriesRoute from './route/countries.route.ts';
+import CompilationsRoute from './route/compilations.route.ts'; // Импорт CompilationsRoute
 
 const app = new Elysia();
 
@@ -75,33 +79,49 @@ async function bootstrap() {
             return 'Favicon not found';
         }
     });
+
+    app.error((ctx: Context, error: any) => { 
+        console.error("Global error handler caught:", error);
     
-    app.error((ctx, error) => {
-        console.error("Global error handler caught:", error); // Логируем ошибку на сервере
-    
-        // Формируем ответ об ошибке в формате DefaultResponseDto
         return new Response(JSON.stringify({
             success: false,
             message: {
-                message: "Внутренняя ошибка сервера", // Общее сообщение об ошибке
+                message: "Внутренняя ошибка сервера",
                 text: "Произошла внутренняя ошибка сервера. Пожалуйста, попробуйте позже."
             }
         }), {
-            status: 500, // Возвращаем статус 500 Internal Server Error
+            status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
     });
-    
+
     app.group("/api", (apiGroup) => // Изменяем параметр на apiGroup для ясности
         apiGroup // Используем apiGroup внутри group()
             .use(AuthRoute)       // Подключаем Elysia роуты как плагины
             .use(ProfileRoute)
             .use(ActorsRoute)
-            .use(MoviesRoute)    // Подключаем Elysia MoviesRoute
+            .use(MoviesRoute)
             .use(GenresRoute)
             .use(DirectorsRoute)
             .use(CountriesRoute)
+            .use(CompilationsRoute) // Подключаем CompilationsRoute
     );
+
+
+        // **Временно запускаем обновление подборок сразу при старте сервера**
+        console.log('Running system compilations update job immediately...');
+        await updateSystemCompilationsByGenre();
+        console.log('System compilations update job finished.');
+    // // Запуск автоматического обновления подборок по жанрам каждый день в 3 часа ночи (время сервера)
+    // cron.schedule('0 3 * * *', async () => {
+    //     console.log('Running system compilations update job...');
+    //     try {
+    //         await updateSystemCompilationsByGenre();
+    //     } catch (error) {
+    //         console.error("Error during system compilations update job:", error);
+    //     }
+    // });
+
 
     app.listen(8000, () => {
         console.log(`Server started on http://localhost:8000`);

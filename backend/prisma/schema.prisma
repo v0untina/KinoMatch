@@ -84,6 +84,8 @@ model movies {
   movie_actors         movie_actors[]
   movie_directors      movie_directors[]
   movie_genres         movie_genres[]
+  movie_online_cinema  movie_online_cinema[]
+  movie_reviews        movie_reviews[]
   countries            countries?             @relation(fields: [country_id], references: [country_id], onDelete: NoAction, onUpdate: NoAction)
   user_movie_favorites user_movie_favorites[]
 }
@@ -105,6 +107,7 @@ model users {
   password_hash          String                   @db.VarChar(255)
   registration_date      DateTime?                @default(now()) @db.Timestamp(6)
   rating                 Int?                     @default(0)
+  movie_reviews          movie_reviews[]
   user_movie_collections user_movie_collections[]
   user_movie_favorites   user_movie_favorites[]
 }
@@ -124,4 +127,37 @@ model user_movie_collections {
   likes             Int?                @default(0)
   collection_movies collection_movies[]
   users             users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model movie_online_cinema {
+  movie_cinema_id  Int            @id @default(autoincrement())
+  movie_id         Int?
+  online_cinema_id Int?
+  movies           movies?        @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+  online_cinema    online_cinema? @relation(fields: [online_cinema_id], references: [online_cinema_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model movie_reviews {
+  movie_review_id Int      @id @default(autoincrement())
+  movie_id        Int?
+  review_id       Int?
+  user_id         Int?
+  movies          movies?  @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+  reviews         reviews? @relation(fields: [review_id], references: [review_id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model online_cinema {
+  online_cinema_id    Int                   @id @default(autoincrement())
+  name                String                @db.VarChar(255)
+  image_url           String?               @db.VarChar(255)
+  movie_online_cinema movie_online_cinema[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model reviews {
+  review_id     Int             @id @default(autoincrement())
+  text          String
+  score         Int
+  movie_reviews movie_reviews[]
 }

@@ -1,0 +1,84 @@
+// frontend/src/app/compilations/[id]/page.tsx
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { getCompilationById } from '@/api/compilations';
+import styles from './compilationPage.module.css';
+
+
+// Интерфейс для данных фильма (упрощенный, добавь нужные поля)
+interface Movie {
+    movie_id: number;
+    title: string;
+    poster_filename?: string; // Имя файла постера
+}
+
+// Интерфейс для деталей подборки, включая фильмы
+interface CompilationDetails {
+    collection_id: number;
+    title: string;
+    movies: Movie[]; // Массив фильмов
+}
+
+// Компонент MovieCard остается без изменений...
+function MovieCard({ movie }: { movie: Movie }) { /* ... */ }
+
+export default function CompilationPage() {
+    const params = useParams();
+    const id = params?.id;
+
+    const [compilation, setCompilation] = useState<CompilationDetails | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        // Логика загрузки данных остается без изменений...
+        if (id) {
+            const fetchCompilation = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    const compilationId = parseInt(Array.isArray(id) ? id[0] : id, 10);
+                    if (isNaN(compilationId)) {
+                        throw new Error("Неверный ID подборки");
+                    }
+                    const data = await getCompilationById(compilationId);
+                    setCompilation(data);
+                } catch (e: any) {
+                    setError(e.message || "Ошибка загрузки подборки");
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchCompilation();
+        } else {
+            setError("ID подборки не найден");
+            setLoading(false);
+        }
+    }, [id]);
+
+    // Просто возвращаем содержимое страницы БЕЗ MainLayout
+    return (
+        <div className={styles.container}>
+            {loading && <p className={styles.message}>Загрузка данных подборки...</p>}
+            {error && <p className={styles.message}>Ошибка: {error}</p>}
+            {!loading && !error && !compilation && <p className={styles.message}>Подборка не найдена.</p>}
+
+            {compilation && (
+                <>
+                    <h1 className={styles.title}>{compilation.title}</h1>
+                    {compilation.movies.length > 0 ? (
+                        <div className={styles.movieGrid}>
+                            {compilation.movies.map(movie => (
+                                <MovieCard key={movie.movie_id} movie={movie} />
+                            ))}
+                        </div>
+                    ) : (
+                        <p className={styles.message}>В этой подборке пока нет фильмов.</p>
+                    )}
+                </>
+            )}
+        </div>
+    );
+}
