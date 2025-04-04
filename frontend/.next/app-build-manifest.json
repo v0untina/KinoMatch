@@ -41,6 +41,12 @@
       "static/chunks/main-app.js",
       "static/css/app/general/page.css",
       "static/chunks/app/general/page.js"
+    ],
+    "/crossing/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/crossing/page.css",
+      "static/chunks/app/crossing/page.js"
     ]
   }
 }
