@@ -1,6 +1,9 @@
 // frontend/src/app/compilations/[id]/page.tsx
+
 "use client";
 
+import bestFilmsStyles from '@/widgets/Landing/BestFilms/BestFilms.module.css';
+import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getCompilationById } from '@/api/compilations';
@@ -22,7 +25,20 @@ interface CompilationDetails {
 }
 
 // Компонент MovieCard остается без изменений...
-function MovieCard({ movie }: { movie: Movie }) { /* ... */ }
+function MovieCard({ movie }: { movie: Movie }) {
+    return (
+        <Link href={`/films/${movie.movie_id}`} className={styles.movieCard}> {}
+            {movie.poster_filename && (
+                <img
+                src={`/posters/${movie.poster_filename}`}
+                alt={movie.title}
+                className={`${styles.moviePoster} ${bestFilmsStyles.image}`}
+            />
+            )}
+            <h3 className={styles.movieTitle}>{movie.title}</h3>
+        </Link>
+    );
+}
 
 export default function CompilationPage() {
     const params = useParams();

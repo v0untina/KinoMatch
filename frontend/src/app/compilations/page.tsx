@@ -1,3 +1,4 @@
+// frontend/src/api/compilations.ts
 import React from 'react';
 import styles from './page.module.css'
 import Compilations from '@/widgets/Compilations/Compilations';

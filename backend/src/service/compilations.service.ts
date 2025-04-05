@@ -98,29 +98,29 @@ export const updateSystemCompilationsByGenre = async () => {
 
         // Определяем правила для каждой подборки
         const compilationRules: { [title: string]: CompilationRule } = {
-            "Жуткие фильмы": { optionalOrGenres: ["Ужасы", "Триллер"] },
+            "Жуткие фильмы": { optionalOrGenres: ["ужасы", "триллер"] },
             "Лучшие мультфильмы всех времен": {
-                requiredGenres: ["Мультфильм"],
-                optionalOrGenres: ["Семейный", "Фэнтези"]
+                requiredGenres: ["мультфильм"],
+                optionalOrGenres: ["семейный", "фэнтези"]
             },
             "Военные фильмы": {
-                 requiredGenres: ["Военный"],
-                 optionalOrGenres: ["Драма", "История"]
+                 requiredGenres: ["военный"],
+                 optionalOrGenres: ["драма", "история"]
             },
-            "Фильмы-мюзикл": { optionalOrGenres: ["Мюзикл", "Музыкальный"] },
-            "Лучшие комедии": { optionalOrGenres: ["Комедия"] },
-            "Фильмы про супергероев": { optionalOrGenres: ["Фантастика", "Боевик", "Приключения"] },
-            "Фильмы про спорт": { optionalOrGenres: ["Спорт"] },
+            "Фильмы-мюзикл": { optionalOrGenres: ["мюзикл", "музыкальный"] },
+            "Лучшие комедии": { optionalOrGenres: ["комедия"] },
+            "Фильмы про супергероев": { optionalOrGenres: ["фантастика", "боевик", "приключения"] },
+            "Фильмы про спорт": { optionalOrGenres: ["спорт"] },
             "Захватывающие детективы": {
-                 requiredGenres: ["Детектив"],
-                 optionalOrGenres: ["Триллер"]
+                 requiredGenres: ["детектив"],
+                 optionalOrGenres: ["триллер"]
             },
             "Криминальные драмы": {
-                 requiredGenres: ["Криминал", "Драма"]
+                 requiredGenres: ["криминал", "драма"]
             },
-            "Фантастические миры": { optionalOrGenres: ["Фантастика", "Фэнтези"] },
-            "Дикий Запад": { optionalOrGenres: ["Вестерн", "Приключения"] },
-            "Документальное кино": { optionalOrGenres: ["Документальный", "История"] },
+            "Фантастические миры": { optionalOrGenres: ["фантастика", "фэнтези"] },
+            "Дикий Запад": { optionalOrGenres: ["вестерн", "приключения"] },
+            "Документальное кино": { optionalOrGenres: ["документальный", "история"] },
         };
 
         // 3. Итерация по подборкам и применение правил
