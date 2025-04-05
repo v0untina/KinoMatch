@@ -1,18 +1,36 @@
+/* GeneralPage.module.css - Объединенные стили */
+
 .container {
   display: flex;
   flex-direction: column;
-  max-width: 1536px;
+  max-width: 1536px; /* Ограничение ширины контейнера */
   margin: 0 auto;
   min-height: 100vh;
   padding: 20px;
   gap: 20px;
 }
 
+/* --- Стили слайдера/баннера --- */
 .posters_slide {
   display: flex;
-  overflow-x: auto;
+  overflow-x: auto; /* Если планируется несколько баннеров */
   gap: 20px;
   width: 100%;
+  position: relative; /* Для позиционирования заголовка */
+}
+
+.movie_card {
+  position: relative;
+  flex-shrink: 0; /* Чтобы карточка не сжималась */
+}
+
+.movie_poster {
+  /* Убрал фиксированную ширину, чтобы она адаптировалась к контейнеру */
+  /* width: 1536px; */
+  width: 100%; /* Занимает всю доступную ширину */
+  height: 340px; /* Фиксированная высота баннера */
+  border-radius: 20px;
+  object-fit: cover; /* Чтобы изображение красиво заполняло область */
 }
 
 .poster_title {
@@ -24,173 +42,27 @@
   font-weight: bold;
   color: white;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  /* Добавить медиа-запросы для меньших экранов */
 }
 
-.add_post_button,.modal_submit{
-  width: 200px;
-  height: 45px;
-  background-color: #00B9AE;
-  padding: 5px;
-  border-radius: 19px;
-  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
-  transition: transform 0.3s ease, background-color 0.3s ease;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: white;
-}
-
-.modal_overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal {
-  background-color: #495064;
-  padding: 30px;
-  border-radius: 10px;
-  width: 500px;
-  max-width: 90%;
-  position: relative;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.modal h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 24px;
-}
-
-.modal_form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.modal_input, .modal_textarea {
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 16px;
-}
-
-.modal_input{
-  background-color: #3A404F;
-  height: 200px;
-}
-
-.modal_textarea {
-  min-height: 200px;
-  resize: vertical;
-  background-color: #495064;
-  border: 3px dashed #3A404F;
-}
-
-.modal_buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
-.modal_close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  padding: 5px 10px;
-}
-
-.upload_image{
-  width: 50px;
-  height: 50px;
-  margin-bottom: 10px;
-}
-
-.add_post_button:hover, .modal_submit:hover{
-  background-color: #25cfc4;
-  cursor: pointer;
-  transform: scale(1.05);
-}
-
-.movie_card {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.movie_poster {
-  width: 1536px;
-  height: 340px;
-  border-radius: 20px;
-  object-fit: cover;
-}
-
-.image_upload_area {
-  min-height: 200px;
-  background-color: #495064;
-  border: 3px dashed #3A404F;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-.image_upload_area.dragging {
-  border-color: #00B9AE;
-  background-color: rgba(0, 185, 174, 0.1);
-}
-
-.upload_placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #7a8195;
-  text-align: center;
-  padding: 20px;
-  pointer-events: none;
-}
-
-.upload_placeholder span {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.image_preview {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.file_input {
-  display: none;
-}
-
+/* --- Основной контент (Сайдбар + Лента) --- */
 .main_content {
   display: flex;
   width: 100%;
   gap: 20px;
 }
 
+/* --- Сайдбар --- */
 .sidebar {
-  flex: 0 0 250px;
+  flex: 0 0 250px; /* Фиксированная ширина сайдбара */
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px;
-  height: fit-content;
+  padding: 20px; /* Внутренний отступ */
+  height: fit-content; /* Высота по содержимому */
+  /* Можно добавить фон или границу для визуального отделения */
+  /* background-color: var(--sidebar-bg-color); */
+  /* border-radius: 10px; */
 }
 
 .sidebar_menu {
@@ -205,97 +77,410 @@
 .sidebar_titles {
   font-size: 23px;
   text-decoration: none;
-  color: inherit;
+  color: var(--text-primary); /* Используем переменную цвета текста */
   display: block;
-  padding: 5px;
-  transition: all 0.2s;
-  
+  padding: 8px 12px; /* Увеличенные отступы для кликабельности */
+  border-radius: 8px; /* Небольшое скругление */
+  transition: all 0.2s ease;
 }
 
 .sidebar_titles:hover {
-  transform: scale(1.05);
+  background-color: rgba(0, 185, 174, 0.1); /* Легкий фон при наведении */
+  transform: scale(1.03); /* Немного увеличим */
 }
 
 .sidebar_titles:active,
 .sidebar_titles.active {
-  background-color: rgba(1, 228, 213, 0.808);
-  border-radius: 12px;
+  background-color: #00B9AE; /* Яркий фон для активного пункта */
   color: white;
-  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  box-shadow: 0px 4px 10px rgba(0, 185, 174, 0.3); /* Тень для активного пункта */
+  transform: scale(1.05); /* Чуть больше увеличение */
 }
 
+/* --- Область контента (Лента постов и т.д.) --- */
 .content {
-  flex: 1;
-  min-height: 400px;
-  padding: 20px;
-  border-radius: 10px;
+  flex: 1; /* Занимает оставшееся пространство */
+  min-height: 400px; /* Минимальная высота */
+  /* Убрал padding: 20px, так как он есть у .container */
+  /* border-radius: 10px; */ /* Убрал, если не нужен отдельный фон/рамка */
 }
 
-.posts{
-  max-height: 800px;
-  margin-top: 20px;
-  overflow-y: auto;
+/* --- Стили для ленты постов --- */
+.feed {
+  /* Можно добавить отступы, если нужно */
+}
+
+.add_post_button {
+  width: 200px;
+  height: 45px;
+  background-color: #00B9AE;
+  padding: 5px;
+  border-radius: 19px;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  border: none; /* Убедимся, что нет рамки по умолчанию */
+  cursor: pointer;
+  display: block; /* Чтобы margin работал */
+  margin-bottom: 25px; /* Отступ снизу от кнопки до постов */
+}
+
+.add_post_button:hover {
+  background-color: #25cfc4;
+  transform: scale(1.05);
+}
+
+.posts {
+  /* max-height: 800px; */ /* Убрал max-height, чтобы лента росла */
+  /* overflow-y: auto; */ /* Убрал overflow, если не нужен скролл внутри блока */
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 30px; /* Расстояние между постами */
+  /* margin-top: 20px; */ /* Убрал, т.к. есть margin у кнопки */
 }
 
-.post{
-  min-height: 500px;
+/* Стили для отдельного поста */
+.post {
+  display: flex; /* Используем flex для расположения контента и комментов */
+  gap: 25px; /* Расстояние между контентом и комментами */
+  background-color: var(--background-card, #2d3340); /* Фон карточки поста, с фоллбэком */
+  border-radius: 12px; /* Скругление углов */
+  padding: 20px; /* Внутренние отступы */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Легкая тень */
+  /* Убрал min-height, высота будет определяться контентом */
+}
+
+/* Левая часть поста (инфо о пользователе, текст, картинка) */
+.postMainContent { /* Новый класс для левой части */
+  flex: 1; /* Занимает большую часть */
   display: flex;
-  gap: 35px;
+  flex-direction: column;
+  gap: 15px; /* Расстояние между элементами внутри */
 }
 
-.about_post{
-  width: 65%;
-  height: 500px;
-  border: 1px solid red;
+.postHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* Расстояние между аватаром и инфо */
 }
 
-.comments{
-  width: 35%;
-  align-items: end;
-  height: 500px;
-  overflow-y: auto;
+.postUserAvatar {
+  width: 45px; /* Немного увеличим аватар */
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.postUserInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.postUsername {
+  font-weight: 600;
+  font-size: 1.05rem; /* Немного увеличим имя */
+  color: var(--text-primary);
+}
+
+.postTimestamp {
+  font-size: 0.85em;
+  color: var(--text-secondary);
+}
+
+.postContent p {
+  margin: 0; /* Убираем дефолтные отступы параграфа */
+  color: var(--text-primary);
+  white-space: pre-wrap; /* Сохранять переносы строк */
+  line-height: 1.5; /* Межстрочный интервал */
+  font-size: 1rem;
+}
+
+.postImage {
+  max-width: 100%;
+  max-height: 500px; /* Ограничиваем макс. высоту изображения */
+  border-radius: 8px;
+  object-fit: contain; /* Чтобы изображение помещалось целиком */
+  display: block;
+  background-color: rgba(0,0,0, 0.1); /* Легкий фон для области картинки */
+}
+
+.postActions {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color, #444); /* Разделитель */
+  font-size: 0.9em;
+  color: var(--text-secondary);
+  /* Сюда можно добавить кнопки лайков и т.п. */
+}
+
+/* --- Стили для комментариев (Правая часть поста) --- */
+.comments {
+  flex: 0 0 300px; /* Фиксированная ширина блока комментариев */
+  display: flex;
+  flex-direction: column;
+  /* align-items: end; */ /* Убрал, т.к. контент слева */
+  max-height: 500px; /* Ограничиваем высоту блока комментов */
+  overflow-y: auto; /* Добавляем скролл, если комментов много */
+  padding-left: 15px; /* Небольшой отступ слева */
+  border-left: 1px solid var(--border-color, #444); /* Разделитель слева */
+}
+
+.comments_title {
+  font-size: 1rem; /* Уменьшим немного заголовок комментов */
+  text-transform: uppercase;
+  font-weight: bold;
+  color: var(--text-secondary); /* Сделаем менее ярким */
+  margin-bottom: 15px; /* Отступ снизу */
+  padding-bottom: 5px;
+  /* border-bottom: 1px solid var(--border-color, #444); */ /* Убрал нижнюю границу */
+  position: sticky; /* Чтобы заголовок "залипал" при скролле */
+  top: 0;
+  background: var(--background-card, #2d3340); /* Фон, чтобы текст под ним не просвечивал */
+  z-index: 1;
 }
 
 .reviews {
-  width: 100%;
-  max-width: 900px;
-  height: 500px;
-  padding: 20px;
+  /* width: 100%; */ /* Убрал, т.к. ширина задана у .comments */
+  /* max-width: 900px; */ /* Убрал */
+  /* height: 500px; */ /* Убрал, высота будет по контенту */
+  /* padding: 20px; */ /* Убрал, отступы у .post и .comments */
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px; /* Уменьшим отступ между комментами */
 }
 
 .review {
   display: flex;
-  gap: 20px;
-  box-shadow: 0 0px 15px var(--clr-default-550);
-  padding: 15px;
-  border-radius: 8px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  gap: 10px; /* Уменьшим отступ в комменте */
+  /* Убрал тень и ховер-эффекты из комментов, можно вернуть если нужно */
+  /* box-shadow: 0 0px 15px var(--clr-default-550); */
+  padding: 10px; /* Уменьшим паддинг */
+  border-radius: 6px;
+  /* transition: transform 0.3s ease, box-shadow 0.3s ease; */
+  background-color: rgba(0,0,0, 0.1); /* Легкий фон для каждого коммента */
 }
 
-.review:hover {
-  transform: scale(1.02);
-  box-shadow: 0 0px 20px var(--clr-default-550);
+/* .review:hover { */
+  /* transform: scale(1.02); */
+  /* box-shadow: 0 0px 20px var(--clr-default-550); */
+  /* cursor: pointer; */
+/* } */
+
+.image_user {
+  width: 35px; /* Немного уменьшим аватар в комменте */
+  height: 35px;
+  /* margin-top: 6px; */ /* Убрал, т.к. есть align-items у .review */
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comment {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 0.9em; /* Немного уменьшим текст коммента */
+  color: var(--text-secondary);
+  word-break: break-word; /* Перенос длинных слов */
+}
+
+
+/* --- Стили для модального окна --- */
+.modal_overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7); /* Увеличим прозрачность фона */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px; /* Отступы для мобильных */
+}
+
+.modal {
+  background-color: var(--modal-bg-color, #3a404f); /* Фон модалки */
+  padding: 25px 30px; /* Отступы внутри модалки */
+  border-radius: 12px;
+  width: 550px; /* Немного увеличим ширину */
+  max-width: 95%;
+  position: relative;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  color: var(--text-primary-modal, white); /* Цвет текста в модалке */
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 25px; /* Увеличим отступ */
+  font-size: 1.6rem; /* Увеличим заголовок */
+  text-align: center;
+}
+
+.modal_form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* Расстояние между полями */
+}
+
+.modal_input, .modal_textarea {
+  padding: 12px 15px; /* Увеличим паддинги */
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: var(--input-bg-modal, #495064); /* Фон полей */
+  border: 1px solid var(--input-border-modal, #5a6174); /* Рамка полей */
+  color: var(--text-primary-modal, white); /* Цвет текста в полях */
+}
+
+.modal_input::placeholder, .modal_textarea::placeholder {
+  color: var(--text-placeholder-modal, #9aa0b0); /* Цвет плейсхолдера */
+}
+
+/* Убираем специфичную высоту для URL-инпута */
+/* .modal_input{
+  height: 200px;
+} */
+
+.modal_textarea {
+  min-height: 120px; /* Уменьшим мин. высоту textarea */
+  resize: vertical;
+  /* Убрал рамку, т.к. есть общая рамка у полей */
+  /* border: 3px dashed #3A404F; */
+}
+
+/* Стили для превью картинки в модалке */
+.image_preview {
+  max-width: 100%;
+  max-height: 150px;
+  margin-top: 5px; /* Уменьшил отступ сверху */
+  margin-bottom: 5px; /* Добавил отступ снизу */
+  border-radius: 4px;
+  object-fit: contain;
+  border: 1px dashed var(--input-border-modal, #5a6174);
+  display: block; /* Чтобы margin работал */
+  background-color: rgba(0,0,0, 0.1); /* Фон для области превью */
+}
+
+.modal_buttons {
+  display: flex;
+  justify-content: flex-end; /* Кнопка справа */
+  margin-top: 10px; /* Отступ сверху */
+}
+
+.modal_submit {
+  width: auto; /* Ширина по контенту */
+  padding: 10px 25px; /* Паддинги кнопки */
+  height: auto;
+  background-color: #00B9AE;
+  border-radius: 8px; /* Скругление кнопки */
+  box-shadow: 0px 4px 10px rgba(0, 185, 174, 0.3);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+  border: none;
   cursor: pointer;
 }
 
-.image_user {
-  width: 39px;
-  height: 39px;
-  margin-top: 6px;
-  border-radius: 50%;
-  object-fit: cover;
+.modal_submit:hover {
+  background-color: #25cfc4;
+  transform: scale(1.03);
 }
 
-.comments_title{
-  font-size: 22px;
-  text-transform: uppercase;
-  font-weight: bold;
-  margin-top: 10px;
-  height: 40px;
+.modal_close {
+  position: absolute;
+  top: 15px; /* Отступы кнопки закрытия */
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 1.8rem; /* Размер крестика */
+  cursor: pointer;
+  padding: 0; /* Убираем паддинги */
+  line-height: 1; /* Чтобы крестик был по центру */
+  color: var(--text-secondary-modal, #9aa0b0); /* Цвет крестика */
+  transition: color 0.2s ease;
+}
+.modal_close:hover {
+  color: var(--text-primary-modal, white); /* Цвет при наведении */
+}
+
+/* Убрал стили для drag-n-drop, т.к. используется URL */
+/* .image_upload_area { ... } */
+/* .upload_placeholder { ... } */
+/* .upload_image{ ... } */
+/* .file_input { ... } */
+
+/* Сообщение об ошибке (если нужно) */
+.error_message {
+  color: #ff6b6b; /* Красный цвет для ошибок */
+  margin-top: 15px;
+  text-align: center;
+}
+
+/* Адаптивность (пример) */
+@media (max-width: 1024px) {
+  .main_content {
+    flex-direction: column; /* Сайдбар и контент друг под другом */
+  }
+  .sidebar {
+    flex: 0 0 auto; /* Убираем фикс. ширину */
+    width: 100%; /* Сайдбар на всю ширину */
+    flex-direction: row; /* Меню в строку */
+    overflow-x: auto; /* Скролл для меню */
+    padding: 10px;
+    height: auto;
+  }
+  .sidebar_menu {
+    flex-direction: row;
+  }
+  .post {
+    flex-direction: column; /* Контент и комменты друг под другом */
+    gap: 20px;
+  }
+  .comments {
+    flex: 0 0 auto; /* Убираем фикс. ширину */
+    width: 100%;
+    max-height: 300px; /* Уменьшаем высоту комментов на мобилках */
+    border-left: none; /* Убираем разделитель */
+    padding-left: 0;
+    border-top: 1px solid var(--border-color, #444); /* Добавляем разделитель сверху */
+    margin-top: 20px;
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .poster_title {
+    font-size: 64px; /* Уменьшаем заголовок на баннере */
+    left: 20px;
+    top: 20px;
+  }
+  .sidebar_titles {
+    font-size: 18px; /* Уменьшаем шрифт в меню */
+  }
+  .modal {
+    width: 90%; /* Модалка шире */
+  }
+  .postUserAvatar {
+    width: 40px;
+    height: 40px;
+  }
+  .postUsername {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+   .poster_title {
+    font-size: 48px;
+  }
+  .add_post_button {
+    width: 100%; /* Кнопка на всю ширину */
+  }
+  .sidebar_titles {
+    font-size: 16px;
+  }
 }
