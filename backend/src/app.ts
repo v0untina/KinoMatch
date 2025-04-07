@@ -168,7 +168,7 @@ app.onError(({ code, error, set }) => {
 
 
     // --- Запуск Cron Job для обновления подборок ---
-    // Обновление каждый день в 3:00 ночи по времени сервера
+    // // Обновление каждый день в 3:00 ночи по времени сервера
     cron.schedule('0 3 * * *', async () => {
         console.log(colors.cyan('Running scheduled system compilations update job...'));
         try {
@@ -183,12 +183,12 @@ app.onError(({ code, error, set }) => {
     });
     console.log(colors.yellow('Cron job for compilations update scheduled for 03:00 AM server time.'));
 
-    // Убираем немедленный запуск обновления при старте
-    /*
-    console.log('Running system compilations update job immediately...');
-    await updateSystemCompilationsByGenre();
-    console.log('System compilations update job finished.');
-    */
+    // // Убираем немедленный запуск обновления при старте
+    
+    // console.log('Running system compilations update job immediately...');
+    // await updateSystemCompilationsByGenre();
+    // console.log('System compilations update job finished.');
+    
 
     // --- Запуск сервера ---
     const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;

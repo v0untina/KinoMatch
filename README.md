@@ -16,6 +16,8 @@
 - ```bun install```
 - Переходим в папку /backend
 - ```bun install```
+<!-- bun install jsonwebtoken
+     bun install node-cron -->
 - Переходим в папку /frontend
 - ```bun install```
 
