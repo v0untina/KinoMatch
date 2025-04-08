@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from "./Compilations.module.css";
 import { getCompilations } from '@/api/compilations';
-import Link from 'next/link'; // Импортируем Link
+import Link from 'next/link'; 
 
 interface Compilation {
   collection_id: number;
@@ -11,13 +11,11 @@ interface Compilation {
   imageFilename: string | null;
 }
 
-// Оборачиваем карточку в Link
 function Card({ compilation }: { compilation: Compilation }) {
   const { collection_id, title, imageFilename } = compilation;
   const imageUrl = imageFilename ? `/compilations/${imageFilename}` : "https://via.placeholder.com/400x300";
 
   return (
-    // Добавляем Link вокруг li
     <Link href={`/compilations/${collection_id}`} className={styles.cardLink}>
         <li className={`${styles.places__item} ${styles.card}`}>
             <img className={styles.card__image} src={imageUrl} alt={title} />
@@ -29,7 +27,6 @@ function Card({ compilation }: { compilation: Compilation }) {
   );
 }
 
-// Остальной код Compilations остается без изменений...
 export default function Compilations() {
   const [compilations, setCompilations] = useState<Compilation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +78,6 @@ export default function Compilations() {
 
   return (
     <main className={styles.main}>
-      {/* Оборачиваем ul в div, чтобы стили ссылок не ломали грид */}
       <div className={styles.places__list_wrapper}>
           <ul className={styles.places__list}>
             {compilations.map((compilation) => (

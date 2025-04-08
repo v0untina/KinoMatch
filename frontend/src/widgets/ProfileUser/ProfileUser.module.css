@@ -1,0 +1,82 @@
+.main {
+    width: 100%;
+    min-height: 100vh;
+    padding: 50px 20px 20px 70px;
+}
+
+.user_info {
+    width: 100%;
+    height: 150px;
+    padding: 25px;
+}
+
+.username_profile {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+.user_avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: antiquewhite;
+    margin-top: 6px;
+}
+
+.user_rating {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.avatar_user_nick {
+    display: flex;
+    gap: 10px;
+}
+
+.rating_count {
+    background-color: #00B9AE;
+    padding: 3px;
+    border-radius: 7px;
+    color: white; 
+}
+
+.tabs {
+    margin-left: 110px;
+    margin-top: 50px;
+    display: flex;
+    gap: 30px;
+}
+
+.tab_button {
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: bold;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 12px;
+    transition: transform 0.2s ease, background-color 0.2s ease; 
+}
+
+.tab_button.active {
+    background-color: #00B9AE;
+    color: white;
+    box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+}
+
+.tab_button:hover{
+    transform: scale(1.05); 
+}
+
+.tab_button.active:hover {
+    transform: scale(1.05); 
+}
+
+.tab_сontent {
+    width: 70%;
+    margin: 40px auto;
+    text-align: center;
+    background-color: red;
+    height: 700px;
+}
