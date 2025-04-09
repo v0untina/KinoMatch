@@ -219,7 +219,7 @@
   }
 }
 
-@media (max-width: 1236px) and (min-width: 1079px) {
+@media (max-width: 1236px) and (min-width: 1092px) {
   .header_titles {
       gap: 4px;
       justify-content: space-around;
@@ -240,7 +240,7 @@
   }
 }
 
-@media (max-width: 1078px) and (min-width: 867px) {
+@media (max-width: 1091px) and (min-width: 954px) {
   .header_titles {
       gap: 4px;
       justify-content: space-around;
@@ -253,7 +253,7 @@
   }
   .subtitles,
   .login {
-      font-size: 8px;
+      font-size: 12px;
   }
   .headerInner {
       padding-left: 5px;
@@ -261,7 +261,7 @@
   }
 }
 
-@media (max-width: 866px) and (min-width: 778px) {
+@media (max-width: 953px) and (min-width: 769px) {
   .header_titles {
       gap: 4px;
       justify-content: space-around;
@@ -274,32 +274,19 @@
   }
   .subtitles,
   .login {
-      font-size: 6px;
+      font-size: 11px;
   }
   .headerInner {
       padding-left: 5px;
       padding-right: 5px;
   }
-}
-
-@media (max-width: 777px) and (min-width: 769px) {
-  .header_titles {
-      gap: 4px;
-      justify-content: space-around;
-      padding-left: 35px;
+  .ticket{
+    width: 40px;
+    height: 31px;
+    margin-left: 4px;
   }
-  .login_buttons {
-      gap: 0px;
-      margin-right: 0px;
-      align-items: flex-end;
-  }
-  .subtitles,
-  .login {
-      font-size: 5px;
-  }
-  .headerInner {
-      padding-left: 5px;
-      padding-right: 5px;
+  .subtitles {
+    margin-right: 10px;
   }
 }
 

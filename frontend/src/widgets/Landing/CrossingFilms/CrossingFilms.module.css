@@ -132,3 +132,170 @@
     margin-top: 0px;
   }
 }
+
+@media (max-width: 755px) {
+  .crossing {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+  }
+
+  .crossing_card {
+    margin-bottom: 30px; 
+    margin-top: 30px; 
+  }
+
+  .crossing_card:first-child {
+    margin-bottom: 30px;
+    margin-top: 0;
+  }
+
+  .crossing_card:last-child {
+    margin-top: 30px;
+    margin-bottom: 0;
+  }
+
+  .crossing_image {
+    margin-top: 0; 
+    margin-bottom: 0;
+  }
+
+  .title {
+    margin-bottom: 80px; 
+  }
+  .loginbutton {
+    margin-top: 50px;
+  }
+  .main {
+    padding: 30px;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .crossing_card {
+    margin-bottom: 20px;
+    margin-top: 20px;
+    width: 200px;
+  }
+
+  .card_image {
+    width: 200px;
+    margin-bottom: 10px;
+  }
+
+  .crossing_card:first-child {
+    margin-bottom: 20px;
+    margin-top: 0;
+  }
+
+  .crossing_card:last-child {
+    margin-top: 20px;
+    margin-bottom: 0;
+  }
+
+  .crossing_image {
+    width: 120px;
+    height: 110px;
+  }
+
+  .title {
+    font-size: 40px;
+    margin-bottom: 60px;
+  }
+  .loginbutton {
+    margin-top: 30px;
+    width: 200px;
+    height: 45px;
+    font-size: 18px;
+  }
+  .main {
+    padding: 20px;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .crossing_card {
+    margin-bottom: 15px;
+    margin-top: 15px;
+    width: 160px;
+  }
+
+  .card_image {
+    width: 160px;
+    margin-bottom: 8px;
+  }
+
+  .crossing_card:first-child {
+    margin-bottom: 15px;
+    margin-top: 0;
+  }
+
+  .crossing_card:last-child {
+    margin-top: 15px;
+    margin-bottom: 0;
+  }
+
+  .crossing_image {
+    width: 100px;
+    height: 92px;
+  }
+
+  .title {
+    font-size: 35px;
+    margin-bottom: 50px;
+  }
+  .loginbutton {
+    margin-top: 25px;
+    width: 180px;
+    height: 40px;
+    font-size: 16px;
+  }
+  .main {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 375px) {
+  .crossing_card {
+    margin-bottom: 10px;
+    margin-top: 10px;
+    width: 140px;
+  }
+
+  .card_image {
+    width: 140px;
+    margin-bottom: 5px;
+  }
+
+  .crossing_card:first-child {
+    margin-bottom: 10px;
+    margin-top: 0;
+  }
+
+  .crossing_card:last-child {
+    margin-top: 10px;
+    margin-bottom: 0;
+  }
+
+  .crossing_image {
+    width: 80px;
+    height: 74px;
+  }
+
+  .title {
+    font-size: 30px;
+    margin-bottom: 40px;
+  }
+  .loginbutton {
+    margin-top: 20px;
+    width: 160px;
+    height: 35px;
+    font-size: 14px;
+  }
+  .main {
+    padding: 10px;
+  }
+}
