@@ -17,15 +17,18 @@
 
 .places__item {
   width: 100%;
+  overflow-x: hidden;
+
 }
 
 .places__list_wrapper {
   width: 100%;
   display: flex;
   justify-content: center;
+  overflow-x: hidden;
+
 }
 
-/* Стили для ссылки-карточки  */
 .cardLink {
   text-decoration: none; 
   color: inherit; 
@@ -38,14 +41,15 @@
 }
 
 .card {
-    border-radius: 20px; 
-    overflow: hidden; 
+  border-radius: 20px; 
+  overflow: hidden; 
 }
 
 .card__image {
   width: 100%; 
-  height: auto;
+  height: 170px;
   display: block; 
+  border-radius:20px;
 }
 
 .card__description {
@@ -59,12 +63,12 @@
 
 @media (max-width: 900px) {
   .places__list {
-    grid-template-columns: repeat(2, 1fr); /* 2 карточки в строке */
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
   .places__list {
-    grid-template-columns: repeat(1, 1fr); /* 1 карточка в строке */
+    grid-template-columns: repeat(1, 1fr); 
   }
 }

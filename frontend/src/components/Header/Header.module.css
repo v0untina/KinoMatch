@@ -20,7 +20,38 @@
   align-items: center;  
   width: 100%;
   justify-content: space-between;
-  
+}
+
+.username_nickname{
+  font-size: 19px;
+  font-weight: bold;
+  transition: transform 0.3s ease;
+  margin-right: 10px;
+  color: var(--clr-default-500);
+}
+
+.username_nickname:hover{
+  color: #00B9AE;
+  transform: scale(1.05);
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout_button{
+  font-weight: bold;
+  color: #C43131;
+  text-transform: uppercase;
+}
+
+.logout_image{
+  width: 22px;
+  height: 22px;
+  margin-top: 5px;
+}
+
+.logout_container{
+  display: flex;
+  gap: 10px;
 }
 
 .ticket {
