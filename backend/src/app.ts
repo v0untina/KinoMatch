@@ -1,16 +1,16 @@
 // backend/src/app.ts
-import Elysia, { NotFoundError } from 'elysia'; // Добавляем NotFoundError для возможной обработки
+import Elysia from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { cors } from '@elysiajs/cors';
 import { jwt } from '@elysiajs/jwt';
+import { staticPlugin } from '@elysiajs/static'; 
 import 'dotenv/config';
 import colors from "colors";
-import packageJSON from "./../package.json"; // Убедись, что путь правильный
+import packageJSON from "./../package.json";
 import { Logestic } from 'logestic';
 import fs from 'node:fs/promises';
-import cron from 'node-cron'; // Импорт node-cron
-import { updateSystemCompilationsByGenre } from './service/compilations.service'; // Импорт функции обновления
-import { Context } from 'elysia'; // Context может понадобиться для onError
+import cron from 'node-cron';
+import { updateSystemCompilationsByGenre } from './service/compilations.service';
 
 // Импорт Elysia роутов
 import AuthRoute from "./route/auth.route"; // Убери .ts если настроен moduleResolution
@@ -43,6 +43,9 @@ async function bootstrap() {
             secret: JWT_SECRET
         })
     );
+
+
+
 
     // Плагин для Swagger документации
     app.use(swagger(
@@ -81,6 +84,8 @@ async function bootstrap() {
         allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization", // Разрешенные заголовки
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'] // Разрешенные методы
     }));
+
+
 
     // Базовый роут для проверки работоспособности
     app.get("/", () => {

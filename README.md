@@ -17,7 +17,8 @@
 - Переходим в папку /backend
 - ```bun install```
 <!-- bun install jsonwebtoken
-     bun install node-cron -->
+     bun install node-cron 
+     bun add @elysiajs/static -->
 - Переходим в папку /frontend
 - ```bun install```
 

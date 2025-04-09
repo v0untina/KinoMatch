@@ -1,3 +1,6 @@
+// src/api/posts.ts
+
+
 import axiosInstance from '@/utils/axios';
 
 // Интерфейс для данных поста (согласуй с бэкендом)
@@ -23,12 +26,11 @@ interface CreatePostData {
 export const getPosts = async (): Promise<Post[]> => {
     try {
         const response = await axiosInstance.get('/posts'); // Запрос к GET /api/posts
+        console.log('Ответ от сервера (getPosts):', response.data); // Логируем ответ
         return response.data as Post[]; // Возвращает массив постов
     } catch (error) {
         console.error("Error fetching posts:", error);
-        // Можно выбросить ошибку дальше или вернуть пустой массив
         throw error;
-        // return [];
     }
 };
 
@@ -36,12 +38,19 @@ export const getPosts = async (): Promise<Post[]> => {
 export const createPost = async (postData: CreatePostData): Promise<Post> => {
     try {
         // Отправляем POST запрос на /api/posts с данными поста
-        // axiosInstance автоматически добавит токен аутентификации из localStorage
         const response = await axiosInstance.post('/posts', postData);
-        return response.data as Post; // Возвращает созданный пост
-    } catch (error) {
+        console.log('Ответ от сервера (createPost):', response.data); // Логируем ответ
+
+        // Проверяем, что ответ соответствует интерфейсу Post
+        const newPost = response.data as Post;
+        if (!newPost.postId || !newPost.content || !newPost.timestamp || !newPost.username) {
+            console.error('Неполный ответ от сервера:', newPost);
+            throw new Error('Сервер вернул неполный объект поста. Обратитесь к разработчику сервера.');
+        }
+
+        return newPost; // Возвращает созданный пост
+    } catch (error: any) {
         console.error("Error creating post:", error);
-        // Выбрасываем ошибку для обработки в компоненте
         throw error;
     }
 };

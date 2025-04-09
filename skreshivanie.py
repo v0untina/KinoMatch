@@ -5,7 +5,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
 
-API_KEY = "AIzaSyBlpcDVPCIFRsBKbVkBeT3pOGvvJgfiWJw"  # Замените на ваш ключ
+API_KEY = "AIzaSyAKBrjBHK61wm2Ktcrr-NApXBTX0qGrmf8"  # Замените на ваш ключ
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-2.0-flash-thinking-exp-01-21')
 
