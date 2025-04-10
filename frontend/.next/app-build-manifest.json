@@ -12,35 +12,11 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
-    "/general/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/general/page.css",
-      "static/chunks/app/general/page.js"
-    ],
-    "/polling/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/polling/page.css",
-      "static/chunks/app/polling/page.js"
-    ],
     "/crossing/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/crossing/page.css",
       "static/chunks/app/crossing/page.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/login/page.css",
-      "static/chunks/app/login/page.js"
-    ],
-    "/profile/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/profile/page.css",
-      "static/chunks/app/profile/page.js"
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
