@@ -291,7 +291,7 @@
   cursor: pointer;
 }
 
-.modal {
+.modal,.comments_modal {
   background-color: var(--modal-bg-color);
   padding: 30px;
   border-radius: 10px;
@@ -310,7 +310,7 @@
   text-align: center;
 }
 
-.modal_form {
+.modal_form,.comment_form {
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -351,7 +351,7 @@
   text-align: center;
 }
 
-.add_post_button {
+.add_post_button,.submit_comment_button {
   width: 200px;
   height: 45px;
   background-color: #00B9AE;
@@ -368,7 +368,7 @@
   margin-bottom: 25px; 
 }
 
-.add_post_button:hover {
+.add_post_button:hover,.submit_comment_button:hover {
   background-color: #25cfc4;
   transform: scale(1.05);
 }

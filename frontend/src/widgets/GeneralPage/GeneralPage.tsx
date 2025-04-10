@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 const PostCard = ({ post }: { post: Post }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(post.likes ?? 0);
+    const [showCommentsModal, setShowCommentsModal] = useState(false); // Состояние для модалки комментариев
+    const [commentText, setCommentText] = useState(''); // Текст комментария
 
     const formattedDate = post.timestamp
         ? new Date(post.timestamp).toLocaleString('ru-RU', {
@@ -17,7 +19,6 @@ const PostCard = ({ post }: { post: Post }) => {
           })
         : 'Дата не указана';
 
-    // Обработчики ошибок изображений
     const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = '/interface/defaultAvatar.webp';
     };
@@ -25,20 +26,66 @@ const PostCard = ({ post }: { post: Post }) => {
         e.currentTarget.style.display = 'none';
     };
 
-    // Обработчики кликов
     const handleLikeClick = () => {
         setIsLiked(!isLiked);
         setLikesCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
         console.log(`Post ${post.postId} Like toggled: ${!isLiked}`);
-        // TODO: API call for like/unlike
     };
+
     const handleCommentClick = () => {
-        console.log(`Post ${post.postId} Comment clicked`);
-        // TODO: Implement comment focus/scroll logic
+        setShowCommentsModal(true); // Открываем модальное окно
+    };
+
+    const handleCloseCommentsModal = () => {
+        setShowCommentsModal(false);
+        setCommentText('');
+    };
+
+    const handleSubmitComment = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!commentText.trim()) {
+            toast.error('Комментарий не может быть пустым');
+            return;
+        }
+        
+        console.log(`Отправка комментария для поста ${post.postId}: ${commentText}`);
+        // TODO: Реализовать API вызов для отправки комментария
+        
+        // Временная логика для демонстрации
+        toast.success('Комментарий отправлен!');
+        setCommentText('');
+        setShowCommentsModal(false);
     };
 
     return (
         <div className={`${styles.post} ${styles.roundedCard}`}>
+            {showCommentsModal && (
+                <div className={styles.modal_overlay} onClick={handleCloseCommentsModal}>
+                    <div className={styles.comments_modal} onClick={(e) => e.stopPropagation()}>
+                        <h3>Новый Комментарий</h3>
+                        <div className={styles.comments_list}>
+                        </div>
+                        <form onSubmit={handleSubmitComment} className={styles.comment_form}>
+                            <textarea className={styles.modal_textarea}
+                                placeholder="Напишите комментарий..."
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                rows={3}
+                                required
+                            />
+                            <button type="submit" className={styles.submit_comment_button}>
+                                Отправить
+                            </button>
+                        </form>
+                        <button 
+                            className={styles.modal_close} 
+                            onClick={handleCloseCommentsModal}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className={styles.postMainContent}>
                 <div className={styles.postHeader}>
                     <img
