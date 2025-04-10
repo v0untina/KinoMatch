@@ -3,7 +3,10 @@ import Elysia from 'elysia';
 import { swagger } from '@elysiajs/swagger';
 import { cors } from '@elysiajs/cors';
 import { jwt } from '@elysiajs/jwt';
-import { staticPlugin } from '@elysiajs/static'; 
+// --- ДОБАВЬ ЭТО ---
+import { staticPlugin } from '@elysiajs/static';
+import path from 'path'; // Убедись, что path импортирован
+// --- КОНЕЦ ДОБАВЛЕНИЯ ---
 import 'dotenv/config';
 import colors from "colors";
 import packageJSON from "./../package.json";
@@ -13,7 +16,7 @@ import cron from 'node-cron';
 import { updateSystemCompilationsByGenre } from './service/compilations.service';
 
 // Импорт Elysia роутов
-import AuthRoute from "./route/auth.route"; // Убери .ts если настроен moduleResolution
+import AuthRoute from "./route/auth.route";
 import ProfileRoute from "./route/profile.route";
 import ActorsRoute from './route/actors.route';
 import MoviesRoute from './route/movies.route';
@@ -21,7 +24,7 @@ import GenresRoute from './route/genres.route';
 import DirectorsRoute from './route/directors.route';
 import CountriesRoute from './route/countries.route';
 import CompilationsRoute from './route/compilations.route';
-import PostsRoute from './route/posts.route'; // Импорт роута постов
+import PostsRoute from './route/posts.route';
 
 const app = new Elysia();
 
@@ -39,53 +42,55 @@ async function bootstrap() {
     // Плагин для работы с JWT
     app.use(
         jwt({
-            name: 'jwt', // Имя декоратора (доступен как ctx.jwt)
+            name: 'jwt',
             secret: JWT_SECRET
         })
     );
 
+    // --- ИЗМЕНЕННЫЙ БЛОК НАСТРОЙКИ СТАТИКИ ---
+    // Используем 'assets', который отсчитывается от process.cwd() (обычно корень папки backend)
+    const assetsFolder = 'data/images'; // Путь относительно корня проекта (backend/)
+    const absoluteAssetsPath = path.resolve(process.cwd(), assetsFolder); // Получаем абсолютный путь для лога и создания папок
+    console.log(colors.magenta(`Serving static files from (using assets): ${absoluteAssetsPath}`));
+    console.log(colors.magenta(`process.cwd(): ${process.cwd()}`)); // Посмотрим текущую рабочую директорию
+
+    // Убедимся, что директория для загрузок существует (используем абсолютный путь)
+    try {
+        await fs.mkdir(absoluteAssetsPath, { recursive: true });
+        await fs.mkdir(path.join(absoluteAssetsPath, 'posts'), { recursive: true }); // И для постов
+        console.log(colors.green(`Static directories ensured/created at ${absoluteAssetsPath}`));
+    } catch (error) {
+        console.error(colors.red(`Error creating static directories:`), error);
+    }
+
+    app.use(staticPlugin({
+        assets: assetsFolder,   // <--- Указываем папку относительно корня проекта
+        prefix: '/public/images', // <--- Префикс URL остается тот же
+        // noCache: true,       // Раскомментируй для разработки, если нужно
+        // alwaysStatic: true, // Можно попробовать добавить, если assets не сработает сразу
+    }));
+    console.log(colors.yellow(`Static file serving enabled at /public/images using assets folder: '${assetsFolder}'`));
+    // Ожидаем, что запрос /public/images/posts/file.png будет искать файл в backend/data/images/posts/file.png
+    // --- КОНЕЦ ИЗМЕНЕННОГО БЛОКА --
 
 
 
     // Плагин для Swagger документации
-    app.use(swagger(
-        {
-            path: '/docs', // Путь к документации
-            documentation: {
-                info: {
-                    title: `KinoMatch API Docs v${packageJSON.version}`, // Используем версию из package.json
-                    version: packageJSON.version // Версия API
-                },
-                tags: [ // Определяем теги для группировки эндпоинтов
-                    { name: 'Auth', description: 'Аутентификация и регистрация' },
-                    { name: 'Profile', description: 'Управление профилем пользователя' },
-                    { name: 'Movies', description: 'Фильмы' },
-                    { name: 'Actors', description: 'Актеры' },
-                    { name: 'Directors', description: 'Режиссеры' },
-                    { name: 'Genres', description: 'Жанры' },
-                    { name: 'Countries', description: 'Страны' },
-                    { name: 'Compilations', description: 'Подборки фильмов' },
-                    { name: 'Posts', description: 'Посты пользователей' }
-                ]
-            }
-        }
-    ));
+    app.use(swagger( /* ... твои настройки swagger ... */ ));
 
     // Обработка preflight запросов OPTIONS
     app.options("*", (ctx) => {
-        ctx.set.status = 204; // No Content
-        return ''; // Возвращаем пустой ответ
+        ctx.set.status = 204;
+        return '';
     });
 
     // Плагин для настройки CORS
     app.use(cors({
         credentials: true,
-        origin: 'http://localhost:3000', // Разрешаем запросы с фронтенда
-        allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization", // Разрешенные заголовки
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'] // Разрешенные методы
+        origin: 'http://localhost:3000',
+        allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
     }));
-
-
 
     // Базовый роут для проверки работоспособности
     app.get("/", () => {
@@ -95,115 +100,38 @@ async function bootstrap() {
     });
 
     // Роут для favicon (опционально)
-    app.get("/favicon.ico", async ({ set }) => {
-        try {
-            // Путь к favicon относительно корня проекта
-            const favicon = await fs.readFile('./public/favicon.ico');
-            set.headers['Content-Type'] = 'image/x-icon';
-            return favicon;
-        } catch (error) {
-            console.warn("Favicon not found at ./public/favicon.ico");
-            set.status = 404;
-            return 'Favicon not found';
-        }
-    });
+    app.get("/favicon.ico", async ({ set }) => { /* ... твой код favicon ... */ });
 
     // --- Глобальные обработчики ошибок ---
-
-// Замени существующий app.onError на этот:
-app.onError(({ code, error, set }) => {
-    // Логируем ошибку для отладки
-    // Не показываем stack trace в продакшене из соображений безопасности
-    console.error(`Error Handler [${code}]: ${error?.message || error}`);
-    if (process.env.NODE_ENV !== 'production' && error?.stack) {
-        console.error(error.stack);
-    }
-
-    // Обработка стандартных кодов ошибок Elysia
-    switch (code) {
-        case 'NOT_FOUND':
-            set.status = 404;
-            return { message: 'Запрашиваемый маршрут не найден.' };
-
-        case 'VALIDATION':
-            set.status = 400; // Bad Request
-            return {
-                message: 'Ошибка валидации входных данных.',
-                // Попытка извлечь детали ошибки валидации (структура может отличаться)
-                errors: error?.errors?.map((e: any) => ({
-                    field: e.path, // Путь к полю с ошибкой
-                    message: e.message, // Сообщение ошибки от TypeBox/валидатора
-                 })) || error?.message // Фоллбэк на общее сообщение
-            };
-
-        case 'PARSE':
-            set.status = 400; // Bad Request
-            return { message: 'Ошибка разбора тела запроса (вероятно, невалидный JSON).' };
-
-        case 'INTERNAL_SERVER_ERROR':
-            set.status = 500;
-            return { message: 'Внутренняя ошибка сервера.' };
-
-        case 'UNKNOWN':
-        default: // Обработка всех остальных или неизвестных ошибок
-            set.status = error?.status || 500; // Пытаемся взять статус из самой ошибки, иначе 500
-            // В продакшене лучше не отправлять детальное сообщение об ошибке
-            const message = process.env.NODE_ENV === 'production'
-                ? 'Произошла непредвиденная ошибка.'
-                : error?.message || 'Произошла непредвиденная ошибка.';
-            return { message };
-    }
-});
-    // --- Конец обработчиков ошибок ---
-
+    app.onError(({ code, error, set }) => { /* ... твой обработчик ошибок ... */ });
 
     // --- Группа для всех API роутов ---
     app.group("/api", (apiGroup) =>
         apiGroup
-            .use(AuthRoute)       // тэг 'Auth'
-            .use(ProfileRoute)    // тэг 'Profile'
-            .use(ActorsRoute)     // тэг 'Actors'
-            .use(MoviesRoute)     // тэг 'Movies'
-            .use(GenresRoute)     // тэг 'Genres'
-            .use(DirectorsRoute)  // тэг 'Directors'
-            .use(CountriesRoute)  // тэг 'Countries'
-            .use(CompilationsRoute) // тэг 'Compilations'
-            .use(PostsRoute)      // тэг 'Posts' - Добавляем роут постов
+            .use(AuthRoute)
+            .use(ProfileRoute)
+            .use(ActorsRoute)
+            .use(MoviesRoute)
+            .use(GenresRoute)
+            .use(DirectorsRoute)
+            .use(CountriesRoute)
+            .use(CompilationsRoute)
+            .use(PostsRoute) // Роут постов уже здесь
     );
 
-
     // --- Запуск Cron Job для обновления подборок ---
-    // // Обновление каждый день в 3:00 ночи по времени сервера
-    cron.schedule('0 3 * * *', async () => {
-        console.log(colors.cyan('Running scheduled system compilations update job...'));
-        try {
-            await updateSystemCompilationsByGenre();
-            console.log(colors.green('Scheduled system compilations update job finished successfully.'));
-        } catch (error) {
-            console.error(colors.red("Error during scheduled system compilations update job:"), error);
-        }
-    }, {
-        scheduled: true,
-        timezone: "Europe/Moscow" // Укажи свою таймзону, если сервер не в Москве
-    });
-    console.log(colors.yellow('Cron job for compilations update scheduled for 03:00 AM server time.'));
-
-    // // Убираем немедленный запуск обновления при старте
-    
-    // console.log('Running system compilations update job immediately...');
-    // await updateSystemCompilationsByGenre();
-    // console.log('System compilations update job finished.');
-    
+    cron.schedule('0 3 * * *', async () => { /* ... твой cron job ... */ });
+    console.log(colors.yellow('Cron job for compilations update scheduled...'));
 
     // --- Запуск сервера ---
     const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
     app.listen(PORT, () => {
         console.log(colors.green(`🚀 Server v${packageJSON.version} started successfully on http://localhost:${PORT}`));
         console.log(colors.blue(`📚 API Documentation available at http://localhost:${PORT}/docs`));
+        console.log(colors.magenta(`🖼️ Images will be served from /public/images`)); // Добавим лог
     });
 }
 
-// Запускаем асинхронную функцию bootstrap
 bootstrap().catch(err => {
     console.error(colors.red("💥 Failed to bootstrap the application:"), err);
     process.exit(1);

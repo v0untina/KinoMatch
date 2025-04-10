@@ -1,36 +1,54 @@
-// GeneralPage.tsx
-
-
 "use client"
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './GeneralPage.module.css';
 import useAuth from '@/hooks/useAuth';
 import { getPosts, createPost, Post } from '@/api/posts';
 import toast from 'react-hot-toast';
 
-// Компонент для отображения одного поста
+// --- Компонент PostCard (ОДНА ВЕРСИЯ) ---
 const PostCard = ({ post }: { post: Post }) => {
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(post.likes ?? 0);
+
     const formattedDate = post.timestamp
         ? new Date(post.timestamp).toLocaleString('ru-RU', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
+              day: 'numeric', month: 'long', year: 'numeric',
+              hour: '2-digit', minute: '2-digit'
           })
         : 'Дата не указана';
 
+    // Обработчики ошибок изображений
+    const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        e.currentTarget.src = '/interface/defaultAvatar.webp';
+    };
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        e.currentTarget.style.display = 'none';
+    };
+
+    // Обработчики кликов
+    const handleLikeClick = () => {
+        setIsLiked(!isLiked);
+        setLikesCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
+        console.log(`Post ${post.postId} Like toggled: ${!isLiked}`);
+        // TODO: API call for like/unlike
+    };
+    const handleCommentClick = () => {
+        console.log(`Post ${post.postId} Comment clicked`);
+        // TODO: Implement comment focus/scroll logic
+    };
+
     return (
-        <div className={styles.post}>
-            {/* Левая часть поста */}
+        // Добавляем класс для округления
+        <div className={`${styles.post} ${styles.roundedCard}`}>
+            {/* Левая часть */}
             <div className={styles.postMainContent}>
                 <div className={styles.postHeader}>
                     <img
                         className={styles.postUserAvatar}
                         src={post.userAvatar || '/interface/defaultAvatar.webp'}
-                        alt={post.username}
-                        onError={(e) => (e.currentTarget.src = '/interface/defaultAvatar.webp')}
+                        alt={`${post.username} avatar`}
+                        onError={handleAvatarError}
                     />
                     <div className={styles.postUserInfo}>
                         <span className={styles.postUsername}>{post.username}</span>
@@ -44,155 +62,189 @@ const PostCard = ({ post }: { post: Post }) => {
                             className={styles.postImage}
                             src={post.imageUrl}
                             alt="Post image"
-                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                            onError={handleImageError}
                         />
                     )}
                 </div>
+                {/* Блок действий */}
                 <div className={styles.postActions}>
-                    <span>Лайки: {post.likes ?? 0}</span>
+                    <button onClick={handleLikeClick} className={styles.actionButton}>
+                        <img
+                           src={isLiked ? '/interface/like_ON.png' : '/interface/like_OFF.png'}
+                           alt="Лайк"
+                           className={styles.actionIcon}
+                        />
+                        <span className={styles.likesCounter}>{likesCount}</span>
+                    </button>
+                    <button onClick={handleCommentClick} className={styles.actionButton}>
+                        <img
+                           src="/interface/commenting.png"
+                           alt="Комментарий"
+                           className={styles.actionIcon}
+                        />
+                        {/* Счетчик комментов, если нужен */}
+                        {/* <span>{post.comments?.length ?? 0}</span> */}
+                    </button>
                 </div>
             </div>
 
-            {/* Правая часть поста (комментарии) */}
-            <div className={styles.comments}>
-                <span className={styles.comments_title}>комментарии</span>
-                <div className={styles.reviews}>
+            {/* Правая часть (комментарии) */}
+            {/* Добавляем класс для округления */}
+            <div className={`${styles.comments} ${styles.roundedCard}`}>
+                 <span className={styles.comments_title}>комментарии</span>
+                 <div className={styles.reviews}>
                     {(!post.comments || post.comments.length === 0) && (
                         <p className={styles.comment}>Комментариев пока нет.</p>
                     )}
-                    {/* Статичные примеры для визуализации */}
-                    <div className={styles.review}>
-                        <img className={styles.image_user} src="/User.png" alt="" />
-                        <p className={styles.comment}>Отличный пост!</p>
-                    </div>
-                    <div className={styles.review}>
-                        <img className={styles.image_user} src="/User.png" alt="" />
-                        <p className={styles.comment}>Согласен!</p>
-                    </div>
-                </div>
-            </div>
+                    {/* Примеры */}
+                    <div className={styles.review}> <img className={styles.image_user} src="/User.png" alt="" /> <p className={styles.comment}>Отличный пост!</p> </div>
+                    <div className={styles.review}> <img className={styles.image_user} src="/User.png" alt="" /> <p className={styles.comment}>Согласен!</p> </div>
+                 </div>
+                 {/* TODO: Поле ввода комментария */}
+             </div>
         </div>
     );
 };
+// --- КОНЕЦ PostCard ---
 
+
+// --- Основной компонент страницы ---
 const GeneralPage = () => {
     const [activeSection, setActiveSection] = useState('feed');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [postText, setPostText] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [errorPosts, setErrorPosts] = useState<string | null>(null);
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const auth = useAuth();
 
-    if (!auth) {
-        return <div className={styles.container}><p>Загрузка данных пользователя...</p></div>;
-    }
-
-    const { user, loading: loadingAuth } = auth;
-
-    // Загрузка постов при монтировании
+    // Загрузка постов
     useEffect(() => {
         setLoadingPosts(true);
         setErrorPosts(null);
         getPosts()
             .then(data => {
-                console.log('Fetched posts:', data); // Логируем данные для отладки
+                console.log('Fetched posts:', data);
                 setPosts(data);
             })
             .catch(err => {
                 console.error("Failed to load posts:", err);
-                const message = err.response?.data?.message || "Не удалось загрузить посты.";
+                const message = err.response?.data?.message || err.message || "Не удалось загрузить посты.";
                 setErrorPosts(message);
                 toast.error(`Ошибка загрузки постов: ${message}`);
             })
-            .finally(() => {
-                setLoadingPosts(false);
-            });
+            .finally(() => setLoadingPosts(false));
     }, []);
 
-    // Обработчик отправки формы создания поста
+    // Обработчик изменения файла
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        setImageFile(null);
+        setImagePreviewUrl(null);
+
+        if (file) {
+            if (!file.type.startsWith('image/')) {
+                toast.error('Пожалуйста, выберите файл изображения.');
+                if (fileInputRef.current) fileInputRef.current.value = "";
+                return;
+            }
+            const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxSizeInBytes) {
+                toast.error(`Файл слишком большой. Макс. размер: ${maxSizeInBytes / 1024 / 1024}MB`);
+                if (fileInputRef.current) fileInputRef.current.value = "";
+                return;
+            }
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => setImagePreviewUrl(reader.result as string);
+            reader.onerror = () => toast.error("Не удалось создать превью.");
+            reader.readAsDataURL(file);
+        }
+    };
+
+    // Очистка выбранного изображения
+    const clearImageSelection = useCallback(() => {
+        setImageFile(null);
+        setImagePreviewUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    }, []);
+
+    // Закрытие модалки
+    const closeModal = useCallback(() => {
+        if (isSubmitting) return; // Не закрывать во время отправки
+        setIsModalOpen(false);
+        setPostText('');
+        clearImageSelection();
+        setIsSubmitting(false);
+    }, [clearImageSelection, isSubmitting]);
+
+    // Отправка формы
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!postText.trim()) {
             toast.error("Текст поста не может быть пустым.");
             return;
         }
-
-        if (imageUrl && !imageUrl.match(/^https?:\/\/.+/)) {
-            toast.error("Введите корректный URL изображения (начинающийся с http:// или https://).");
-            return;
-        }
-
-        const postData = {
-            content: postText,
-            imageUrl: imageUrl.trim() || undefined
-        };
-
+        setIsSubmitting(true);
         const toastId = toast.loading("Публикация поста...");
+        const payload = { content: postText.trim(), image: imageFile ?? undefined };
 
         try {
-            const newPost = await createPost(postData);
-            console.log('Created post:', newPost); // Логируем новый пост
+            const newPost = await createPost(payload);
             setPosts(prevPosts => [newPost, ...prevPosts]);
             toast.success("Пост успешно опубликован!", { id: toastId });
-            setIsModalOpen(false);
-            setPostText('');
-            setImageUrl('');
+            closeModal(); // Закроет и сбросит isSubmitting
         } catch (error: any) {
             console.error("Failed to create post:", error);
-            const errorMessage = error.response?.data?.message || "Не удалось опубликовать пост.";
-            toast.error(`Ошибка: ${errorMessage}`, { id: toastId });
+            toast.error(`Ошибка: ${error.message}`, { id: toastId });
+            setIsSubmitting(false); // Разблокируем кнопку только в случае ошибки
         }
     };
 
-    // Логика рендера контента секций
+    // Рендер контента секций
     const renderContent = () => {
+        // ... (логика switch case без изменений) ...
         switch (activeSection) {
             case 'feed':
                 return (
                     <div className={styles.feed}>
-                        {!loadingAuth && user && (
+                        {auth && !auth.loading && auth.user && (
                             <button
                                 className={styles.add_post_button}
                                 onClick={() => setIsModalOpen(true)}
-                            >
-                                добавить пост
-                            </button>
+                                disabled={auth.loading || isSubmitting} // Блокируем и во время сабмита
+                            > добавить пост </button>
                         )}
                         {loadingPosts && <p>Загрузка постов...</p>}
                         {errorPosts && <p className={styles.error_message}>{errorPosts}</p>}
                         {!loadingPosts && !errorPosts && (
                             posts.length === 0 ? (
-                                <p>Постов пока нет.</p>
+                                <p>Постов пока нет. Создайте первый!</p>
                             ) : (
                                 <div className={styles.posts}>
-                                    {posts.map((post, index) => (
-                                        <PostCard key={post.postId || index} post={post} />
-                                    ))}
+                                    {posts.map((post) => ( <PostCard key={post.postId} post={post} /> ))}
                                 </div>
                             )
                         )}
                     </div>
                 );
-            case 'new':
-                return <div>Контент новинок (не реализовано)</div>;
-            case 'collections':
-                return <div>Контент подборок пользователей (не реализовано)</div>;
-            case 'rating':
-                return <div>Контент рейтинга подборок (не реализовано)</div>;
+            // ... другие case ...
             default:
-                return <div className={styles.feed}>{/* Логика как в 'feed' */}</div>;
+                 return <div className={styles.feed}> {auth && !auth.loading && auth.user && ( <button className={styles.add_post_button} onClick={() => setIsModalOpen(true)} disabled={auth.loading || isSubmitting} > добавить пост </button> )} {loadingPosts && <p>Загрузка постов...</p>} {errorPosts && <p className={styles.error_message}>{errorPosts}</p>} {!loadingPosts && !errorPosts && ( posts.length === 0 ? ( <p>Постов пока нет. Создайте первый!</p> ) : ( <div className={styles.posts}> {posts.map((post) => ( <PostCard key={post.postId} post={post} /> ))} </div> ) )} </div>;
         }
     };
 
+    // Основной рендер страницы
     return (
         <div className={styles.container}>
-            {/* Модальное окно создания поста */}
+            {/* Модальное окно */}
             {isModalOpen && (
-                <div className={styles.modal_overlay}>
-                    <div className={styles.modal}>
+                <div className={styles.modal_overlay} onClick={closeModal}>
+                    <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
                         <h2>Новая запись</h2>
                         <form className={styles.modal_form} onSubmit={handleSubmit}>
                             <textarea
@@ -202,99 +254,99 @@ const GeneralPage = () => {
                                 onChange={(e) => setPostText(e.target.value)}
                                 rows={5}
                                 required
+                                disabled={isSubmitting}
                             />
+                            {/* Скрытый input */}
                             <input
-                                type="url"
-                                placeholder="URL изображения (необязательно)"
-                                className={styles.modal_input}
-                                value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
+                                id="post-image-upload"
+                                ref={fileInputRef}
+                                type="file"
+                                accept="image/*" // Упростим accept
+                                className={styles.modal_file_input}
+                                onChange={handleImageChange}
+                                disabled={isSubmitting}
                             />
-                            {imageUrl && imageUrl.match(/^https?:\/\/.+/) && (
-                                <img
-                                    src={imageUrl}
-                                    alt="Preview"
-                                    className={styles.image_preview}
-                                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                                    onLoad={(e) => (e.currentTarget.style.display = 'block')}
-                                />
-                            )}
+                             {/* Область загрузки, СТИЛИЗОВАННАЯ ПОД СТАРЫЙ CSS */}
+                             <div className={styles.image_upload_area}>
+                                 {/* Кнопка выбора файла внутри области */}
+                                 <label htmlFor="post-image-upload" className={`${styles.modal_file_label} ${isSubmitting ? styles.disabled_label : ''}`}>
+                                      Выбрать файл
+                                 </label>
+
+                                 {/* Показываем превью, если есть URL */}
+                                {imagePreviewUrl && (
+                                    <div className={styles.image_preview_container}>
+                                        <img
+                                            src={imagePreviewUrl}
+                                            alt="Предпросмотр изображения"
+                                            className={styles.image_preview}
+                                        />
+                                        {/* Кнопка для удаления выбранного файла */}
+                                        <button
+                                            type="button"
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Важно!
+                                                !isSubmitting && clearImageSelection();
+                                            }}
+                                            className={styles.clear_image_button}
+                                            disabled={isSubmitting}
+                                            aria-label="Удалить изображение"
+                                        > × </button>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Кнопки формы */}
                             <div className={styles.modal_buttons}>
-                                <button type="submit" className={styles.modal_submit}>
-                                    Опубликовать
-                                </button>
+                                <button
+                                    type="submit"
+                                    className={styles.modal_submit}
+                                    disabled={isSubmitting || !postText.trim()}
+                                > {isSubmitting ? 'Публикация...' : 'Опубликовать'} </button>
                             </div>
                         </form>
+                        {/* Кнопка закрытия */}
                         <button
                             className={styles.modal_close}
-                            onClick={() => {
-                                setIsModalOpen(false);
-                                setPostText('');
-                                setImageUrl('');
-                            }}
+                            onClick={closeModal}
                             aria-label="Закрыть"
-                        >
-                            ×
-                        </button>
+                            disabled={isSubmitting}
+                        >×</button>
                     </div>
                 </div>
             )}
 
-            {/* Остальной контент страницы */}
+            {/* Баннер/Слайдер */}
             <div className={styles.posters_slide}>
                 <div className={styles.movie_card}>
                     <img className={styles.movie_poster} src="/chtivo.png" alt="Криминальное чтиво" />
                     <h2 className={styles.poster_title}>Криминальное <br />чтиво</h2>
                 </div>
+                {/* Можно добавить другие карточки */}
             </div>
 
+            {/* Основной контент (Сайдбар + Лента) */}
             <div className={styles.main_content}>
+                {/* Сайдбар */}
                 <aside className={styles.sidebar}>
                     <div className={styles.sidebar_section}>
                         <ul className={styles.sidebar_menu}>
-                            <li>
-                                <a
-                                    className={`${styles.sidebar_titles} ${activeSection === 'feed' ? styles.active : ''}`}
-                                    href="#"
-                                    onClick={(e) => { e.preventDefault(); setActiveSection('feed'); }}
-                                >
-                                    Лента постов
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    className={`${styles.sidebar_titles} ${activeSection === 'new' ? styles.active : ''}`}
-                                    href="#"
-                                    onClick={(e) => { e.preventDefault(); setActiveSection('new'); }}
-                                >
-                                    Новинки
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    className={`${styles.sidebar_titles} ${activeSection === 'collections' ? styles.active : ''}`}
-                                    href="#"
-                                    onClick={(e) => { e.preventDefault(); setActiveSection('collections'); }}
-                                >
-                                    Подборки пользователей
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    className={`${styles.sidebar_titles} ${activeSection === 'rating' ? styles.active : ''}`}
-                                    href="#"
-                                    onClick={(e) => { e.preventDefault(); setActiveSection('rating'); }}
-                                >
-                                    Рейтинг подборок
-                                </a>
-                            </li>
+                            <li> <a className={`${styles.sidebar_titles} ${activeSection === 'feed' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('feed'); }}> Лента постов </a> </li>
+                            <li> <a className={`${styles.sidebar_titles} ${activeSection === 'new' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('new'); }}> Новинки </a> </li>
+                            <li> <a className={`${styles.sidebar_titles} ${activeSection === 'collections' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('collections'); }}> Подборки пользователей </a> </li>
+                            <li> <a className={`${styles.sidebar_titles} ${activeSection === 'rating' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('rating'); }}> Рейтинг подборок </a> </li>
+                            {/* Добавь пункт "Рейтинг пользователей", если он был */}
+                             <li> <a className={`${styles.sidebar_titles} ${activeSection === 'user_rating' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('user_rating'); }}> Рейтинг пользователей </a> </li>
                         </ul>
                     </div>
                 </aside>
+
+                {/* Контентная часть (Лента или другое) */}
                 <div className={styles.content}>
                     {renderContent()}
                 </div>
             </div>
+            {/* --- КОНЕЦ БЛОКОВ, КОТОРЫЕ ДОЛЖНЫ БЫТЬ --- */}
         </div>
     );
 };

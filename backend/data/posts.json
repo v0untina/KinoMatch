@@ -1,5 +1,39 @@
 [
   {
+    "id": "24445ad1-5a72-4021-93f5-cb7e375b44f8",
+    "author": "tashe",
+    "text": "ghbdtn",
+    "createdAt": "2025-04-09T23:46:47.999Z",
+    "likes": 0,
+    "comments": []
+  },
+  {
+    "id": "f03b1fee-a198-4046-8f63-b218b06d94a9",
+    "author": "tashe",
+    "text": "приветик",
+    "createdAt": "2025-04-09T23:20:12.551Z",
+    "imageUrl": "/public/images/posts/700c1ad9-9e6b-4718-ae2f-d1e6d82dfd00.png",
+    "likes": 0,
+    "comments": []
+  },
+  {
+    "id": "a6f9612c-585f-4dc5-ba67-7ac5c03ee45b",
+    "author": "tashe",
+    "text": "ghbdtn",
+    "createdAt": "2025-04-09T23:11:13.892Z",
+    "imageUrl": "/public/images/posts/3373986d-4ac0-4b1b-82a0-06d76d68145f.png",
+    "likes": 0,
+    "comments": []
+  },
+  {
+    "id": "6b84b462-d8e7-4c00-93de-6667144a6746",
+    "author": "tashe",
+    "text": "ghbdtn",
+    "createdAt": "2025-04-09T23:05:25.376Z",
+    "likes": 0,
+    "comments": []
+  },
+  {
     "id": "e498739a-c53e-4ef7-86f0-aec3cc2ca5fb",
     "author": "tashe",
     "text": "ААААААААААААААА НАКОНЕЦ ТО!!!!!!",

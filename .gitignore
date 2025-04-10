@@ -5,4 +5,5 @@ bun.lockb
 package-lock.json
 frontend/.next/app-build-manifest.json
 frontend/.next/app-build-manifest.json
-frontend/public
+frontend/public/actors
+frontend/public/posters
