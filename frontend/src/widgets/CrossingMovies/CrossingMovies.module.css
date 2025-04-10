@@ -106,6 +106,8 @@
   
 .search_container {
     padding: 20px;
+    /* Убираем отступ снизу, если он не нужен или мешает списку */
+    /* padding-bottom: 0; */
 }
   
 .image_crossing{
@@ -122,6 +124,14 @@
     outline: none;
     transition: all 0.3s;
     font-size: 1rem;
+}
+
+.search_input:focus {
+    border-color: #00B9AE;
+    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.4);
+    /* Добавляем скругление только верхних углов, если список активен */
+    /* Можно реализовать через JS добавлением класса, если нужно */
+    /* border-radius: 8px 8px 0 0; */
 }
   
 .button_set, .button_random{
@@ -203,4 +213,83 @@
     .action_title {
         font-size: 1.5rem;
     }
+}
+
+
+.search_wrapper {
+    position: relative;
+}
+
+.movie_card {
+    border-radius: 10px;
+    overflow: visible;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #444;
+    width: 240px;
+    background-color: #1c1c1e;
+}
+
+.suggestions_list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #28282a;
+    border: 1px solid var(--nextui-border-color, #444);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 20;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+}
+
+.suggestion_item,
+.suggestion_item_loading,
+.suggestion_item_no_results {
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 0.95rem;
+    color: var(--nextui-foreground, #e1e1e1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.suggestion_item:hover {
+    background-color: var(--nextui-focus, #00B9AE);
+    color: #ffffff;
+}
+
+.suggestion_item_loading,
+.suggestion_item_no_results {
+    cursor: default;
+    color: #777;
+    font-style: italic;
+}
+
+.suggestion_item_loading:hover,
+.suggestion_item_no_results:hover {
+    background-color: transparent;
+    color: #777;
+}
+
+.search_container {
+    padding: 20px;
+}
+
+.search_input {
+    background-color: #333;
+    color: #eee;
+    border: 1px solid #555;
+}
+
+.search_input:focus {
+    border-color: #00B9AE;
+    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.4);
+    background-color: #444;
 }
