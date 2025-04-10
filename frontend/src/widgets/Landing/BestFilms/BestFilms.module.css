@@ -117,7 +117,7 @@
 
 @media (max-width: 768px) {
   .new_films {
-    gap: 10px;
+    gap: 15px;
   }
   
   .image, .image_f {
@@ -135,3 +135,113 @@
     font-size: 14px;
   }
 }
+
+@media (max-width: 587px) {
+  .subtitle {
+    font-size: 35px;
+  }
+
+  .new_films {
+    gap: 8px;
+  }
+
+  .image, .image_f {
+    width: 120px;
+    height: 180px;
+  }
+
+  .card_film {
+    width: 120px;
+    height: 230px;
+  }
+
+  .film_title {
+    width: 120px;
+    font-size: 12px;
+  }
+
+  .button_next {
+    top: 35%;
+    width: 40px;
+    height: 40px;
+  }
+
+  .next_button_image{
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 500px) {
+  .subtitle {
+    font-size: 30px;
+  }
+
+  .new_films {
+    gap: 15px;
+  }
+
+  .image, .image_f {
+    width: 100px;
+    height: 150px;
+  }
+
+  .card_film {
+    width: 100px;
+    height: 200px;
+  }
+
+  .film_title {
+    width: 100px;
+    font-size: 11px;
+  }
+
+  .button_next {
+    top: 30%; 
+    width: 35px;
+    height: 35px;
+  }
+
+  .next_button_image{
+    width: 35px;
+    height: 35px;
+  }
+}
+
+
+@media (max-width: 445px) {
+  .subtitle {
+    font-size: 28px;
+  }
+
+  .new_films {
+    gap: 8px;
+  }
+
+  .image, .image_f {
+    width: 80px;
+    height: 120px;
+  }
+
+  .card_film {
+    width: 80px;
+    height: 170px;
+  }
+
+  .film_title {
+    width: 80px;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .button_next {
+    top: 25%;
+    width: 30px;
+    height: 30px;
+  }
+
+  .next_button_image{
+    width: 30px;
+    height: 30px;
+  }
+}  

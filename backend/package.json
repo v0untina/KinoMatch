@@ -23,6 +23,7 @@
     "elysia": "^1.2.25",
     "flat": "^6.0.1",
     "iconv-lite": "^0.6.3",
+    "jsonwebtoken": "^9.0.2",
     "logestic": "^1.2.4",
     "node-cron": "^3.0.3",
     "prisma": "^6.5.0"

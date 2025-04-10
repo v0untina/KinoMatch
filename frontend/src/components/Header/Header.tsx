@@ -72,9 +72,13 @@ const Header = ({ className }: { className?: string }) => {
 
                     <div className={styles.login_buttons}>
                         {user ? (
-                            <>
-                                <span>{user.username}</span>
-                                <button onClick={handleLogout} className={styles.logoutButton}>Выход</button>
+                            <>  <Link href='/profile'>
+                                <span className={styles.username_nickname}>{user.username}</span>
+                                </Link>
+                                <div className={styles.logout_container}>
+                                <button onClick={handleLogout} className={styles.logout_button}>Выход</button>
+                                <img className={styles.logout_image} src="/logout.png" alt="" />
+                                </div>
                             </>
                         ) : (
                             <>
@@ -118,10 +122,7 @@ const Header = ({ className }: { className?: string }) => {
                         }}>
                             <h2 className={styles.subtitles}>таблица рейтинга</h2>
                         </Link>
-                        <Link href={'/polling'}>
-                            <h2 className={styles.subtitles}>подобрать фильм</h2>
-                        </Link>
-                        <Link href={'/'}>
+                        <Link href={'/crossing'}>
                             <h2 className={styles.subtitles}>скрестить фильм</h2>
                         </Link>
                         <Link href={'/compilations'}>

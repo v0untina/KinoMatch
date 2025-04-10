@@ -9,8 +9,14 @@
     "/general/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/general/page.css",
-      "static/chunks/app/general/page.js"
+      "static/css/app/films/[id]/page.css",
+      "static/chunks/app/films/[id]/page.js"
+    ],
+    "/crossing/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/crossing/page.css",
+      "static/chunks/app/crossing/page.js"
     ],
     "/page": [
       "static/chunks/webpack.js",
