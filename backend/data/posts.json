@@ -1,40 +1,82 @@
 [
   {
+    "id": "1dda2d8c-2711-47bd-9bb9-a6401f71d442",
+    "author": "tashe",
+    "text": "ghdbtn",
+    "createdAt": "2025-04-11T02:48:58.123Z",
+    "likes": 1,
+    "comments": [
+      {
+        "id": "6d74aac4-dd57-4456-aa6d-fbb8cb906c04",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "ну ты фуфел",
+        "createdAt": "2025-04-11T02:49:06.159Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
+  },
+  {
     "id": "755617b6-80ff-4fac-be51-71aae2540b5e",
     "author": "tashe",
     "text": "wdq",
     "createdAt": "2025-04-10T22:07:34.480Z",
     "imageUrl": "/public/images/posts/88c855b9-c1e6-4648-8ccc-d4fa0f03f529.jpg",
-    "likes": 0,
-    "comments": [],
-    "likedBy": []
+    "likes": 2,
+    "comments": [
+      {
+        "id": "cbeb3ea5-384c-4077-96d6-4d852361c683",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "это круто!!!",
+        "createdAt": "2025-04-11T02:33:52.685Z"
+      },
+      {
+        "id": "aa596cd1-69ab-45e8-b6f1-020b11f87fd8",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "это не круто((((",
+        "createdAt": "2025-04-11T02:40:24.730Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
   },
   {
     "id": "21178b02-db98-4c8d-9f01-c768839310f2",
     "author": "tashe",
     "text": "sdfsd",
     "createdAt": "2025-04-10T22:07:23.740Z",
-    "likes": 0,
+    "likes": 6,
     "comments": [],
-    "likedBy": []
+    "likedBy": [
+      26
+    ]
   },
   {
     "id": "9c7d070b-6b6a-4fd2-8b17-aa8d76afbba8",
     "author": "tashe",
     "text": "привет",
     "createdAt": "2025-04-10T15:20:25.939Z",
-    "likes": 0,
+    "likes": 1,
     "comments": [],
-    "likedBy": []
+    "likedBy": [
+      26
+    ]
   },
   {
     "id": "1ff50a92-6591-4e15-85a4-5e062223ecd9",
     "author": "tashe",
     "text": "ghbdtn",
     "createdAt": "2025-04-10T00:15:38.591Z",
-    "likes": 0,
+    "likes": 1,
     "comments": [],
-    "likedBy": []
+    "likedBy": [
+      26
+    ]
   },
   {
     "id": "24445ad1-5a72-4021-93f5-cb7e375b44f8",
