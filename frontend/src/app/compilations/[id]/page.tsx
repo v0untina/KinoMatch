@@ -1,5 +1,3 @@
-// frontend/src/app/compilations/[id]/page.tsx
-
 "use client";
 
 import bestFilmsStyles from '@/widgets/Landing/BestFilms/BestFilms.module.css';
@@ -8,23 +6,22 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getCompilationById } from '@/api/compilations';
 import styles from './compilationPage.module.css';
+import Header from '@/components/Header/Header';
+import Footer from '@/components/Footer/Footer';
 
 
-// Интерфейс для данных фильма (упрощенный, добавь нужные поля)
 interface Movie {
     movie_id: number;
     title: string;
     poster_filename?: string; // Имя файла постера
 }
 
-// Интерфейс для деталей подборки, включая фильмы
 interface CompilationDetails {
     collection_id: number;
     title: string;
     movies: Movie[]; // Массив фильмов
 }
 
-// Компонент MovieCard остается без изменений...
 function MovieCard({ movie }: { movie: Movie }) {
     return (
         <Link href={`/films/${movie.movie_id}`} className={styles.movieCard}> {}
@@ -49,7 +46,6 @@ export default function CompilationPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        // Логика загрузки данных остается без изменений...
         if (id) {
             const fetchCompilation = async () => {
                 setLoading(true);
@@ -74,8 +70,9 @@ export default function CompilationPage() {
         }
     }, [id]);
 
-    // Просто возвращаем содержимое страницы БЕЗ MainLayout
     return (
+        <>
+        <Header/>
         <div className={styles.container}>
             {loading && <p className={styles.message}>Загрузка данных подборки...</p>}
             {error && <p className={styles.message}>Ошибка: {error}</p>}
@@ -96,5 +93,7 @@ export default function CompilationPage() {
                 </>
             )}
         </div>
+        <Footer/>
+        </>
     );
 }

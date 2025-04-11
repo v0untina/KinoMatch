@@ -6,10 +6,11 @@ import useAuth from '@/hooks/useAuth';
 import { getPosts, createPost, Post } from '@/api/posts';
 import toast from 'react-hot-toast';
 
-// --- Компонент PostCard (ОДНА ВЕРСИЯ) ---
 const PostCard = ({ post }: { post: Post }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(post.likes ?? 0);
+    const [showCommentsModal, setShowCommentsModal] = useState(false); // Состояние для модалки комментариев
+    const [commentText, setCommentText] = useState(''); // Текст комментария
 
     const formattedDate = post.timestamp
         ? new Date(post.timestamp).toLocaleString('ru-RU', {
@@ -18,7 +19,6 @@ const PostCard = ({ post }: { post: Post }) => {
           })
         : 'Дата не указана';
 
-    // Обработчики ошибок изображений
     const handleAvatarError = (e: React.SyntheticEvent<HTMLImageElement>) => {
         e.currentTarget.src = '/interface/defaultAvatar.webp';
     };
@@ -26,22 +26,66 @@ const PostCard = ({ post }: { post: Post }) => {
         e.currentTarget.style.display = 'none';
     };
 
-    // Обработчики кликов
     const handleLikeClick = () => {
         setIsLiked(!isLiked);
         setLikesCount(prevCount => isLiked ? prevCount - 1 : prevCount + 1);
         console.log(`Post ${post.postId} Like toggled: ${!isLiked}`);
-        // TODO: API call for like/unlike
     };
+
     const handleCommentClick = () => {
-        console.log(`Post ${post.postId} Comment clicked`);
-        // TODO: Implement comment focus/scroll logic
+        setShowCommentsModal(true); // Открываем модальное окно
+    };
+
+    const handleCloseCommentsModal = () => {
+        setShowCommentsModal(false);
+        setCommentText('');
+    };
+
+    const handleSubmitComment = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!commentText.trim()) {
+            toast.error('Комментарий не может быть пустым');
+            return;
+        }
+        
+        console.log(`Отправка комментария для поста ${post.postId}: ${commentText}`);
+        // TODO: Реализовать API вызов для отправки комментария
+        
+        // Временная логика для демонстрации
+        toast.success('Комментарий отправлен!');
+        setCommentText('');
+        setShowCommentsModal(false);
     };
 
     return (
-        // Добавляем класс для округления
         <div className={`${styles.post} ${styles.roundedCard}`}>
-            {/* Левая часть */}
+            {showCommentsModal && (
+                <div className={styles.modal_overlay} onClick={handleCloseCommentsModal}>
+                    <div className={styles.comments_modal} onClick={(e) => e.stopPropagation()}>
+                        <h3>Новый Комментарий</h3>
+                        <div className={styles.comments_list}>
+                        </div>
+                        <form onSubmit={handleSubmitComment} className={styles.comment_form}>
+                            <textarea className={styles.modal_textarea}
+                                placeholder="Напишите комментарий..."
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                rows={3}
+                                required
+                            />
+                            <button type="submit" className={styles.submit_comment_button}>
+                                Отправить
+                            </button>
+                        </form>
+                        <button 
+                            className={styles.modal_close} 
+                            onClick={handleCloseCommentsModal}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className={styles.postMainContent}>
                 <div className={styles.postHeader}>
                     <img
@@ -66,7 +110,6 @@ const PostCard = ({ post }: { post: Post }) => {
                         />
                     )}
                 </div>
-                {/* Блок действий */}
                 <div className={styles.postActions}>
                     <button onClick={handleLikeClick} className={styles.actionButton}>
                         <img
@@ -82,33 +125,26 @@ const PostCard = ({ post }: { post: Post }) => {
                            alt="Комментарий"
                            className={styles.actionIcon}
                         />
-                        {/* Счетчик комментов, если нужен */}
-                        {/* <span>{post.comments?.length ?? 0}</span> */}
+
                     </button>
                 </div>
             </div>
 
-            {/* Правая часть (комментарии) */}
-            {/* Добавляем класс для округления */}
             <div className={`${styles.comments} ${styles.roundedCard}`}>
                  <span className={styles.comments_title}>комментарии</span>
                  <div className={styles.reviews}>
                     {(!post.comments || post.comments.length === 0) && (
                         <p className={styles.comment}>Комментариев пока нет.</p>
                     )}
-                    {/* Примеры */}
                     <div className={styles.review}> <img className={styles.image_user} src="/User.png" alt="" /> <p className={styles.comment}>Отличный пост!</p> </div>
                     <div className={styles.review}> <img className={styles.image_user} src="/User.png" alt="" /> <p className={styles.comment}>Согласен!</p> </div>
                  </div>
-                 {/* TODO: Поле ввода комментария */}
              </div>
         </div>
     );
 };
-// --- КОНЕЦ PostCard ---
 
 
-// --- Основной компонент страницы ---
 const GeneralPage = () => {
     const [activeSection, setActiveSection] = useState('feed');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -205,9 +241,7 @@ const GeneralPage = () => {
         }
     };
 
-    // Рендер контента секций
     const renderContent = () => {
-        // ... (логика switch case без изменений) ...
         switch (activeSection) {
             case 'feed':
                 return (
@@ -216,7 +250,7 @@ const GeneralPage = () => {
                             <button
                                 className={styles.add_post_button}
                                 onClick={() => setIsModalOpen(true)}
-                                disabled={auth.loading || isSubmitting} // Блокируем и во время сабмита
+                                disabled={auth.loading || isSubmitting} 
                             > добавить пост </button>
                         )}
                         {loadingPosts && <p>Загрузка постов...</p>}
@@ -232,16 +266,13 @@ const GeneralPage = () => {
                         )}
                     </div>
                 );
-            // ... другие case ...
             default:
                  return <div className={styles.feed}> {auth && !auth.loading && auth.user && ( <button className={styles.add_post_button} onClick={() => setIsModalOpen(true)} disabled={auth.loading || isSubmitting} > добавить пост </button> )} {loadingPosts && <p>Загрузка постов...</p>} {errorPosts && <p className={styles.error_message}>{errorPosts}</p>} {!loadingPosts && !errorPosts && ( posts.length === 0 ? ( <p>Постов пока нет. Создайте первый!</p> ) : ( <div className={styles.posts}> {posts.map((post) => ( <PostCard key={post.postId} post={post} /> ))} </div> ) )} </div>;
         }
     };
 
-    // Основной рендер страницы
     return (
         <div className={styles.container}>
-            {/* Модальное окно */}
             {isModalOpen && (
                 <div className={styles.modal_overlay} onClick={closeModal}>
                     <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -256,24 +287,20 @@ const GeneralPage = () => {
                                 required
                                 disabled={isSubmitting}
                             />
-                            {/* Скрытый input */}
                             <input
                                 id="post-image-upload"
                                 ref={fileInputRef}
                                 type="file"
-                                accept="image/*" // Упростим accept
+                                accept="image/*" 
                                 className={styles.modal_file_input}
                                 onChange={handleImageChange}
                                 disabled={isSubmitting}
                             />
-                             {/* Область загрузки, СТИЛИЗОВАННАЯ ПОД СТАРЫЙ CSS */}
                              <div className={styles.image_upload_area}>
-                                 {/* Кнопка выбора файла внутри области */}
                                  <label htmlFor="post-image-upload" className={`${styles.modal_file_label} ${isSubmitting ? styles.disabled_label : ''}`}>
                                       Выбрать файл
                                  </label>
 
-                                 {/* Показываем превью, если есть URL */}
                                 {imagePreviewUrl && (
                                     <div className={styles.image_preview_container}>
                                         <img
@@ -281,7 +308,6 @@ const GeneralPage = () => {
                                             alt="Предпросмотр изображения"
                                             className={styles.image_preview}
                                         />
-                                        {/* Кнопка для удаления выбранного файла */}
                                         <button
                                             type="button"
                                             onClick={(e) => {
@@ -296,7 +322,6 @@ const GeneralPage = () => {
                                 )}
                             </div>
 
-                            {/* Кнопки формы */}
                             <div className={styles.modal_buttons}>
                                 <button
                                     type="submit"
@@ -305,7 +330,6 @@ const GeneralPage = () => {
                                 > {isSubmitting ? 'Публикация...' : 'Опубликовать'} </button>
                             </div>
                         </form>
-                        {/* Кнопка закрытия */}
                         <button
                             className={styles.modal_close}
                             onClick={closeModal}
@@ -316,18 +340,14 @@ const GeneralPage = () => {
                 </div>
             )}
 
-            {/* Баннер/Слайдер */}
             <div className={styles.posters_slide}>
                 <div className={styles.movie_card}>
                     <img className={styles.movie_poster} src="/chtivo.png" alt="Криминальное чтиво" />
                     <h2 className={styles.poster_title}>Криминальное <br />чтиво</h2>
                 </div>
-                {/* Можно добавить другие карточки */}
             </div>
 
-            {/* Основной контент (Сайдбар + Лента) */}
             <div className={styles.main_content}>
-                {/* Сайдбар */}
                 <aside className={styles.sidebar}>
                     <div className={styles.sidebar_section}>
                         <ul className={styles.sidebar_menu}>
@@ -335,18 +355,13 @@ const GeneralPage = () => {
                             <li> <a className={`${styles.sidebar_titles} ${activeSection === 'new' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('new'); }}> Новинки </a> </li>
                             <li> <a className={`${styles.sidebar_titles} ${activeSection === 'collections' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('collections'); }}> Подборки пользователей </a> </li>
                             <li> <a className={`${styles.sidebar_titles} ${activeSection === 'rating' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('rating'); }}> Рейтинг подборок </a> </li>
-                            {/* Добавь пункт "Рейтинг пользователей", если он был */}
-                             <li> <a className={`${styles.sidebar_titles} ${activeSection === 'user_rating' ? styles.active : ''}`} href="#" onClick={(e) => { e.preventDefault(); setActiveSection('user_rating'); }}> Рейтинг пользователей </a> </li>
                         </ul>
                     </div>
                 </aside>
-
-                {/* Контентная часть (Лента или другое) */}
                 <div className={styles.content}>
                     {renderContent()}
                 </div>
             </div>
-            {/* --- КОНЕЦ БЛОКОВ, КОТОРЫЕ ДОЛЖНЫ БЫТЬ --- */}
         </div>
     );
 };
