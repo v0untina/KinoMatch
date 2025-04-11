@@ -175,3 +175,171 @@
     margin-top: 30px;
   }
 }
+
+
+/* --- НОВЫЕ СТИЛИ ДЛЯ РЕЗУЛЬТАТОВ --- */
+
+.resultsTitle {
+  font-size: 40px; /* Размер как у основного заголовка или чуть меньше */
+  font-weight: 600;
+  text-align: center;
+  color: var(--clr-default-500);
+  margin-top: 40px; /* Отступ сверху */
+  margin-bottom: 40px;
+}
+
+.loadingMessage,
+.errorMessage,
+.noResultsMessage {
+  font-size: 24px;
+  text-align: center;
+  margin-top: 50px;
+  color: var(--clr-default-400);
+}
+
+.errorMessage {
+  color: #ff4d4f; /* Красный для ошибок */
+  font-weight: 500;
+}
+
+.resultsGrid {
+  display: grid;
+  /* Адаптивная сетка: минимум 200px на карточку, максимум 4 в ряд */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px; /* Отступы между карточками */
+  width: 80%; /* Или другая ширина по твоему макету */
+  max-width: 1200px; /* Максимальная ширина сетки */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 40px;
+}
+
+.movieCard {
+  background-color: var(--clr-default-100); /* Фон карточки */
+  border-radius: 15px; /* Скругление как на картинке */
+  overflow: hidden; /* Чтобы скругление работало для картинки */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Небольшая тень */
+  text-align: center;
+  padding-bottom: 10px; /* Отступ под текстом */
+  transition: transform 0.3s ease;
+}
+
+.movieCard:hover {
+    transform: translateY(-5px); /* Небольшой подъем при наведении */
+}
+
+.movieCardImage {
+  width: 100%;
+  height: auto; /* Автоматическая высота для сохранения пропорций */
+  aspect-ratio: 2 / 3; /* Соотношение сторон постера, подбери нужное */
+  object-fit: cover; /* Масштабирование картинки */
+  display: block; /* Убирает лишний отступ снизу */
+  background-color: var(--clr-default-200); /* Цвет фона для заглушки */
+}
+
+.movieCardTitle {
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--clr-default-500);
+  padding: 0 10px; /* Отступы слева/справа для названия */
+  /* Можно добавить обрезку длинных названий */
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+.resetButton {
+  /* Стилизуй как кнопку .next_button или немного иначе */
+  margin-top: 30px;
+  width: 250px; /* Чуть шире */
+  height: 60px;
+  background-color: #00B9AE;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: 600;
+  border-radius: 40px;
+  color: white;
+  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 50px; /* Отступ снизу */
+}
+
+.resetButton:hover {
+  background-color: #25cfc4;
+  transform: scale(1.05);
+}
+
+
+/* --- Улучшения для радиокнопок/чекбоксов (если нужно) --- */
+.checkboxLabel, .radioLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkboxInput, .radioInput {
+   /* Стили из твоего варианта или новые */
+   appearance: none;
+   margin-right: 15px;
+   width: 30px;
+   height: 30px;
+   border: 2px solid #00B9AE;
+   border-radius: 50%;
+   background-color: transparent;
+   cursor: pointer;
+   position: relative;
+   flex-shrink: 0; /* Предотвращает сжатие */
+}
+
+.checkboxInput:checked::after,
+.radioInput:checked::after {
+   content: "";
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   width: 17px; /* Размер точки */
+   height: 17px;
+   background-color: #00B9AE;
+   border-radius: 50%;
+}
+
+.optionText {
+    /* Стили для текста варианта ответа */
+    font-size: 28px; /* Убедись, что размер соответствует .option_item */
+    color: var(--clr-default-500);
+    text-transform: uppercase;
+    line-height: 1.2; /* Может помочь с выравниванием */
+}
+
+/* Адаптивность для результатов */
+@media (max-width: 822px) {
+    .resultsTitle {
+        font-size: 28px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    .resultsGrid {
+        width: 95%;
+        gap: 15px;
+         /* Можно изменить minmax для мобильных */
+         grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+     .loadingMessage,
+    .errorMessage,
+    .noResultsMessage {
+        font-size: 18px;
+        margin-top: 30px;
+    }
+    .movieCardTitle {
+        font-size: 14px;
+    }
+    .resetButton {
+        width: 200px;
+        height: 50px;
+        font-size: 16px;
+    }
+}

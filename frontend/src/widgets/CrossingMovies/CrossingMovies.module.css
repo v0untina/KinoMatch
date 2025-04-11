@@ -1,69 +1,77 @@
+/* frontend/src/widgets/CrossingMovies/CrossingMovies.module.css */
+
 .main {
-    min-height: 100vh;
-    padding: 40px;
+    min-height: 100vh; /* Минимальная высота на весь экран */
+    padding: 40px 20px; /* Добавляем горизонтальные отступы */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 20px; /* Пространство между основными блоками */
+    background-color: var(--clr-default-50); /* Светлый фон для страницы */
+    color: var(--clr-default-900); /* Темный текст по умолчанию */
 }
-  
+
+/* --- ЗАГОЛОВКИ --- */
 .title {
-    font-size: 3rem;
+    font-size: 3rem; /* Крупный заголовок */
     text-transform: uppercase;
     font-weight: bold;
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem; /* Меньший отступ снизу */
+    color: var(--clr-primary-500); /* Используем основной цвет */
 }
-  
-.subtitle {
+
+.subtitle { /* Подзаголовок (если будет использоваться) */
     font-size: 1.5rem;
     text-align: center;
     margin-bottom: 2rem;
-    color: #555;
+    color: #555; /* Серый цвет */
     font-weight: normal;
 }
 
-.action_title {
+.action_title { /* Заголовок над попкорнами */
     font-size: 1.8rem;
     text-align: center;
-    margin-bottom: 2rem;
-    color: #000;
-    font-weight: bold;
+    margin-bottom: 1rem; /* Уменьшенный отступ */
+    color: var(--clr-default-700); /* Темно-серый */
+    font-weight: 600; /* Полужирный */
     text-transform: uppercase;
 }
-  
+
+/* --- ВЫБОР КОЛИЧЕСТВА (ПОПКОРНЫ) --- */
 .popcorn_container {
     display: flex;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem; /* Расстояние между попкорнами */
+    margin-bottom: 3rem; /* Больший отступ снизу */
 }
-  
+
 .popcorn_wrapper {
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease; /* Плавные переходы */
 }
-  
-.popcorn_wrapper:hover {
-    transform: scale(1.1);
+
+.popcorn_wrapper:hover:not(.disabled) { /* Эффект при наведении, если не отключен */
+    transform: scale(1.1); /* Увеличение */
 }
-  
+
 .popcorn_wrapper.inactive {
-    opacity: 0.6;
+    opacity: 0.5; /* Полупрозрачность для невыбранных */
 }
-  
+
 .popcorn_wrapper.disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    filter: grayscale(100%);
+    opacity: 0.4; /* Сильнее затемнение для отключенных */
+    cursor: not-allowed; /* Курсор "нельзя" */
+    filter: grayscale(80%); /* Почти черно-белый */
 }
-  
+
 .popcorn_image {
-    width: 80px;
-    height: 80px;
-    object-fit: contain;
+    width: 70px; /* Немного уменьшим */
+    height: 70px;
+    object-fit: contain; /* Сохраняем пропорции */
 }
-  
+
+/* Номер внутри попкорна (если нужен) */
 .popcorn_number {
     position: absolute;
     top: 50%;
@@ -71,225 +79,351 @@
     transform: translate(-50%, -50%);
     font-size: 1.5rem;
     font-weight: bold;
-    color: #000;
+    color: #000; /* Черный номер */
 }
 
+/* --- КОНТЕЙНЕР ДЛЯ КАРТОЧЕК ВВОДА --- */
 .movies_container {
     display: flex;
-    align-items: flex-start;
-    gap: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-    max-width: 1760px;
-    margin: 30px 0;
+    align-items: flex-start; /* Карточки выравниваются по верху */
+    gap: 25px; /* Расстояние между карточками и разделителем */
+    flex-wrap: wrap; /* Перенос на новую строку при нехватке места */
+    justify-content: center; /* Центрирование по горизонтали */
+    width: 100%; /* Занимает всю доступную ширину */
+    max-width: 1760px; /* Ограничение максимальной ширины */
+    margin: 30px 0; /* Вертикальные отступы */
 }
-  
+
+/* --- КАРТОЧКА ДЛЯ ВВОДА ФИЛЬМА --- */
 .movie_card {
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 1px solid #ddd;
-    width: 240px;
+    border-radius: 12px; /* Скругление углов */
+    overflow: visible; /* Чтобы подсказки были видны */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Тень */
+    border: 1px solid #e0e0e0; /* Светлая граница */
+    width: 250px; /* Ширина карточки */
+    background-color: #ffffff; /* Белый фон */
+    display: flex; /* Используем flex для структуры */
+    flex-direction: column; /* Элементы внутри - в колонку */
 }
-  
-.movie_content {
-    padding: 25px;
+
+.movie_content { /* Заголовок карточки ("Фильм 1") */
+    padding: 15px 20px; /* Внутренние отступы */
     text-align: center;
-    font-weight: bold;
-    font-size: 1.3rem;
-    min-height: 70px;
+    font-weight: 600; /* Полужирный */
+    font-size: 1.2rem; /* Размер шрифта */
+    min-height: 60px; /* Минимальная высота */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid #eee;
-}
-  
-.search_container {
-    padding: 20px;
-    /* Убираем отступ снизу, если он не нужен или мешает списку */
-    /* padding-bottom: 0; */
-}
-  
-.image_crossing{
-    width: 79px;
-    height: 70px;
-    margin-top: 10px;
+    border-bottom: 1px solid #eee; /* Разделитель */
+    background-color: #f9f9f9; /* Слегка серый фон заголовка */
+    color: var(--clr-default-800);
+    border-radius: 12px 12px 0 0; /* Скругление только верхних углов */
 }
 
-.search_input {
-    width: 100%;
-    padding: 10px 15px;
-    border: 1px solid #ccc;
-    border-radius: 25px;
-    outline: none;
-    transition: all 0.3s;
-    font-size: 1rem;
-}
-
-.search_input:focus {
-    border-color: #00B9AE;
-    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.4);
-    /* Добавляем скругление только верхних углов, если список активен */
-    /* Можно реализовать через JS добавлением класса, если нужно */
-    /* border-radius: 8px 8px 0 0; */
-}
-  
-.button_set, .button_random{
-  background-color: #00B9AE;
-  padding: 5px;
-  border-radius: 19px;
-  box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4);
-  transition: transform 0.3s ease, background-color 0.3s ease;
-  font-weight: bold;
-  text-transform: uppercase;
-  color: white;
-}
-
-.button_set:hover, .button_random:hover{
-    background-color: #25cfc4;
-    cursor: pointer;
-    transform: scale(1.05);
-}
-
-.button_set{
-    height: 50px;
-    width: 240px;
-}
-
-.button_random{
-    height: 50px;
-    width: 50px;
-}
-
-.image_random{
-    width: 50px;
-    height: 40px;
-}
-
-.buttons_result{
-    display: flex;
-    gap: 17px;
-}
-
-.search_input:focus {
-    border-color: #00B9AE;
-    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.4);
-    ;
-}
-  
+/* --- РАЗДЕЛИТЕЛЬ "+" --- */
 .divider {
     display: flex;
-    align-items: center;
-    padding: 0 10px;
-    margin-top: 50px;
+    align-items: center; /* Выравниваем по центру по вертикали */
+    padding: 0 10px; /* Отступы по бокам */
+    margin-top: 60px; /* Отступ сверху, чтобы был примерно на уровне инпута */
 }
 
-.result {
-    width: 1200px;
-    height: 800px;
-    background-color: #25cfc4;
+.image_crossing{
+    width: 60px; /* Размер иконки "+" */
+    height: 60px;
+    opacity: 0.6; /* Слегка прозрачный */
 }
 
-
-@media (max-width: 768px) {
-    .movies_container {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .divider {
-        margin: 15px 0;
-        transform: rotate(90deg);
-    }
-    
-    .title {
-        font-size: 2.2rem;
-    }
-    
-    .subtitle {
-        font-size: 1.2rem;
-    }
-    
-    .action_title {
-        font-size: 1.5rem;
-    }
-}
-
-
+/* --- ОБЕРТКА ДЛЯ ИНПУТА И ПОДСКАЗОК --- */
 .search_wrapper {
-    position: relative;
+    position: relative; /* Для позиционирования списка подсказок */
+    flex-grow: 1; /* Занимает оставшееся место в карточке */
 }
 
-.movie_card {
-    border-radius: 10px;
-    overflow: visible;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: 1px solid #444;
-    width: 240px;
-    background-color: #1c1c1e;
+/* Контейнер для самого поля ввода */
+.search_container {
+    padding: 20px; /* Отступы вокруг поля ввода */
 }
 
+/* Поле ввода */
+.search_input {
+    width: 100%;
+    padding: 12px 18px; /* Увеличенные отступы */
+    border: 1px solid #ccc; /* Стандартная граница */
+    border-radius: 25px; /* Скругленные края */
+    outline: none; /* Убираем стандартный контур */
+    transition: all 0.3s ease; /* Плавные переходы */
+    font-size: 1rem; /* Размер шрифта */
+    background-color: #fff; /* Белый фон */
+    color: #333; /* Темный текст */
+}
+
+.search_input:focus {
+    border-color: #00B9AE; /* Бирюзовый цвет при фокусе */
+    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.3); /* Легкое свечение */
+    background-color: #f0fafa; /* Очень светлый бирюзовый фон при фокусе */
+}
+.search_input::placeholder {
+    color: #999; /* Цвет плейсхолдера */
+}
+
+/* --- СПИСОК ПОДСКАЗОК --- */
 .suggestions_list {
     position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: #28282a;
-    border: 1px solid var(--nextui-border-color, #444);
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    list-style: none;
+    top: calc(100% - 20px); /* Позиционируем под инпутом (минус padding-bottom у search_container) */
+    left: 20px; /* С отступом слева, как у инпута */
+    right: 20px; /* С отступом справа, как у инпута */
+    background-color: #ffffff; /* Белый фон */
+    border: 1px solid #00B9AE; /* Бирюзовая граница, как у фокуса инпута */
+    border-top: none; /* Убираем верхнюю границу */
+    border-radius: 0 0 8px 8px; /* Скругление только нижних углов */
+    list-style: none; /* Убираем маркеры списка */
     margin: 0;
     padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 20;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+    max-height: 200px; /* Ограничение высоты */
+    overflow-y: auto; /* Прокрутка при необходимости */
+    z-index: 20; /* Поверх других элементов */
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Тень под списком */
 }
 
+/* Элемент списка подсказок */
 .suggestion_item,
 .suggestion_item_loading,
 .suggestion_item_no_results {
-    padding: 10px 15px;
+    padding: 10px 15px; /* Внутренние отступы */
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    font-size: 0.95rem;
-    color: var(--nextui-foreground, #e1e1e1);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    transition: background-color 0.2s ease; /* Плавный переход фона */
+    font-size: 0.95rem; /* Размер шрифта подсказки */
+    color: var(--clr-default-700); /* Цвет текста */
+    white-space: nowrap; /* Запрет переноса */
+    overflow: hidden; /* Обрезка лишнего */
+    text-overflow: ellipsis; /* Многоточие для длинных названий */
 }
 
 .suggestion_item:hover {
-    background-color: var(--nextui-focus, #00B9AE);
-    color: #ffffff;
+    background-color: #e0f7f5; /* Светло-бирюзовый фон при наведении */
+    color: #00796b; /* Темно-бирюзовый текст при наведении */
 }
 
+/* Стили для "Загрузка..." и "Ничего не найдено" */
 .suggestion_item_loading,
 .suggestion_item_no_results {
-    cursor: default;
-    color: #777;
-    font-style: italic;
+    cursor: default; /* Обычный курсор */
+    color: #888; /* Серый цвет */
+    font-style: italic; /* Курсив */
 }
 
 .suggestion_item_loading:hover,
 .suggestion_item_no_results:hover {
-    background-color: transparent;
-    color: #777;
+    background-color: transparent; /* Убираем фон при наведении */
+    color: #888; /* Оставляем серым */
 }
 
-.search_container {
-    padding: 20px;
+/* --- КНОПКИ ДЕЙСТВИЙ --- */
+.buttons_result{
+    display: flex;
+    gap: 17px; /* Расстояние между кнопками */
+    margin-top: 20px; /* Отступ сверху */
+    margin-bottom: 30px; /* Отступ снизу */
 }
 
-.search_input {
-    background-color: #333;
-    color: #eee;
-    border: 1px solid #555;
+.button_set, .button_random {
+  background-color: #00B9AE; /* Бирюзовый фон */
+  padding: 0 20px; /* Горизонтальные падинги */
+  border-radius: 25px; /* Сильно скругленные края */
+  box-shadow: 0px 6px 12px rgba(0, 185, 174, 0.3); /* Тень */
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease; /* Плавные переходы */
+  font-weight: 600; /* Полужирный */
+  text-transform: uppercase;
+  color: white; /* Белый текст */
+  border: none; /* Убираем границу */
+  cursor: pointer; /* Курсор-палец */
+  display: flex; /* Для центрирования иконки */
+  align-items: center;
+  justify-content: center;
 }
 
-.search_input:focus {
-    border-color: #00B9AE;
-    box-shadow: 0 0 0 3px rgba(0, 185, 174, 0.4);
-    background-color: #444;
+.button_set { /* Основная кнопка */
+    height: 50px;
+    width: 240px; /* Ширина */
+    font-size: 1rem; /* Размер шрифта */
+}
+
+.button_random { /* Кнопка с кубиком */
+    height: 50px;
+    width: 50px; /* Квадратная */
+    padding: 0; /* Убираем паддинги для иконки */
+}
+
+.button_set:hover, .button_random:hover {
+    background-color: #00a396; /* Чуть темнее при наведении */
+    transform: translateY(-2px); /* Небольшой подъем */
+    box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.4); /* Увеличенная тень */
+}
+
+/* Отключенные кнопки */
+.button_set:disabled, .button_random:disabled {
+    background-color: #b0bec5; /* Серый фон */
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    opacity: 0.7;
+}
+
+/* Иконка кубика */
+.image_random{
+    width: 28px; /* Размер иконки */
+    height: 28px;
+}
+
+/* --- ОБЛАСТЬ ВЫВОДА РЕЗУЛЬТАТА --- */
+.result {
+    margin-top: 30px; /* Отступ сверху */
+    width: 100%; /* Ширина */
+    max-width: 300px; /* Макс ширина для одной карточки результата */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px; /* Примерная высота для карточки или сообщений */
+    padding: 20px; /* Отступы */
+    /* background-color: #f0f0f0; */ /* Убрал заливку области */
+}
+
+/* Стили для сообщений */
+.loadingMessage,
+.errorMessage {
+  font-size: 1.2rem; /* Размер текста */
+  color: var(--clr-default-600); /* Серый текст */
+  text-align: center;
+}
+.errorMessage {
+  color: #d32f2f; /* Красный для ошибок */
+  font-weight: 500;
+}
+
+/* Контейнер для ОДНОЙ карточки результата */
+.recommendation_output_single {
+   display: flex;
+   justify-content: center;
+}
+
+/* Стили для карточки результата (могут отличаться от карточек ввода) */
+.movieCardResult {
+  width: 250px; /* Такая же ширина, как у карточки ввода */
+  background-color: #ffffff; /* Белый фон */
+  border-radius: 12px; /* Скругление */
+  overflow: hidden; /* Обрезка изображения */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Тень */
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+.movieCardResult:hover {
+    transform: scale(1.03); /* Небольшое увеличение при наведении */
+}
+
+.movieCardImageResult {
+  width: 100%; /* Изображение на всю ширину */
+  height: auto; /* Авто высота */
+  aspect-ratio: 2 / 3; /* Соотношение сторон постера */
+  object-fit: cover; /* Масштабирование */
+  display: block; /* Убирает лишний отступ */
+  background-color: #e0e0e0; /* Цвет фона для заглушки */
+}
+
+.movieCardTitleResult {
+  margin-top: 10px; /* Отступ сверху */
+  margin-bottom: 15px; /* Отступ снизу */
+  font-size: 1rem; /* Размер шрифта */
+  font-weight: 600; /* Полужирный */
+  color: var(--clr-default-800); /* Темно-серый текст */
+  padding: 0 10px; /* Горизонтальные отступы */
+  white-space: nowrap; /* Запрет переноса */
+  overflow: hidden; /* Обрезка */
+  text-overflow: ellipsis; /* Многоточие */
+}
+
+/* --- АДАПТИВНОСТЬ --- */
+@media (max-width: 1200px) {
+    .movies_container {
+        gap: 20px; /* Уменьшаем зазор */
+    }
+    .movie_card, .movieCardResult {
+        width: 220px; /* Уменьшаем карточки */
+    }
+    .divider {
+        margin-top: 45px; /* Поднимаем разделитель */
+    }
+    .image_crossing {
+        width: 50px; height: 50px;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 20px 10px; /* Уменьшаем отступы */
+    }
+    .title {
+        font-size: 2rem; /* Уменьшаем заголовки */
+    }
+    .action_title {
+        font-size: 1.3rem;
+    }
+    .popcorn_image {
+        width: 50px; height: 50px; /* Уменьшаем попкорн */
+    }
+    .popcorn_container {
+        gap: 1rem;
+    }
+    .movies_container {
+        flex-direction: column; /* Карточки ввода в колонку */
+        align-items: center; /* Центрируем по горизонтали */
+        gap: 15px; /* Уменьшаем зазор */
+    }
+    .divider {
+        margin: 10px 0; /* Разделитель между карточками в колонке */
+        transform: rotate(90deg); /* Поворачиваем + */
+    }
+    .movie_card, .movieCardResult {
+        width: 85%; /* Карточки шире на мобильных */
+        max-width: 300px;
+    }
+    .buttons_result {
+        flex-direction: column; /* Кнопки в колонку */
+        align-items: center;
+        gap: 10px;
+    }
+    .button_set {
+        width: 220px; /* Фиксированная ширина */
+    }
+    .result {
+        min-height: 300px; /* Уменьшаем минимальную высоту результата */
+        max-width: 90%; /* Ограничиваем ширину результата */
+    }
+}
+
+@media (max-width: 480px) {
+     .title {
+        font-size: 1.8rem;
+    }
+     .action_title {
+        font-size: 1.1rem;
+    }
+     .popcorn_image {
+        width: 40px; height: 40px;
+    }
+    .movie_content {
+        font-size: 1rem;
+        min-height: 50px;
+        padding: 10px;
+    }
+    .search_container { padding: 15px; }
+    .search_input { padding: 10px 15px; font-size: 0.9rem; }
+    .suggestions_list { left: 15px; right: 15px; top: calc(100% - 15px); }
+    .suggestion_item { padding: 8px 12px; font-size: 0.9rem; }
+    .button_set { width: 200px; height: 45px; font-size: 0.9rem;}
+    .button_random { width: 45px; height: 45px;}
+    .image_random { width: 24px; height: 24px;}
+    .movieCardResult, .movie_card { width: 90%; max-width: 280px;}
+    .movieCardTitleResult { font-size: 0.9rem; }
 }
