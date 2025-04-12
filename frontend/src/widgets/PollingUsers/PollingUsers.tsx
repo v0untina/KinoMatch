@@ -1,12 +1,13 @@
 // frontend/src/widgets/PollingUsers/PollingUsers.tsx
-// (Предполагая, что файл находится по этому пути, если нет - скорректируй импорт стилей)
 "use client";
 import React, { useState } from "react";
+import Link from "next/link"; // Импортируем Link
 import styles from "./Polling.module.css"; // Убедись, что путь к стилям верный
 import axios from "axios"; // Импортируем axios для HTTP-запросов
 
-// --- ИНТЕРФЕЙС ДЛЯ ОБЪЕКТА РЕКОМЕНДАЦИИ ---
+// --- ИНТЕРФЕЙС ДЛЯ ОБЪЕКТА РЕКОМЕНДАЦИИ (теперь с ID) ---
 interface MovieRecommendation {
+  movie_id: number; // Добавляем ID
   titleLine: string; // Строка вида "Название (Год)"
   posterFilename: string | null; // Имя файла постера или null
 }
@@ -14,52 +15,51 @@ interface MovieRecommendation {
 // --- ИНТЕРФЕЙС ДЛЯ ОТВЕТА API ---
 interface PollApiResponse {
   success: boolean;
-  recommendations?: MovieRecommendation[]; // Массив объектов рекомендаций
+  recommendations?: MovieRecommendation[]; // Массив обновленных объектов рекомендаций
   error?: string;
 }
 
-// --- КОМПОНЕНТ КАРТОЧКИ ФИЛЬМА ---
-// (Можно вынести в отдельный файл src/components/MovieCard/MovieCard.tsx)
-const MovieCard = ({ titleLine, posterFilename }: MovieRecommendation) => {
+// --- КОМПОНЕНТ КАРТОЧКИ ФИЛЬМА (теперь кликабельный) ---
+const MovieCard = ({ movie_id, titleLine, posterFilename }: MovieRecommendation) => {
     // Извлекаем название из строки "Название (Год)" для alt и title
     const titleMatch = titleLine.match(/^"?(.+?)"?(?:\s+\(\d{4}\))?$/);
-    const displayTitle = titleMatch ? titleMatch[1].trim() : titleLine;
+    const displayTitle = titleMatch ? titleMatch[1].trim() : titleLine; // Запасной вариант - вся строка
 
-    // --- Формируем путь к постеру ---
-    const imageBasePath = "/posters/"; // Базовый путь к папке постеров в /public
-    const placeholderImage = `${imageBasePath}placeholder.jpg`; // Путь к заглушке
-    // Собираем полный URL: используем posterFilename или заглушку
+    // Формируем путь к постеру
+    const imageBasePath = "/posters/";
+    const placeholderImage = `${imageBasePath}placeholder.jpg`;
     const imageUrl = posterFilename ? `${imageBasePath}${posterFilename}` : placeholderImage;
-    // ---------------------------------
 
-    // Обработчик ошибок загрузки изображения: заменяет src на заглушку
     const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
         console.warn(`Ошибка загрузки постера: ${imageUrl}. Используется заглушка.`);
         e.currentTarget.src = placeholderImage;
     };
 
     return (
-        <div className={styles.movieCard}>
-            <img
-                src={imageUrl}
-                alt={displayTitle} // Используем чистое название для alt
-                className={styles.movieCardImage}
-                onError={handleImageError} // Устанавливаем обработчик ошибок
-                loading="lazy" // Добавляем ленивую загрузку для изображений
-            />
-            <p className={styles.movieCardTitle} title={displayTitle}> {/* Добавляем title для длинных названий */}
-                {displayTitle}
-            </p>
-        </div>
+        // Оборачиваем карточку в Link
+        <Link href={`/films/${movie_id}`} className={styles.movieCardLink} title={`Перейти к фильму: ${displayTitle}`}>
+            <div className={styles.movieCard}>
+                <img
+                    src={imageUrl}
+                    alt={displayTitle}
+                    className={styles.movieCardImage}
+                    onError={handleImageError}
+                    loading="lazy"
+                />
+                <p className={styles.movieCardTitle} title={displayTitle}>
+                    {displayTitle}
+                </p>
+            </div>
+        </Link>
     );
 }
 
 // --- ОСНОВНОЙ КОМПОНЕНТ ОПРОСА ---
 export default function Pollingusers() {
-  // Массив с вопросами и вариантами ответов
+  // Массив вопросов (оставляем как есть)
   const questions = [
     { question: "Какое настроение вы хотите испытать после просмотра фильма?", options: ["Радость и смех", "Напряжение и волнение", "Глубокие размышления", "Ностальгия"], multipleChoice: false, },
-    { question: "Какой жанр вам ближе всего в данный момент? (выберите несколько)", options: ["Комедия", "Ужасы", "Научная фантастика", "Романтика", "Документальный", "Боевик", "Триллер", "Драма"], multipleChoice: true, }, // Добавил пару жанров
+    { question: "Какой жанр вам ближе всего в данный момент? (выберите несколько)", options: ["Комедия", "Ужасы", "Научная фантастика", "Романтика", "Документальный", "Боевик", "Триллер", "Драма"], multipleChoice: true, },
     { question: "Какой тип времени суток вам предпочтителен для просмотра фильма?", options: ["Утро", "Днем", "Вечером", "Ночью"], multipleChoice: false, },
     { question: "Какой стиль повествования вам больше нравится?", options: ["Линейный (по порядку)", "Нелинейный", "Антология", "Документальный стиль"], multipleChoice: false, },
     { question: "Какой уровень сложности сюжета вы предпочитаете?", options: ["Легкий и предсказуемый", "Умеренно сложный", "Требующий анализа", "Сложный"], multipleChoice: false, },
@@ -72,180 +72,93 @@ export default function Pollingusers() {
 
   // Состояния компонента
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
-  const [answers, setAnswers] = useState<Record<number, string | string[]>>({}); // Ответы пользователя
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Флаг загрузки рекомендаций
-  const [error, setError] = useState<string | null>(null); // Сообщение об ошибке
-  const [recommendations, setRecommendations] = useState<MovieRecommendation[]>([]); // Результаты - массив объектов
-  const [showResults, setShowResults] = useState<boolean>(false); // Показать экран результатов?
+  const [answers, setAnswers] = useState<Record<number, string | string[]>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  // Используем обновленный тип MovieRecommendation
+  const [recommendations, setRecommendations] = useState<MovieRecommendation[]>([]);
+  const [showResults, setShowResults] = useState<boolean>(false);
 
-  // URL Flask API из переменных окружения
-  // Убедись, что в frontend/.env.local есть: NEXT_PUBLIC_FLASK_API_URL=http://93.115.104.249:5000
   const flaskApiUrl = process.env.NEXT_PUBLIC_FLASK_API_URL;
 
-  // Обработчик выбора ответа для одиночного выбора (радиокнопки)
-  const handleAnswerSelect = (answer: string) => {
-    setAnswers((prevAnswers) => ({
-      ...prevAnswers,
-      [currentQuestionIndex]: answer,
-    }));
-  };
+  // Обработчики ответов (handleAnswerSelect, handleMultipleChoiceSelect - без изменений)
+   const handleAnswerSelect = (answer: string) => { setAnswers((prev) => ({ ...prev, [currentQuestionIndex]: answer })); };
+   const handleMultipleChoiceSelect = (answer: string) => {
+     setAnswers((prev) => {
+       const current = (prev[currentQuestionIndex] as string[]) || [];
+       const newAnswers = current.includes(answer) ? current.filter((i) => i !== answer) : [...current, answer];
+       return { ...prev, [currentQuestionIndex]: newAnswers };
+     });
+   };
 
-  // Обработчик выбора ответа для множественного выбора (чекбоксы)
-  const handleMultipleChoiceSelect = (answer: string) => {
-    setAnswers((prevAnswers) => {
-      const currentAnswers = (prevAnswers[currentQuestionIndex] as string[]) || [];
-      // Если ответ уже есть - удаляем, если нет - добавляем
-      const newAnswers = currentAnswers.includes(answer)
-        ? currentAnswers.filter((item) => item !== answer)
-        : [...currentAnswers, answer];
-      return {
-        ...prevAnswers,
-        [currentQuestionIndex]: newAnswers,
-      };
-    });
-  };
-
-  // Асинхронная функция отправки ответов и получения рекомендаций
+  // Асинхронная функция отправки ответов
   const submitPollAndGetRecommendations = async () => {
-      if (!flaskApiUrl) {
-          setError("Ошибка конфигурации: URL API не найден.");
-          console.error("Ошибка: NEXT_PUBLIC_FLASK_API_URL не установлена в .env.local");
-          setShowResults(true); // Показать экран с ошибкой
-          return;
-      }
+      if (!flaskApiUrl) { setError("URL API не настроен."); setShowResults(true); return; }
 
-      setIsLoading(true); // Включаем индикатор загрузки
-      setError(null); // Сбрасываем предыдущие ошибки
-      setRecommendations([]); // Очищаем предыдущие рекомендации
-      setShowResults(true); // Переключаемся на экран результатов
-
-      console.log("Отправляемые ответы:", answers); // Лог для отладки
+      setIsLoading(true); setError(null); setRecommendations([]); setShowResults(true);
+      console.log("Отправляемые ответы:", answers);
 
       try {
-          // Отправляем POST-запрос на Flask API
-          const response = await axios.post<PollApiResponse>(
-              `${flaskApiUrl}/api/submit_poll`,
-              answers // Тело запроса - объект с ответами
-          );
+          // Запрос к Flask API (ожидаем обновленный формат ответа)
+          const response = await axios.post<PollApiResponse>(`${flaskApiUrl}/api/submit_poll`, answers);
+          console.log("Ответ API:", response.data);
 
-          console.log("Ответ API:", response.data); // Лог для отладки
-
-          // Обрабатываем успешный ответ
           if (response.data.success && response.data.recommendations) {
-              // Фильтруем на случай пустых строк или объектов (доп. подстраховка)
-              const validRecs = response.data.recommendations.filter(rec => rec && rec.titleLine);
+              // Фильтруем на случай некорректных данных (наличие ID и titleLine)
+              const validRecs = response.data.recommendations.filter(rec => rec && rec.movie_id && rec.titleLine);
               setRecommendations(validRecs);
-              if (validRecs.length === 0) {
-                  setError("Не удалось подобрать фильмы по вашим критериям."); // Сообщение если массив пуст, но success=true
-              }
+              if (validRecs.length === 0) { setError("Не удалось подобрать фильмы по вашим критериям."); }
           } else {
-              // Обрабатываем неуспешный ответ (success=false или нет поля recommendations)
               setError(response.data.error || "Не удалось получить рекомендации.");
           }
-
       } catch (err) {
-          // Обрабатываем ошибки сети или HTTP-статуса
           console.error("Ошибка при отправке опроса:", err);
             if (axios.isAxiosError(err)) {
-                 if (err.response) {
-                     // Ошибка от сервера Flask (включая 404)
-                     setError(err.response.data?.error || `Ошибка сервера (${err.response.status})`);
-                 } else if (err.request) {
-                     // Запрос сделан, но ответ не получен
-                     setError("Не удалось подключиться к серверу рекомендаций. Проверьте сеть.");
-                 } else {
-                     // Ошибка настройки запроса
-                     setError(`Ошибка при формировании запроса: ${err.message}`);
-                 }
-            } else {
-                // Другие типы ошибок
-                setError("Произошла неизвестная ошибка при запросе рекомендаций.");
-            }
+                 setError(err.response?.data?.error || `Ошибка сервера (${err.response?.status || 'N/A'})` || (err.request ? "Нет ответа от сервера." : `Ошибка запроса: ${err.message}`));
+            } else { setError("Неизвестная ошибка при запросе."); }
       } finally {
-          setIsLoading(false); // Выключаем индикатор загрузки в любом случае
+          setIsLoading(false);
       }
   };
 
-  // Обработчик нажатия кнопки "Далее" или "Показать результаты"
+  // Обработчик кнопки "Далее" (без изменений)
   const handleNext = () => {
     const currentAnswers = answers[currentQuestionIndex];
-    // Проверка, что ответ дан
-    if (!currentAnswers || (Array.isArray(currentAnswers) && currentAnswers.length === 0)) {
-      alert("Пожалуйста, выберите ответ или варианты ответа.");
-      return;
-    }
-
-    // Если не последний вопрос - переходим к следующему
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      // Если последний вопрос - отправляем данные на бэкенд
-      submitPollAndGetRecommendations();
-    }
+    if (!currentAnswers || (Array.isArray(currentAnswers) && currentAnswers.length === 0)) { alert("Пожалуйста, выберите ответ."); return; }
+    if (currentQuestionIndex < questions.length - 1) { setCurrentQuestionIndex(currentQuestionIndex + 1); }
+    else { submitPollAndGetRecommendations(); }
   };
 
-   // Обработчик нажатия кнопки "Пройти еще раз"
+   // Обработчик кнопки "Пройти еще раз" (без изменений)
    const handleReset = () => {
-        setCurrentQuestionIndex(0); // Возвращаемся к первому вопросу
-        setAnswers({}); // Сбрасываем ответы
-        setIsLoading(false); // Сбрасываем флаги
-        setError(null);
-        setRecommendations([]);
-        setShowResults(false); // Скрываем экран результатов
-   }
+        setCurrentQuestionIndex(0); setAnswers({}); setIsLoading(false);
+        setError(null); setRecommendations([]); setShowResults(false);
+   };
 
-  // Получаем данные текущего вопроса
   const currentQuestion = questions[currentQuestionIndex];
 
-  // Основная разметка компонента
+  // Основная разметка
   return (
     <main className={styles.main}>
-      {/* Условный рендеринг: либо вопросы, либо результаты */}
       {!showResults ? (
         // --- ЭКРАН С ВОПРОСАМИ ---
         <>
-          <h1 className={styles.title}>Найдите идеальный фильм за считанные минуты <br />с помощью нашего опроса</h1>
+          <h1 className={styles.title}>Найдите идеальный фильм <br />с помощью нашего опроса</h1>
           <div className={styles.questions_container}>
-            {/* Прогресс-бар (опционально) */}
-            {/* <div className={styles.progressBar}> ... </div> */}
             <h2 className={styles.h2}>{currentQuestion.question}</h2>
             <div className={styles.options}>
-              {/* Рендерим варианты ответов */}
               {currentQuestion.options.map((option, index) => (
                 <div key={index} className={styles.option_item}>
                   {currentQuestion.multipleChoice ? (
-                    // Чекбокс для множественного выбора
-                    <label className={styles.checkboxLabel}>
-                      <input
-                        type="checkbox"
-                        className={styles.checkboxInput}
-                        // Проверяем, включен ли ответ в массив ответов для текущего вопроса
-                        checked={answers[currentQuestionIndex]?.includes(option)}
-                        onChange={() => handleMultipleChoiceSelect(option)}
-                      />
-                      <span className={styles.optionText}>{option}</span>
-                    </label>
+                    <label className={styles.checkboxLabel}> <input type="checkbox" className={styles.checkboxInput} checked={answers[currentQuestionIndex]?.includes(option)} onChange={() => handleMultipleChoiceSelect(option)}/> <span className={styles.optionText}>{option}</span> </label>
                   ) : (
-                    // Радиокнопка для одиночного выбора
-                    <label className={styles.radioLabel}>
-                       <input
-                           type="radio"
-                           name={`question-${currentQuestionIndex}`} // Уникальное имя для группы радиокнопок
-                           className={styles.radioInput}
-                           // Проверяем, равен ли ответ текущему выбору
-                           checked={answers[currentQuestionIndex] === option}
-                           onChange={() => handleAnswerSelect(option)}
-                       />
-                       <span className={styles.optionText}>{option}</span>
-                    </label>
+                    <label className={styles.radioLabel}> <input type="radio" name={`question-${currentQuestionIndex}`} className={styles.radioInput} checked={answers[currentQuestionIndex] === option} onChange={() => handleAnswerSelect(option)}/> <span className={styles.optionText}>{option}</span> </label>
                   )}
                 </div>
               ))}
             </div>
-            {/* Кнопка навигации */}
             <div className={styles.button_layout}>
               <button className={styles.next_button} onClick={handleNext}>
-                {/* Текст кнопки меняется на последнем вопросе */}
                 {currentQuestionIndex === questions.length - 1 ? "Показать результаты" : "Далее"}
               </button>
             </div>
@@ -255,38 +168,27 @@ export default function Pollingusers() {
         // --- ЭКРАН С РЕЗУЛЬТАТАМИ ---
         <>
           <h1 className={styles.resultsTitle}>Предлагаем вам посмотреть следующие фильмы</h1>
-
-          {/* Индикатор загрузки */}
-          {isLoading && <p className={styles.loadingMessage}>Подбираем для вас лучшие фильмы...</p>}
-
-          {/* Сообщение об ошибке */}
+          {isLoading && <p className={styles.loadingMessage}>Подбираем фильмы...</p>}
           {error && <p className={styles.errorMessage}>Ошибка: {error}</p>}
-
-          {/* Сетка с результатами, если нет загрузки, нет ошибки и есть рекомендации */}
           {!isLoading && !error && recommendations.length > 0 && (
              <div className={styles.resultsGrid}>
-                 {/* Рендерим карточку для каждой рекомендации */}
-                 {recommendations.map((rec, index) => (
+                 {/* Рендерим кликабельную карточку для каждой рекомендации */}
+                 {recommendations.map((rec) => (
                      <MovieCard
-                        key={index} // Используем индекс как ключ (или лучше ID фильма, если он будет)
-                        titleLine={rec.titleLine}
+                        key={rec.movie_id} // Используем ID фильма как ключ
+                        movie_id={rec.movie_id}
+                        titleLine={rec.titleLine} // Передаем для извлечения названия
                         posterFilename={rec.posterFilename}
                      />
                  ))}
              </div>
           )}
-
-          {/* Сообщение, если фильмы не найдены (но ошибки запроса не было) */}
           {!isLoading && !error && recommendations.length === 0 && (
-              <p className={styles.noResultsMessage}>К сожалению, по вашим ответам сейчас не удалось подобрать фильмы из нашей базы.</p>
+              <p className={styles.noResultsMessage}>К сожалению, по вашим ответам сейчас не удалось подобрать фильмы.</p>
           )}
-
-          {/* Кнопка "Пройти еще раз", показывается после загрузки/ошибки */}
           {!isLoading && (
-            <div className={styles.button_layout}> {/* Используем тот же контейнер для центрирования */}
-                 <button className={styles.resetButton} onClick={handleReset}>
-                    Пройти еще раз
-                 </button>
+            <div className={styles.button_layout}>
+                 <button className={styles.resetButton} onClick={handleReset}>Пройти еще раз</button>
             </div>
           )}
         </>

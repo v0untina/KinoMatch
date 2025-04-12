@@ -12,17 +12,11 @@
       "static/css/app/page.css",
       "static/chunks/app/page.js"
     ],
-    "/login/page": [
+    "/crossing/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/login/page.css",
-      "static/chunks/app/login/page.js"
-    ],
-    "/general/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/general/page.css",
-      "static/chunks/app/general/page.js"
+      "static/css/app/crossing/page.css",
+      "static/chunks/app/crossing/page.js"
     ],
     "/films/[id]/page": [
       "static/chunks/webpack.js",
@@ -30,29 +24,23 @@
       "static/css/app/films/[id]/page.css",
       "static/chunks/app/films/[id]/page.js"
     ],
-    "/polling/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/polling/page.css",
-      "static/chunks/app/polling/page.js"
-    ],
-    "/crossing/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/css/app/crossing/page.css",
-      "static/chunks/app/crossing/page.js"
-    ],
     "/compilations/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/compilations/page.css",
       "static/chunks/app/compilations/page.js"
     ],
-    "/compilations/[id]/page": [
+    "/polling/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/compilations/[id]/page.css",
-      "static/chunks/app/compilations/[id]/page.js"
+      "static/css/app/polling/page.css",
+      "static/chunks/app/polling/page.js"
+    ],
+    "/general/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/general/page.css",
+      "static/chunks/app/general/page.js"
     ]
   }
 }
