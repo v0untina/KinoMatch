@@ -1,3 +1,4 @@
+// frontend/src/widgets/AboutMovie/AboutMovie.tsx
 "use client";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -189,7 +190,7 @@ export default function AboutMovie() {
         <h1 className={styles.title}>{movie.title} | {movie.original_title}</h1>
         
         <div className={styles.meta}>
-        {movie.kinomatch_rating && (
+        {(movie.kinomatch_rating !== null && movie.kinomatch_rating !== undefined) && (
             <div className={styles.rating}>
               <StarRating rating={movie.kinomatch_rating} />
             </div>

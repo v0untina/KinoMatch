@@ -104,21 +104,32 @@
     background-color: #ffffff; /* Белый фон */
     display: flex; /* Используем flex для структуры */
     flex-direction: column; /* Элементы внутри - в колонку */
+    height: 100%; /* Чтобы карточки были одинаковой высоты */
 }
 
-.movie_content { /* Заголовок карточки ("Фильм 1") */
-    padding: 15px 20px; /* Внутренние отступы */
+/* ОБНОВЛЕННЫЙ стиль для заголовка карточки ("Фильм 1" или постер) */
+.movie_content {
+    padding: 0; /* Убираем паддинг, чтобы картинка прилегала к краям */
     text-align: center;
-    font-weight: 600; /* Полужирный */
-    font-size: 1.2rem; /* Размер шрифта */
-    min-height: 60px; /* Минимальная высота */
+    font-weight: 600;
+    font-size: 1.2rem;
+    min-height: 60px; /* Сохраняем минимальную высоту */
     display: flex;
     align-items: center;
     justify-content: center;
-    border-bottom: 1px solid #eee; /* Разделитель */
-    background-color: #f9f9f9; /* Слегка серый фон заголовка */
+    border-bottom: 1px solid #eee;
+    background-color: #f9f9f9;
     color: var(--clr-default-800);
-    border-radius: 12px 12px 0 0; /* Скругление только верхних углов */
+    border-radius: 12px 12px 0 0;
+    overflow: hidden; /* Скрываем части изображения, выходящие за границы */
+}
+
+/* НОВЫЙ стиль для постера в заголовке карточки */
+.movie_content_poster {
+    width: 100%;
+    height: 100%; /* Растягиваем на всю высоту блока .movie_content */
+    object-fit: cover; /* Масштабируем, сохраняя пропорции и обрезая лишнее */
+    display: block; /* Убираем лишние отступы */
 }
 
 /* --- РАЗДЕЛИТЕЛЬ "+" --- */
@@ -139,6 +150,8 @@
 .search_wrapper {
     position: relative; /* Для позиционирования списка подсказок */
     flex-grow: 1; /* Занимает оставшееся место в карточке */
+    /* Добавляем padding снизу, чтобы контент не прилипал к краю */
+    padding-bottom: 20px;
 }
 
 /* Контейнер для самого поля ввода */
@@ -181,24 +194,55 @@
     list-style: none; /* Убираем маркеры списка */
     margin: 0;
     padding: 0;
-    max-height: 200px; /* Ограничение высоты */
+    max-height: 250px; /* Можно увеличить высоту */
     overflow-y: auto; /* Прокрутка при необходимости */
     z-index: 20; /* Поверх других элементов */
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15); /* Тень под списком */
 }
 
-/* Элемент списка подсказок */
-.suggestion_item,
-.suggestion_item_loading,
-.suggestion_item_no_results {
-    padding: 10px 15px; /* Внутренние отступы */
+/* Элемент списка подсказок - ОБНОВЛЕНО для flex */
+.suggestion_item {
+    display: flex; /* Используем flex для выравнивания картинки и текста */
+    align-items: center; /* Выравнивание по вертикали */
+    gap: 10px; /* Пространство между картинкой и текстом */
+    padding: 8px 12px; /* Немного уменьшим паддинги */
     cursor: pointer;
     transition: background-color 0.2s ease; /* Плавный переход фона */
-    font-size: 0.95rem; /* Размер шрифта подсказки */
     color: var(--clr-default-700); /* Цвет текста */
+    overflow: hidden; /* Обрезка, если элемент слишком широкий */
+}
+
+.suggestion_item_loading,
+.suggestion_item_no_results {
+    padding: 10px 15px; /* Стандартные паддинги для этих сообщений */
+    cursor: default; /* Обычный курсор */
+    color: #888; /* Серый цвет */
+    font-style: italic; /* Курсив */
+}
+
+/* НОВЫЙ стиль для изображения в подсказке */
+.suggestion_image {
+    width: 40px; /* Ширина постера */
+    height: 60px; /* Высота постера (соотношение 2:3) */
+    object-fit: cover; /* Масштабирование */
+    border-radius: 4px; /* Небольшое скругление */
+    background-color: #e0e0e0; /* Фон для заглушки */
+    flex-shrink: 0; /* Предотвратить сжатие изображения */
+}
+
+/* Класс для заглушки, если нужна доп. стилизация */
+.suggestion_image_error {
+    /* Например, можно добавить рамку или иконку ошибки */
+    /* border: 1px dashed red; */
+}
+
+/* НОВЫЙ стиль для текста в подсказке */
+.suggestion_text {
+    font-size: 0.95rem; /* Размер шрифта подсказки */
     white-space: nowrap; /* Запрет переноса */
     overflow: hidden; /* Обрезка лишнего */
     text-overflow: ellipsis; /* Многоточие для длинных названий */
+    flex-grow: 1; /* Занимает оставшееся место */
 }
 
 .suggestion_item:hover {
@@ -206,18 +250,11 @@
     color: #00796b; /* Темно-бирюзовый текст при наведении */
 }
 
-/* Стили для "Загрузка..." и "Ничего не найдено" */
-.suggestion_item_loading,
-.suggestion_item_no_results {
-    cursor: default; /* Обычный курсор */
-    color: #888; /* Серый цвет */
-    font-style: italic; /* Курсив */
-}
-
+/* Убираем фон при наведении для "Загрузка" и "Ничего не найдено" */
 .suggestion_item_loading:hover,
 .suggestion_item_no_results:hover {
-    background-color: transparent; /* Убираем фон при наведении */
-    color: #888; /* Оставляем серым */
+    background-color: transparent;
+    color: #888;
 }
 
 /* --- КНОПКИ ДЕЙСТВИЙ --- */
@@ -278,156 +315,278 @@
 }
 
 /* --- ОБЛАСТЬ ВЫВОДА РЕЗУЛЬТАТА --- */
-.result {
-    margin-top: 30px; /* Отступ сверху */
-    width: 100%; /* Ширина */
-    max-width: 300px; /* Макс ширина для одной карточки результата */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px; /* Примерная высота для карточки или сообщений */
-    padding: 20px; /* Отступы */
-    /* background-color: #f0f0f0; */ /* Убрал заливку области */
+.result { /* Старая область вывода, можно удалить или оставить для обратной совместимости */
+    /* ... */
 }
 
-/* Стили для сообщений */
+/* Стили для сообщений загрузки/ошибки */
 .loadingMessage,
 .errorMessage {
   font-size: 1.2rem; /* Размер текста */
   color: var(--clr-default-600); /* Серый текст */
   text-align: center;
+  padding: 20px; /* Отступы для сообщений */
 }
 .errorMessage {
   color: #d32f2f; /* Красный для ошибок */
   font-weight: 500;
 }
 
-/* Контейнер для ОДНОЙ карточки результата */
-.recommendation_output_single {
-   display: flex;
-   justify-content: center;
+/* === НОВЫЕ СТИЛИ ДЛЯ ДЕТАЛЬНОЙ КАРТОЧКИ === */
+
+.resultDetailed { /* Область для вывода детальной карточки */
+  margin-top: 40px;
+  width: 100%;
+  max-width: 900px; /* Ширина как у блока инфо в AboutMovie */
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  min-height: 300px; /* Минимальная высота для сообщений/карточки */
+  box-sizing: border-box; /* Учитываем padding в ширине */
 }
 
-/* Стили для карточки результата (могут отличаться от карточек ввода) */
-.movieCardResult {
-  width: 250px; /* Такая же ширина, как у карточки ввода */
-  background-color: #ffffff; /* Белый фон */
-  border-radius: 12px; /* Скругление */
-  overflow: hidden; /* Обрезка изображения */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Тень */
-  text-align: center;
-  transition: transform 0.3s ease;
-}
-.movieCardResult:hover {
-    transform: scale(1.03); /* Небольшое увеличение при наведении */
+.detailedCardLink {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  border-radius: 12px; /* Скругление для тени/hover */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.movieCardImageResult {
-  width: 100%; /* Изображение на всю ширину */
-  height: auto; /* Авто высота */
-  aspect-ratio: 2 / 3; /* Соотношение сторон постера */
-  object-fit: cover; /* Масштабирование */
-  display: block; /* Убирает лишний отступ */
-  background-color: #e0e0e0; /* Цвет фона для заглушки */
+.detailedCardLink:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-.image_crossing{
-    filter: var(--clr-default-filter);
+.detailedCardContainer {
+  display: flex;
+  gap: 40px; /* Отступ между постером и инфо */
+  background-color: var(--clr-default-100); /* Или другой фон, если у вас есть */
+  padding: 25px;
+  border-radius: 12px;
+  border: 1px solid var(--clr-default-300); /* Граница */
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
 }
 
-.movieCardTitleResult {
-  margin-top: 10px; /* Отступ сверху */
-  margin-bottom: 15px; /* Отступ снизу */
-  font-size: 1rem; /* Размер шрифта */
-  font-weight: 600; /* Полужирный */
-  color: var(--clr-default-800); /* Темно-серый текст */
-  padding: 0 10px; /* Горизонтальные отступы */
-  white-space: nowrap; /* Запрет переноса */
-  overflow: hidden; /* Обрезка */
-  text-overflow: ellipsis; /* Многоточие */
+.detailedCardPosterContainer {
+  width: 250px; /* Фиксированная ширина постера */
+  flex-shrink: 0;
 }
+
+.detailedCardPoster {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+  background-color: #e0e0e0; /* Заглушка */
+}
+
+.detailedCardInfoContainer {
+  flex-grow: 1; /* Занимает оставшееся место */
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Вертикальный отступ между блоками инфо */
+  overflow: hidden; /* Предотвращение вылезания контента */
+  min-width: 0; /* Исправляет баг flexbox с text-overflow */
+}
+
+/* Стилизация текста */
+.detailedCardTitle { /* Используем для h2 */
+  font-size: 2rem; /* Немного меньше, чем на странице фильма */
+  font-weight: bold;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--clr-primary-500); /* Цвет из переменных */
+}
+
+.detailedCardMeta { /* Контейнер для рейтингов */
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap; /* Перенос рейтингов */
+  gap: 15px 25px; /* Вертикальный и горизонтальный отступ */
+  margin-top: 5px; /* Небольшой отступ сверху */
+}
+
+/* --- Стили рейтинга (для детальной карточки) --- */
+.rating_container {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.star {
+  width: 28px; /* Размер звезд для детальной карточки */
+  height: 28px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 1px rgba(0, 185, 174, 0.4));
+}
+.star_partial_container {
+  position: relative;
+  width: 28px; /* Размер звезд */
+  height: 28px;
+  flex-shrink: 0;
+}
+.star_partial_container svg { /* Общий стиль для SVG внутри контейнера */
+  position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+}
+/* Определяем видимые части для полу/частичных звезд */
+.star_half { clip-path: inset(0 50% 0 0); } /* Левая половина видима */
+.star_half_empty { clip-path: inset(0 0 0 50%); } /* Правая половина видима */
+.star_partial { clip-path: inset(0 20% 0 0); } /* Левые 80% видимы */
+.star_partial_empty { clip-path: inset(0 0 0 80%); } /* Правые 20% видимы */
+
+.rating_value {
+  margin-left: 6px;
+  font-size: 1rem; /* Размер текста рейтинга */
+  font-weight: bold;
+  color: var(--clr-default-800);
+  min-width: 25px;
+  display: inline-block;
+}
+.imdb_rating {
+  font-size: 1rem; /* Размер текста IMDb */
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--clr-default-800); /* Цвет текста рейтинга */
+}
+.imdb_title {
+  background-color: rgba(0, 185, 174, 0.5); /* Цвет плашки IMDb */
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.9rem; /* Размер текста в плашке */
+  color: var(--clr-default-900); /* Цвет текста внутри плашки */
+}
+/* --- Конец стилей рейтинга --- */
+
+
+/* Жанры и страна */
+.detailedCardAbout {
+  display: flex;
+  flex-wrap: wrap; /* Перенос при необходимости */
+  gap: 10px 15px; /* Вертикальный и горизонтальный отступ */
+}
+.detailedCardAboutItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.detailedCardAboutIcon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  opacity: 0.8;
+}
+.detailedCardAboutText {
+  font-size: 0.95rem;
+  color: var(--clr-default-700);
+  white-space: nowrap; /* Предотвращаем перенос текста жанров/страны */
+}
+
+/* Описание */
+.detailedCardDescription {
+  font-size: 0.95rem; /* Немного меньше */
+  line-height: 1.5;
+  color: var(--clr-default-800);
+  margin-top: 5px;
+  /* Ограничение по высоте/строкам */
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Ограничиваем 4 строками */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.5em * 4); /* Макс высота для 4 строк */
+}
+.detailedCardDescription p {
+    margin: 0;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s ease-in-out infinite;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+
 
 /* --- АДАПТИВНОСТЬ --- */
 @media (max-width: 1200px) {
-    .movies_container {
-        gap: 20px; /* Уменьшаем зазор */
-    }
-    .movie_card, .movieCardResult {
-        width: 220px; /* Уменьшаем карточки */
-    }
-    .divider {
-        margin-top: 45px; /* Поднимаем разделитель */
-    }
-    .image_crossing {
-        width: 50px; height: 50px;
-    }
+    .movies_container { gap: 20px; }
+    .movie_card { width: 220px; }
+    .divider { margin-top: 45px; }
+    .image_crossing { width: 50px; height: 50px; }
+    /* Адаптивность для детальной карточки */
+    .resultDetailed { max-width: 750px; }
+    .detailedCardContainer { gap: 30px; }
 }
 
 @media (max-width: 768px) {
-    .main {
-        padding: 20px 10px; /* Уменьшаем отступы */
-    }
-    .title {
-        font-size: 2rem; /* Уменьшаем заголовки */
-    }
-    .action_title {
-        font-size: 1.3rem;
-    }
-    .popcorn_image {
-        width: 50px; height: 50px; /* Уменьшаем попкорн */
-    }
-    .popcorn_container {
-        gap: 1rem;
-    }
-    .movies_container {
-        flex-direction: column; /* Карточки ввода в колонку */
-        align-items: center; /* Центрируем по горизонтали */
-        gap: 15px; /* Уменьшаем зазор */
-    }
-    .divider {
-        margin: 10px 0; /* Разделитель между карточками в колонке */
-        transform: rotate(90deg); /* Поворачиваем + */
-    }
-    .movie_card, .movieCardResult {
-        width: 85%; /* Карточки шире на мобильных */
-        max-width: 300px;
-    }
-    .buttons_result {
-        flex-direction: column; /* Кнопки в колонку */
-        align-items: center;
-        gap: 10px;
-    }
-    .button_set {
-        width: 220px; /* Фиксированная ширина */
-    }
-    .result {
-        min-height: 300px; /* Уменьшаем минимальную высоту результата */
-        max-width: 90%; /* Ограничиваем ширину результата */
-    }
+    .main { padding: 20px 10px; }
+    .title { font-size: 2rem; }
+    .action_title { font-size: 1.3rem; }
+    .popcorn_image { width: 50px; height: 50px; }
+    .popcorn_container { gap: 1rem; }
+    .movies_container { flex-direction: column; align-items: center; gap: 15px; }
+    .divider { margin: 10px 0; transform: rotate(90deg); }
+    .movie_card { width: 85%; max-width: 300px; }
+    .buttons_result { flex-direction: column; align-items: center; gap: 10px; }
+    .button_set { width: 220px; }
+    /* Адаптивность для детальной карточки */
+    .resultDetailed { max-width: 600px; padding: 15px;}
+    .detailedCardContainer { flex-direction: column; gap: 20px; padding: 20px; }
+    .detailedCardPosterContainer { width: 200px; align-self: center; }
+    .detailedCardTitle { font-size: 1.8rem; text-align: center; }
+    .detailedCardMeta { gap: 10px 15px; justify-content: center; }
+    .star { width: 24px; height: 24px; }
+    .star_partial_container { width: 24px; height: 24px; }
+    .rating_value { font-size: 0.9rem; }
+    .imdb_rating { font-size: 0.9rem; }
+    .imdb_title { font-size: 0.8rem; }
+    .detailedCardAbout { justify-content: center; }
+    .detailedCardAboutText { font-size: 0.9rem; }
+    .detailedCardDescription { font-size: 0.9rem; -webkit-line-clamp: 3; max-height: calc(1.5em * 3); }
 }
 
 @media (max-width: 480px) {
-     .title {
-        font-size: 1.8rem;
-    }
-     .action_title {
-        font-size: 1.1rem;
-    }
-     .popcorn_image {
-        width: 40px; height: 40px;
-    }
-    .movie_content {
-        font-size: 1rem;
-        min-height: 50px;
-        padding: 10px;
-    }
-    .search_container { padding: 15px; }
-    .search_input { padding: 10px 15px; font-size: 0.9rem; }
-    .suggestions_list { left: 15px; right: 15px; top: calc(100% - 15px); }
-    .suggestion_item { padding: 8px 12px; font-size: 0.9rem; }
-    .button_set { width: 200px; height: 45px; font-size: 0.9rem;}
-    .button_random { width: 45px; height: 45px;}
-    .image_random { width: 24px; height: 24px;}
-    .movieCardResult, .movie_card { width: 90%; max-width: 280px;}
-    .movieCardTitleResult { font-size: 0.9rem; }
+     .title { font-size: 1.8rem; }
+     .action_title { font-size: 1.1rem; }
+     .popcorn_image { width: 40px; height: 40px; }
+     .movie_content { font-size: 1rem; min-height: 50px; height: 60px;} /* Уменьшена высота */
+     .search_container { padding: 15px; }
+     .search_input { padding: 10px 15px; font-size: 0.9rem; }
+     .suggestions_list { left: 15px; right: 15px; top: calc(100% - 15px); }
+     .suggestion_item { padding: 6px 10px; gap: 8px; }
+     .suggestion_image { width: 30px; height: 45px; }
+     .suggestion_text { font-size: 0.9rem; }
+     .button_set { width: 200px; height: 45px; font-size: 0.9rem;}
+     .button_random { width: 45px; height: 45px;}
+     .image_random { width: 24px; height: 24px;}
+     .movie_card { width: 90%; max-width: 280px;}
+     /* Адаптивность для детальной карточки */
+     .resultDetailed { max-width: 100%; padding: 10px; }
+     .detailedCardContainer { padding: 15px; gap: 15px; }
+     .detailedCardPosterContainer { width: 150px; }
+     .detailedCardTitle { font-size: 1.5rem; }
+     .star { width: 20px; height: 20px; }
+     .star_partial_container { width: 20px; height: 20px; }
+     .rating_value { font-size: 0.85rem; }
+     .imdb_rating { font-size: 0.85rem; }
+     .detailedCardAbout { gap: 8px 10px; }
+     .detailedCardAboutIcon { width: 16px; height: 16px; }
+     .detailedCardAboutText { font-size: 0.85rem; }
+     .detailedCardDescription { font-size: 0.85rem; line-height: 1.4; -webkit-line-clamp: 3; max-height: calc(1.4em * 3); }
 }

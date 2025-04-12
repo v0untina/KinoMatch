@@ -35,6 +35,12 @@
 
 }
 
+.movieCardLink {
+  text-decoration: none; /* Убираем подчеркивание ссылки */
+  color: inherit; /* Наследуем цвет текста от родителя */
+  display: block; /* Чтобы ссылка занимала всю область карточки */
+}
+
 .options {
   display: flex;
   flex-direction: column;
