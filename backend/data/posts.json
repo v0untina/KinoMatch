@@ -1,5 +1,93 @@
 [
   {
+    "id": "d6bf449d-6a33-4d25-b3ed-4b93740703ed",
+    "author": "tashe",
+    "text": "w",
+    "createdAt": "2025-04-12T20:17:31.317Z",
+    "likes": 4,
+    "comments": [
+      {
+        "id": "c7c3aeb2-5608-4b4d-b36b-f7968b5f34ef",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "ss",
+        "createdAt": "2025-04-12T20:17:35.709Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
+  },
+  {
+    "id": "7d74877a-594f-4d0b-aeed-63a22d6ac5b9",
+    "author": "tashe",
+    "text": "уввацу",
+    "createdAt": "2025-04-12T18:59:59.004Z",
+    "imageUrl": "/public/images/posts/2eef6e0b-5772-4994-8d9a-818ac708928e.jpg",
+    "likes": 33,
+    "comments": [
+      {
+        "id": "a4c43a40-d5f0-4c08-a2a7-296f22fd8d1d",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "ебать я ахуенный",
+        "createdAt": "2025-04-12T19:00:05.204Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
+  },
+  {
+    "id": "87ad5506-3939-4f7a-919b-06af8e7abb17",
+    "author": "tashe",
+    "text": "tjkhkjkj",
+    "createdAt": "2025-04-11T07:47:05.907Z",
+    "likes": 11,
+    "comments": [],
+    "likedBy": [
+      26
+    ]
+  },
+  {
+    "id": "69d58c4f-a2cb-4e56-b288-2f1a527d2955",
+    "author": "tashe",
+    "text": "прорр",
+    "createdAt": "2025-04-11T07:19:32.132Z",
+    "likes": 38,
+    "comments": [
+      {
+        "id": "35afcf6d-e8bf-412f-9501-d94a10578f61",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "ппоро",
+        "createdAt": "2025-04-11T07:19:42.644Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
+  },
+  {
+    "id": "4e165061-7395-4412-8f11-ea74a9dfbd8d",
+    "author": "tashe",
+    "text": "32",
+    "createdAt": "2025-04-11T07:13:25.853Z",
+    "likes": 25,
+    "comments": [
+      {
+        "id": "d5e057a6-cd43-486b-967a-f4aaf15ca657",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "few",
+        "createdAt": "2025-04-11T07:13:29.813Z"
+      }
+    ],
+    "likedBy": [
+      26
+    ]
+  },
+  {
     "id": "1dda2d8c-2711-47bd-9bb9-a6401f71d442",
     "author": "tashe",
     "text": "ghdbtn",

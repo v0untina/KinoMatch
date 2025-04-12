@@ -296,7 +296,6 @@ export default function CrossingMovies() {
                  ref={el => inputRefs.current[index] = el}
               >
                 <div className={styles.search_container}>
-                  {/* Поле ввода */}
                   <input
                     type="text"
                     placeholder="Введите название фильма..."

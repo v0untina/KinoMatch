@@ -331,6 +331,10 @@
   background-color: #e0e0e0; /* Цвет фона для заглушки */
 }
 
+.image_crossing{
+    filter: var(--clr-default-filter);
+}
+
 .movieCardTitleResult {
   margin-top: 10px; /* Отступ сверху */
   margin-bottom: 15px; /* Отступ снизу */

@@ -104,6 +104,10 @@
   animation: buttonAnimation 1s forwards;
 }
 
+.crossing_image{
+  filter: var(--clr-default-filter);
+}
+
 @keyframes buttonAnimation {
   0% {
     opacity: 0;
