@@ -1,10 +1,37 @@
 [
   {
+    "id": "6225c1cc-5915-45df-827f-76b886b4a749",
+    "author": "tashe",
+    "text": "привети к как делишки ёоууууу",
+    "createdAt": "2025-04-12T21:59:53.049Z",
+    "likes": 2,
+    "comments": [
+      {
+        "id": "d04f00c8-22f9-479a-a8e8-d0681f9c3619",
+        "userId": 26,
+        "authorUsername": "tashe",
+        "text": "ты вообще упал?",
+        "createdAt": "2025-04-12T22:00:02.253Z"
+      },
+      {
+        "id": "1005b24c-c415-4464-9718-fb5304964f89",
+        "userId": 30,
+        "authorUsername": "test123",
+        "text": "неее ты фрик :((((",
+        "createdAt": "2025-04-12T22:01:00.078Z"
+      }
+    ],
+    "likedBy": [
+      26,
+      30
+    ]
+  },
+  {
     "id": "d6bf449d-6a33-4d25-b3ed-4b93740703ed",
     "author": "tashe",
     "text": "w",
     "createdAt": "2025-04-12T20:17:31.317Z",
-    "likes": 4,
+    "likes": 3,
     "comments": [
       {
         "id": "c7c3aeb2-5608-4b4d-b36b-f7968b5f34ef",
@@ -14,9 +41,7 @@
         "createdAt": "2025-04-12T20:17:35.709Z"
       }
     ],
-    "likedBy": [
-      26
-    ]
+    "likedBy": []
   },
   {
     "id": "7d74877a-594f-4d0b-aeed-63a22d6ac5b9",
@@ -24,7 +49,7 @@
     "text": "уввацу",
     "createdAt": "2025-04-12T18:59:59.004Z",
     "imageUrl": "/public/images/posts/2eef6e0b-5772-4994-8d9a-818ac708928e.jpg",
-    "likes": 33,
+    "likes": 32,
     "comments": [
       {
         "id": "a4c43a40-d5f0-4c08-a2a7-296f22fd8d1d",
@@ -34,9 +59,7 @@
         "createdAt": "2025-04-12T19:00:05.204Z"
       }
     ],
-    "likedBy": [
-      26
-    ]
+    "likedBy": []
   },
   {
     "id": "87ad5506-3939-4f7a-919b-06af8e7abb17",

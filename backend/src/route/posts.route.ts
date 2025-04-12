@@ -299,43 +299,75 @@ const PostsRoute = new Elysia({ prefix: '/posts' })
         }) // Конец POST /
 
         // --- Лайкнуть/Дизлайкнуть пост ---
-        .post('/:postId/like', async (context) => {
-            // ... (код POST /:postId/like остается пока без изменений - только инкремент)
-            const { params, store, set } = context;
-            const postId = params.postId;
-            const userId = store.userId;
-            console.log(colors.cyan(`--- [LIKE] Received request for Post ID: ${postId} by User ID: ${userId} ---`));
-            try {
-                const posts = await readPosts();
-                const postIndex = posts.findIndex(p => p.id === postId);
-                if (postIndex === -1) {
-                    return context.error(404, 'Пост не найден');
-                }
-                const post = posts[postIndex];
-                // !!! ЗДЕСЬ НУЖНА ЛОГИКА LIKE/UNLIKE С ПРОВЕРКОЙ likedBy !!!
-                // Пока просто инкремент для совместимости с предыдущим кодом:
-                post.likes = (post.likes ?? 0) + 1;
-                post.likedBy = post.likedBy ?? []; // Убедимся что массив есть
-                if (!post.likedBy.includes(userId)) { // Добавим в likedBy если еще нет
-                    post.likedBy.push(userId);
-                }
-                console.log(colors.magenta(`[LIKE] Likes logic executed. New count: ${post.likes}, LikedBy: ${post.likedBy.length}`));
-                // ---
-                await writePosts(posts);
-                set.status = 200;
-                const responsePayload = { postId: post.id, likes: post.likes };
-                console.log(colors.green('[LIKE] Sending success response:'), responsePayload);
-                return responsePayload;
-            } catch (err: unknown) {
-                console.error(colors.red(`--- [LIKE] ERROR occurred for Post ID: ${postId} ---`), err);
-                const errorMessage = err instanceof Error ? err.message : 'Failed to process like';
-                return context.error(500, `Ошибка обработки лайка: ${errorMessage}`);
-            }
-        }, { // Валидация для POST /:postId/like
-            params: t.Object({
-                postId: t.String({ error: "Неверный ID поста в URL" })
-            })
-        }) // Конец POST /:postId/like
+.post('/:postId/like', async (context) => {
+    // Деструктурируем для ясности
+    const { params, store, set, error } = context;
+    const postId = params.postId;
+    const userId = store.userId; 
+
+    console.log(colors.cyan(`--- [LIKE/UNLIKE] Received request for Post ID: ${postId} by User ID: ${userId} ---`));
+
+    try {
+        const posts = await readPosts();
+        const postIndex = posts.findIndex(p => p.id === postId);
+
+        if (postIndex === -1) {
+            console.error(colors.red(`[LIKE/UNLIKE] Error: Post with ID ${postId} not found.`));
+            return error(404, 'Пост не найден'); // Используем error()
+        }
+
+        const post = posts[postIndex];
+
+        // --- НАЧАЛО НОВОЙ ЛОГИКИ ---
+
+        // Убедимся, что массив likedBy существует
+        post.likedBy = post.likedBy ?? [];
+
+        // Ищем, лайкал ли УЖЕ этот пользователь
+        const userIndexInLikedBy = post.likedBy.indexOf(userId);
+
+        let isLikedByCurrentUser: boolean; // Флаг для ответа клиенту
+
+        if (userIndexInLikedBy === -1) {
+            // Пользователь ЕЩЕ НЕ лайкал: ставим лайк
+            post.likedBy.push(userId);
+            post.likes = (post.likes ?? 0) + 1;
+            isLikedByCurrentUser = true;
+            console.log(colors.magenta(`[LIKE] User ${userId} liked Post ${postId}. New count: ${post.likes}`));
+        } else {
+            // Пользователь УЖЕ лайкал: снимаем лайк (unlike)
+            post.likedBy.splice(userIndexInLikedBy, 1); // Удаляем userId из массива
+            post.likes = Math.max(0, (post.likes ?? 1) - 1); // Уменьшаем счетчик, но не ниже 0
+            isLikedByCurrentUser = false;
+            console.log(colors.magenta(`[UNLIKE] User ${userId} unliked Post ${postId}. New count: ${post.likes}`));
+        }
+
+        // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
+
+        // Записываем обновленный массив постов
+        await writePosts(posts);
+
+        set.status = 200;
+        // Возвращаем обновленное количество лайков И состояние лайка для текущего пользователя
+        const responsePayload = {
+            postId: post.id,
+            likes: post.likes,
+            isLikedByCurrentUser: isLikedByCurrentUser // Добавляем этот флаг
+        };
+        console.log(colors.green('[LIKE/UNLIKE] Sending success response:'), responsePayload);
+        return responsePayload;
+
+    } catch (err: unknown) {
+        console.error(colors.red(`--- [LIKE/UNLIKE] ERROR occurred for Post ID: ${postId} ---`), err);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to process like/unlike';
+        // Используем error() для возврата ошибки сервера
+        return error(500, `Ошибка обработки лайка/дизлайка: ${errorMessage}`);
+    }
+}, { // Валидация для POST /:postId/like (остается прежней)
+    params: t.Object({
+        postId: t.String({ error: "Неверный ID поста в URL" })
+    })
+}) // Конец POST /:postId/like
 
 
         // --- ДОБАВИТЬ КОММЕНТАРИЙ К ПОСТУ ---

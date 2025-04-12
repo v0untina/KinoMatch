@@ -36,6 +36,7 @@ interface CreatePostPayload {
 interface LikeResponse {
     postId: string;
     likes: number;
+    isLikedByCurrentUser: boolean; // Добавляем это поле
 }
 
 // --- API ФУНКЦИИ ---
@@ -101,31 +102,33 @@ export const createPost = async (payload: CreatePostPayload): Promise<Post> => {
 };
 
 /**
- * Отправляет запрос на лайк (или изменение состояния лайка) поста.
- * @param postId - ID поста, который нужно лайкнуть.
- * @returns Объект с обновленным количеством лайков.
+ * Отправляет запрос на лайк/анлайк поста.
+ * @param postId - ID поста.
+ * @returns Объект с обновленным количеством лайков и состоянием лайка текущего пользователя.
  */
-export const likePost = async (postId: string): Promise<LikeResponse> => {
+export const likePost = async (postId: string): Promise<LikeResponse> => { // Обновляем возвращаемый тип
     if (!postId) {
         console.error("likePost called with invalid postId");
         throw new Error("Невозможно лайкнуть пост: неверный ID.");
     }
     try {
+        // Запрос не меняется
         const response = await axiosInstance.post(`/posts/${postId}/like`);
-        console.log(`Ответ от сервера (likePost ${postId}):`, response.data);
+        console.log(`Ответ от сервера (likePost/unlike ${postId}):`, response.data);
 
+        // Проверяем новый формат ответа
         const data = response.data as LikeResponse;
-        // Улучшенная проверка ответа
-        if (!data || typeof data.postId !== 'string' || typeof data.likes !== 'number') {
-             console.error('Некорректный ответ от сервера (likePost):', data);
+        if (!data || typeof data.postId !== 'string' || typeof data.likes !== 'number' || typeof data.isLikedByCurrentUser !== 'boolean') { // Добавляем проверку isLikedByCurrentUser
+             console.error('Некорректный ответ от сервера (likePost/unlike):', data);
              throw new Error('Сервер вернул некорректные данные о лайках.');
         }
+        // Возвращаем весь объект ответа
         return data;
 
     } catch (error: any) {
-        console.error(`Error liking post ${postId}:`, error);
+        console.error(`Error liking/unliking post ${postId}:`, error);
         const backendMessage = error.response?.data?.message || error.response?.data;
-        const errorMessage = typeof backendMessage === 'string' ? backendMessage : (error.message || "Неизвестная ошибка при добавлении лайка");
+        const errorMessage = typeof backendMessage === 'string' ? backendMessage : (error.message || "Неизвестная ошибка при обработке лайка");
         console.error("Parsed error for user (likePost):", errorMessage);
         throw new Error(errorMessage);
     }
