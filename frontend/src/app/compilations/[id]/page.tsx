@@ -1,3 +1,4 @@
+// frontend/src/app/compilations/[id]/page.tsx
 "use client";
 
 import bestFilmsStyles from '@/widgets/Landing/BestFilms/BestFilms.module.css';

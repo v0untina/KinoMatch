@@ -1,37 +1,62 @@
+// backend/src/route/profile.route.ts
 import { Elysia, t } from 'elysia';
-import { DefaultResponseDto, OffsetLengthQueryDto } from "../dto/Response.dto.ts";
-import { UserProvider } from "../providers/user.provider.ts";
-import prisma from "../util/prisma.ts";
-import { jwt } from '@elysiajs/jwt';
-import { MovieIdParamsDto } from '../dto/Movie.dto.ts';
+import { DefaultResponseDto, OffsetLengthQueryDto } from "../dto/Response.dto.ts"; // Убедись, что пути верны
+import { UserProvider } from "../providers/user.provider.ts"; // Убедись, что пути верны
+import prisma from "../util/prisma.ts"; // Убедись, что пути верны
+// Убери @elysiajs/jwt, если используешь checkAuth из middleware
+// import { jwt } from '@elysiajs/jwt';
+import { checkAuth } from '../middleware/authentication.middleware.ts'; // Импортируем checkAuth
+import { MovieIdParamsDto } from '../dto/Movie.dto.ts'; // Убедись, что пути верны
 
-// Определяем тип для JWT payload.  ЭТО ДОЛЖНО СОВПАДАТЬ С ТЕМ, ЧТО ВЫ ПОМЕЩАЕТЕ В JWT!
-type JWTPayload = {
-    username: string;
-    userId: number; // ДОБАВЬТЕ userId, если он есть в токене (а он должен быть!).
-    // ... другие поля из вашего JWT (если есть) ...
-};
+// Определяем тип для хранилища Elysia, чтобы знать про userId
+interface AuthStore {
+    userId?: number;
+    [key: string]: any; // Для совместимости
+}
+
+// Тип для фильма (упрощенный, можно вынести)
+const MovieSchema = t.Object({
+    movie_id: t.Number(),
+    title: t.String(),
+    original_title: t.Nullable(t.String()),
+    year: t.Nullable(t.Number()),
+    poster_filename: t.Nullable(t.String()),
+    // Добавь другие поля, если нужно
+});
+
+// Тип для записи из user_movie_favorites
+const FavoriteMovieRecordSchema = t.Object({
+    user_id: t.Number(),
+    movie_id: t.Number(),
+    added_at: t.Nullable(t.Date()), // Используем t.Date(), если Prisma возвращает Date
+    movies: MovieSchema // Используем схему для фильма
+});
+
 
 const profileRoutes = new Elysia({ prefix: '/profile', detail: { tags: ['Profile'] } });
 
-// Endpoint для получения своего профиля
+// --- Получение своего профиля ---
+// (Этот роут не использует checkAuth, а проверяет токен вручную - ОСТАВЛЯЕМ ПОКА ТАК,
+// но лучше перевести на checkAuth для единообразия)
 profileRoutes.get('/', async (ctx) => {
+    // ... (код получения userId из токена и userData остается) ...
     const authorization = ctx.headers.authorization;
     if (!authorization) {
-        return { status: 401, body: { success: false, message: 'Unauthorized' } };
+        ctx.set.status = 401; return { success: false, message: 'Unauthorized' };
     }
-    const verification = await ctx.jwt.verify(authorization);
-
+    // Предполагаем, что ctx.jwt настроен глобально или через .use()
+    // Если checkAuth настроен глобально, этот код можно упростить, беря userId из store
+    const verification = await ctx.jwt.verify(authorization); // Нужен ctx.jwt!
     if (!verification) {
-        return { status: 401, body: { success: false, message: 'Invalid token' } };
+        ctx.set.status = 401; return { success: false, message: 'Invalid token' };
     }
-    const { userId } = verification as JWTPayload;
+    const { userId } = verification as { userId: number }; // Упростил тип JWTPayload
     const userData = await UserProvider.getByID(userId);
     if (!userData) {
-        return { status: 404, body: { success: false, message: 'User not found' } };
+        ctx.set.status = 404; return { success: false, message: 'User not found' };
     }
 
-    // !!! ИСПРАВЛЕНИЕ: Убираем обертку 200: { ... } и явно устанавливаем статус !!!
+    // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
     ctx.set.status = 200;
     return {
         success: true,
@@ -43,226 +68,184 @@ profileRoutes.get('/', async (ctx) => {
         }
     };
 }, {
+    // Схема ответа остается как есть
     response: {
-        200: t.Object({
-            success: t.Boolean(), // Оставляем t.Boolean() пока
-            data: t.Object({
-                user_id: t.Number(),
-                username: t.String(),
-                email: t.String(),
-                // ... другие поля, которые вы возвращаете ...
-            })
-        }),
-        401: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        404: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        })
+        200: t.Object({ success: t.Boolean(), data: t.Object({ user_id: t.Number(), username: t.String(), email: t.String() }) }),
+        401: t.Object({ success: t.Boolean(), message: t.String() }),
+        404: t.Object({ success: t.Boolean(), message: t.String() })
     }
 });
 
-// Endpoint для получения списка избранного
+
+// --- Получение списка избранного ---
 profileRoutes.get('/favorites', async (ctx) => {
-    const authorization = ctx.headers.authorization;
-    if (!authorization) {
-        return { status: 401, body: { success: false, message: 'Unauthorized' } };
+    const userId = (ctx.store as AuthStore).userId; // Получаем из store
+    if (!userId) {
+        // Эта проверка на случай, если checkAuth не отработал как надо
+        ctx.set.status = 401; return { success: false, message: "Unauthorized" };
     }
-
-    const verification = await ctx.jwt.verify(authorization);
-    if (!verification) {
-         return { status: 401, body: { success: false, message: 'Invalid token' } };
-    }
-
-    const { userId } = verification as JWTPayload;
 
     try {
-        const userData = await UserProvider.getByID(userId); // Исправлено: getByID
-        if (!userData) {
-            return { status: 404, body: { success: false, message: 'User not found' } };
-        }
-
-        const length = parseInt(ctx.query.length || "20");
+        // Пагинация
+        const length = parseInt(ctx.query.length || "1000"); // Увеличил дефолт
         const offset = parseInt(ctx.query.offset || "0");
 
-        const favoritesData = await prisma.user_movie_favorites.findMany({ // Изменил имя переменной
-            where: {
-                user_id: userData.user_id // Исправлено: используем user_id из userData
-            },
-            include: {
-                movies: true, // Включаем данные о фильмах
-            },
+        const favoritesData = await prisma.user_movie_favorites.findMany({
+            where: { user_id: userId }, // Используем userId из store
+            include: { movies: true }, // Включаем данные о фильмах
             take: length,
             skip: offset
         });
-        //  Убрал проверку на !eventsData, т.к. пустой массив - это нормальный результат.
 
+        // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
+        ctx.set.status = 200;
         return {
-            status: 200,
-            body: {
-                success: true,
-                pagination: {
-                    length: length,
-                    offset: offset
-                },
-                data: favoritesData // Возвращаем данные об избранном
-            }
+            success: true,
+            pagination: { length, offset },
+            data: favoritesData // Возвращаем данные об избранном
         };
     } catch (e) {
-        console.error(e);
-        return { status: 500, body: { success: false, message: "An error occurred" } }; // Возвращаем ошибку 500
+        console.error("Error fetching favorites:", e);
+        ctx.set.status = 500; // Внутренняя ошибка сервера
+        return { success: false, message: "Произошла ошибка при получении избранного" };
     }
 }, {
+    // Применяем middleware аутентификации
+    beforeHandle: [checkAuth],
     query: OffsetLengthQueryDto,
-    response: { // ЯВНО указываем схему ответа.
-        200: t.Object({  // Добавил описание для 200 OK
+    response: {
+        // Используем более точную схему для data
+        200: t.Object({
             success: t.Boolean(),
-            data: t.Array(t.Any()), //  t.Array(t.Any())!  Укажи тип элементов массива!
-            pagination: t.Object({
-                length: t.Number(),
-                offset: t.Number()
-            })
+            data: t.Array(FavoriteMovieRecordSchema), // Уточнили схему
+            pagination: t.Object({ length: t.Number(), offset: t.Number() })
         }),
-        401: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        404: t.Object({ // Добавил описание для 404
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        500: t.Object({ // Добавил описание для 500
-            success: t.Boolean(),
-            message: t.String()
-        })
+        401: t.Object({ success: t.Boolean(), message: t.String() }),
+        500: t.Object({ success: t.Boolean(), message: t.String() })
+        // Убрали 404, т.к. пустой список - не ошибка
     }
 });
 
-// Endpoint для добавления фильма в избранное
+
+// --- Добавление фильма в избранное ---
 profileRoutes.post('/favorites/:movieId', async (ctx) => {
-    const authorization = ctx.headers.authorization;
-     if (!authorization) {
-        return { status: 401, body: { success: false, message: 'Unauthorized' } };
+    const userId = (ctx.store as AuthStore).userId;
+    if (!userId) {
+        ctx.set.status = 401; return { success: false, message: "Unauthorized" };
     }
-    const verification = await ctx.jwt.verify(authorization);
-    if (!verification) {
-         return { status: 401, body: { success: false, message: 'Invalid token' } };
-    }
-
-    const { userId } = verification as JWTPayload;
-
-    const userData = await UserProvider.getByID(userId); // Исправлено: getByID
-    if (!userData) {
-        return { status: 404, body: { success: false, message: 'User not found' } };
-    }
+    const movieId = parseInt(ctx.params.movieId); // Получаем и парсим ID фильма
 
     try {
+        // Проверяем, существует ли фильм (опционально, но хорошо бы)
+        const movieExists = await prisma.movies.findUnique({ where: { movie_id: movieId } });
+        if (!movieExists) {
+             ctx.set.status = 404;
+             return { success: false, message: "Фильм с таким ID не найден." };
+        }
+
+        // Создаем запись в избранном
         await prisma.user_movie_favorites.create({
-            data: {
-                user_id: userData.user_id, // Исправлено: используем user_id из userData
-                movie_id: parseInt(ctx.params.movieId) // Преобразуем movieId в число
-            }
+            data: { user_id: userId, movie_id: movieId }
         });
-        return { status: 201, body: { success: true } }; // Используем 201 Created
-    } catch (e) {
-        console.error(e);
-        return { status: 500, body: { success: false, message: "An error occurred" } };
+
+        // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
+        ctx.set.status = 201; // 201 Created
+        return { success: true, message: "Фильм добавлен в избранное" };
+    } catch (e: any) {
+        console.error("Error adding favorite:", e);
+        // Обработка ошибки уникальности (если уже добавлено)
+        if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+            ctx.set.status = 409; // Conflict
+            return { success: false, message: "Этот фильм уже в избранном." };
+        }
+        ctx.set.status = 500;
+        return { success: false, message: "Произошла ошибка при добавлении в избранное" };
     }
 }, {
-    params: MovieIdParamsDto,
-    response: { // ЯВНО указываем схему ответа.
-        201: t.Object({ // Добавил описание для 201 Created
-            success: t.Boolean()
-        }),
-        401: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        404: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        500: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        })
+    beforeHandle: [checkAuth], // Требуется аутентификация
+    params: MovieIdParamsDto, // Валидация параметра movieId
+    response: {
+        201: t.Object({ success: t.Boolean(), message: t.String() }), // Успешное добавление
+        401: t.Object({ success: t.Boolean(), message: t.String() }), // Не авторизован
+        404: t.Object({ success: t.Boolean(), message: t.String() }), // Фильм не найден
+        409: t.Object({ success: t.Boolean(), message: t.String() }), // Уже добавлен (Conflict)
+        500: t.Object({ success: t.Boolean(), message: t.String() })  // Внутренняя ошибка
     }
 });
 
-// Endpoint для удаления фильма из избранного
+
+// --- Удаление фильма из избранного ---
 profileRoutes.delete('/favorites/:movieId', async (ctx) => {
-   const authorization = ctx.headers.authorization;
-     if (!authorization) {
-        return { status: 401, body: { success: false, message: 'Unauthorized' } };
+    const userId = (ctx.store as AuthStore).userId;
+    if (!userId) {
+        ctx.set.status = 401; return { success: false, message: "Unauthorized" };
     }
-    const verification = await ctx.jwt.verify(authorization);
-    if (!verification) {
-        return { status: 401, body: { success: false, message: 'Invalid token' } };
-    }
-
-    const { userId } = verification as JWTPayload;
-
-    const userData = await UserProvider.getByID(userId); // Исправлено: getByID
-    if (!userData) {
-        return { status: 404, body: { success: false, message: 'User not found' } };
-    }
+    const movieId = parseInt(ctx.params.movieId);
 
     try {
-        await prisma.user_movie_favorites.delete({
+        // Удаляем запись
+        const deleteResult = await prisma.user_movie_favorites.delete({
             where: {
-                user_id_movie_id: {
-                    user_id: userData.user_id,  // Исправлено: используем user_id из userData
-                    movie_id: parseInt(ctx.params.movieId) // Преобразуем movieId в число
+                user_id_movie_id: { // Используем составной ключ
+                    user_id: userId,
+                    movie_id: movieId
                 }
             }
         });
-        return { status: 200, body: { success: true } }; // Используем 200 OK
-    } catch (e) {
-        console.error(e);
-        return { status: 500, body: { success: false, message: "An error occurred" } };
+        // delete не бросает ошибку, если запись не найдена, поэтому проверяем count в результате (или можно сделать findFirst перед delete)
+        // Однако, в данном случае, если записи нет, то и удалять нечего - это ОК.
+
+        // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
+        ctx.set.status = 200; // OK (или 204 No Content, если ничего не возвращаем)
+        return { success: true, message: "Фильм удален из избранного" };
+    } catch (e: any) {
+        console.error("Error removing favorite:", e);
+         // Обработка ошибки "запись не найдена для удаления"
+         if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+            ctx.set.status = 404;
+            return { success: false, message: "Фильм не найден в избранном." };
+        }
+        ctx.set.status = 500;
+        return { success: false, message: "Произошла ошибка при удалении из избранного" };
     }
 }, {
-    params: MovieIdParamsDto,
-    response: { // ЯВНО указываем схему ответа
-        200: t.Object({
-            success: t.Boolean()
-        }),
-        401: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        404: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        }),
-        500: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        })
+    beforeHandle: [checkAuth], // Требуется аутентификация
+    params: MovieIdParamsDto, // Валидация параметра movieId
+    response: {
+        200: t.Object({ success: t.Boolean(), message: t.String() }), // Успешное удаление
+        401: t.Object({ success: t.Boolean(), message: t.String() }), // Не авторизован
+        404: t.Object({ success: t.Boolean(), message: t.String() }), // Не найден в избранном
+        500: t.Object({ success: t.Boolean(), message: t.String() })  // Внутренняя ошибка
     }
 });
 
-// Роут для получения списка актеров (не требует JWT)
-profileRoutes.get("/actors", async (ctx) => { // Добавил ctx
+
+// --- Роут для получения списка актеров (не требует JWT) ---
+profileRoutes.get("/actors", async (ctx) => {
     try {
-        const actors = await prisma.actors.findMany();
-        return { status: 200, body: { success: true, data: actors } }; // Оборачиваем в объект с кодом 200 и success
+        const actors = await prisma.actors.findMany({
+            select: { actor_id: true, name: true, photo_filename: true } // Выбираем нужные поля
+        });
+        // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
+        ctx.set.status = 200;
+        return { success: true, data: actors };
     } catch (error) {
         console.error("Error fetching actors:", error);
-        return { status: 500, body: { success: false, message: 'Failed to fetch actors' } };
+        ctx.set.status = 500;
+        return { success: false, message: 'Не удалось получить список актеров' };
     }
 }, {
-    response: { // Добавлено описание ответа
+    response: {
         200: t.Object({
             success: t.Boolean(),
-            data: t.Array(t.Any()) // !!! Укажи тип элементов массива !!!
+            // Уточняем схему для актеров
+            data: t.Array(t.Object({
+                actor_id: t.Number(),
+                name: t.String(),
+                photo_filename: t.Nullable(t.String())
+            }))
         }),
-        500: t.Object({
-            success: t.Boolean(),
-            message: t.String()
-        })
+        500: t.Object({ success: t.Boolean(), message: t.String() })
     }
 });
 

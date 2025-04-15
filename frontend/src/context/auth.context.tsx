@@ -1,15 +1,15 @@
 // frontend/src/context/auth.context.tsx
 "use client";
-import React, { createContext, ReactNode, useEffect, useState } from 'react';
+// Добавляем useMemo
+import React, { createContext, ReactNode, useEffect, useState, useCallback, useMemo } from 'react';
 import { fetchProfile } from "@/api/auth";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 interface User {
-    user_id: number; // Добавлены user_id, username, email в интерфейс User
+    user_id: number;
     username: string;
     email: string;
-    // image?: string; // Убран image, если не используется
 }
 
 interface AuthContextType {
@@ -24,60 +24,63 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 interface AuthProviderProps {
     children: ReactNode;
 }
-console.log("Rendering AuthProvider"); // !!! ДОБАВЬ ЭТО !!!
+console.log("Rendering AuthProvider"); // Отладочный лог
+
 export const AuthProvider = ({children}: AuthProviderProps) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-    const router = useRouter(); // Инициализация useRouter
+    const router = useRouter();
 
-    // Получаем профиль при загрузке страницы
+    // Загрузка профиля при инициализации (без изменений)
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             fetchProfile()
-                .then((response) => {
-                    setUser(response.data.data);
-                })
-                .catch((error) => { // Добавлен параметр error
-                    console.error("Fetch profile error on startup:", error); // Логирование ошибки
-                    localStorage.removeItem('token');
-                    setUser(null);
-                })
+                .then((response) => { setUser(response.data.data); })
+                .catch((error) => { console.error("Fetch profile error on startup:", error); localStorage.removeItem('token'); setUser(null); })
                 .finally(() => setLoading(false));
-        } else {
-            setLoading(false);
-        }
+        } else { setLoading(false); }
     }, []);
 
-    // Вход в аккаунт
-    const login = (token: string) => {
+    // login и logout уже обернуты в useCallback - это хорошо
+    const login = useCallback((token: string) => {
         localStorage.setItem('token', token);
+        setLoading(true); // Показываем загрузку после логина
         fetchProfile()
             .then((response) => {
                 setUser(response.data.data);
-                toast.success(`Добро пожаловать, ${response.data.data.username}!`); // Приветствие toast при логине
-                router.push('/'); // Редирект на главную после логина
+                toast.success(`Добро пожаловать, ${response.data.data.username}!`);
+                router.push('/');
             })
-            .catch((error) => { // Добавлен параметр error
-                console.error("Fetch profile error after login:", error); // Логирование ошибки
-                localStorage.removeItem('token');
-                setUser(null);
-                toast.error("Не удалось загрузить профиль после входа."); // Сообщение об ошибке toast
-            });
-    };
+            .catch((error) => {
+                console.error("Fetch profile error after login:", error);
+                localStorage.removeItem('token'); setUser(null);
+                toast.error("Не удалось загрузить профиль после входа.");
+            })
+            .finally(() => setLoading(false)); // Убираем загрузку
+    }, [router]); // Зависимость только от router
 
-    // Выйти из аккаунта
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('token');
         setUser(null);
-        router.push('/login'); // Редирект на страницу логина после логаута
-        toast.success("Вы вышли из аккаунта."); // Сообщение toast при логауте
-    };
+        router.push('/login');
+        toast.success("Вы вышли из аккаунта.");
+    }, [router]); // Зависимость только от router
 
+    // --- МЕМОИЗАЦИЯ КОНТЕКСТА ---
+    // Создаем объект value с помощью useMemo.
+    // Он будет пересоздаваться только если user, loading, login или logout изменятся.
+    const contextValue = useMemo(() => ({
+        user,
+        login,
+        logout,
+        loading
+    // login и logout стабильны благодаря useCallback.
+    }), [user, loading, login, logout]);
 
-    // Результат - контекст
     return (
-        <AuthContext.Provider value={{user, login, logout, loading}}>
+        // Передаем мемоизированное значение contextValue
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

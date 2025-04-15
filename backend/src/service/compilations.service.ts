@@ -1,257 +1,290 @@
+// backend/src/service/compilations.service.ts
 import { PrismaClient, Prisma } from '@prisma/client'; // Импортируем Prisma
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient(); // Инициализируем Prisma Client
 
-// --- Функция получения списка системных подборок (без изменений) ---
+// --- 1. Функция получения списка СИСТЕМНЫХ подборок ---
 export const getSystemCompilations = async () => {
     try {
         const compilations = await prisma.user_movie_collections.findMany({
             where: {
-                user_id: null,
+                user_id: null, // Только системные
             },
             select: {
                 collection_id: true,
                 title: true,
             },
+            orderBy: {
+                 collection_id: 'asc' // Для консистентного порядка
+            }
         });
         return compilations;
     } catch (error) {
         console.error("Error fetching system compilations:", error);
-        throw new Error("Failed to fetch system compilations");
-    } finally {
-        // Не отключаем здесь, если используется в cron
-        // await prisma.$disconnect();
+        throw new Error("Не удалось получить системные подборки");
     }
+    // Не отключаем prisma здесь, если он используется в других запросах
 };
 
-// --- Функция получения деталей одной подборки (без изменений) ---
+// --- 2. Функция получения деталей ОДНОЙ подборки (ЛЮБОЙ - системной или пользовательской) ---
 export const getCompilationDetails = async (id: number) => {
     try {
         const compilation = await prisma.user_movie_collections.findUnique({
             where: {
                 collection_id: id,
-                user_id: null, // Убедимся, что ищем системную подборку
+                // БЕЗ фильтра по user_id: null - ищем любую по ID
             },
-            include: {
+            include: { // Включаем связанные данные
                 collection_movies: {
                     select: {
-                        movies: {
+                        movies: { // Выбираем данные из связанной таблицы movies
                             select: {
                                 movie_id: true,
                                 title: true,
+                                original_title: true,
+                                year: true,
                                 poster_filename: true,
+                                kinomatch_rating: true,
+                                imdb_rating: true,
+                                // Добавьте другие поля фильма, если нужно на странице деталей
                             }
                         }
+                    },
+                    orderBy: { // Для консистентного порядка фильмов
+                        collection_movie_id: 'asc'
+                    }
+                },
+                users: { // Включаем данные пользователя, если это не системная подборка
+                    select: {
+                        user_id: true,
+                        username: true
                     }
                 }
             }
         });
 
+        // Если подборка с таким ID вообще не найдена
         if (!compilation) {
-            throw new Error(`Compilation with ID ${id} not found`);
+            throw new Error(`Подборка с ID ${id} не найдена`);
         }
 
-        const movies = compilation.collection_movies.map(cm => cm.movies).filter(movie => movie !== null);
+        // Формируем ответ: извлекаем фильмы и добавляем информацию о создателе
+        const movies = compilation.collection_movies
+                                .map(cm => cm.movies) // Берем объект фильма
+                                .filter(movie => movie !== null); // Убираем возможные null
 
         return {
             collection_id: compilation.collection_id,
             title: compilation.title,
+            // Добавляем информацию о пользователе, если она есть
+            user: compilation.users ? { id: compilation.users.user_id, username: compilation.users.username } : null,
+            // Фильмы в подборке
             movies: movies,
         };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error(`Error fetching compilation details for ID ${id}:`, error);
-        if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
-             throw new Error(`Compilation with ID ${id} not found`);
-        }
-        throw error;
-    } finally {
-         // Не отключаем здесь, если используется в cron
-         // await prisma.$disconnect();
+        // Перебрасываем ошибку с понятным сообщением
+         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+             throw new Error(`Подборка с ID ${id} не найдена`); // Конкретизируем Prisma-ошибку
+         } else if (error.message.includes("not found")) { // Если уже бросили кастомную
+             throw error;
+         }
+        // Общая ошибка
+        throw new Error(`Не удалось получить детали подборки: ${error.message}`);
     }
 };
 
 
-// --- Обновленная функция автоматического обновления подборок по сложным правилам ---
-export const updateSystemCompilationsByGenre = async () => {
-    let localPrisma: PrismaClient | null = null; // Локальный экземпляр Prisma для этой функции
-    try {
-        localPrisma = new PrismaClient(); // Создаем экземпляр
-        console.log("Starting automatic update of system compilations by genre (complex rules)...");
+// --- 3. Функция создания ПОЛЬЗОВАТЕЛЬСКОЙ подборки ---
+export const createUserCompilation = async (userId: number, title: string, movieIds: number[]) => {
+    // Проверка входных данных
+    if (!userId || !title || !Array.isArray(movieIds) || movieIds.length === 0) {
+        throw new Error("Некорректные входные данные: требуются userId, title и непустой массив movieIds.");
+    }
 
-        // 1. Получаем все системные подборки
-        const systemCompilations = await localPrisma.user_movie_collections.findMany({
+    try {
+        // Используем транзакцию для атомарности операций
+        const newCompilation = await prisma.$transaction(async (tx) => {
+            // 1. Создаем подборку
+            const collection = await tx.user_movie_collections.create({
+                data: {
+                    user_id: userId,
+                    title: title,
+                    likes: 0, // Начальные лайки
+                },
+            });
+
+            // 2. Подготавливаем данные для связей
+            const moviesToLink = movieIds.map((movieId) => ({
+                collection_id: collection.collection_id,
+                movie_id: movieId,
+            }));
+
+            // 3. Создаем связи
+            await tx.collection_movies.createMany({
+                data: moviesToLink,
+                skipDuplicates: true,
+            });
+
+            return collection; // Возвращаем созданную коллекцию
+        });
+
+        console.log(`User compilation "${title}" (ID: ${newCompilation.collection_id}) created for user ${userId}`);
+        return newCompilation; // Возвращаем данные созданной подборки клиенту
+
+    } catch (error: any) {
+        console.error(`Error creating user compilation for user ${userId}:`, error);
+        // Обработка специфичных ошибок Prisma
+        if (error instanceof Prisma.PrismaClientKnownRequestError) {
+            if (error.code === 'P2003' || error.code === 'P2025') {
+                throw new Error("Не удалось связать фильмы: один или несколько ID фильмов не существуют.");
+            }
+        }
+        // Общая ошибка
+        throw new Error(`Не удалось создать пользовательскую подборку: ${error.message}`);
+    }
+};
+
+// --- 4. Функция получения подборок КОНКРЕТНОГО пользователя ---
+// Возвращает данные в формате UserCompilationSummary для фронтенда
+export const getUserCompilations = async (userId: number) => {
+    if (!userId) {
+        throw new Error("Требуется ID пользователя для получения его подборок.");
+    }
+    try {
+        const compilations = await prisma.user_movie_collections.findMany({
             where: {
-                user_id: null,
+                user_id: userId, // Только подборки этого пользователя
             },
             select: {
                 collection_id: true,
                 title: true,
+                // Получаем связанные фильмы для постеров и подсчета
+                collection_movies: {
+                    select: {
+                        movies: {
+                            select: {
+                                poster_filename: true, // Нужен только постер для превью
+                            },
+                        },
+                    },
+                    orderBy: {
+                        collection_movie_id: 'asc', // Консистентный порядок постеров
+                    },
+                    take: 4, // Не больше 4 постеров
+                },
+                // Эффективный подсчет фильмов
+                _count: {
+                    select: { collection_movies: true }
+                }
+            },
+            orderBy: {
+                collection_id: 'desc', // Сначала новые
             },
         });
 
-        // 2. Новая структура для правил подборок
-        interface CompilationRule {
-            requiredGenres?: string[];
-            optionalOrGenres?: string[];
-        }
+        // Форматируем результат для фронтенда
+        const formattedCompilations = compilations.map(comp => ({
+            id: comp.collection_id,
+            title: comp.title,
+            movieCount: comp._count.collection_movies, // Используем результат _count
+            previewPosters: comp.collection_movies
+                                .map(cm => cm.movies?.poster_filename) // Получаем имена файлов
+                                .filter((p): p is string => p !== null && p !== undefined), // Убираем null/undefined
+        }));
 
-        // Определяем правила для каждой подборки
+        return formattedCompilations;
+
+    } catch (error: any) {
+        console.error(`Error fetching compilations for user ${userId}:`, error);
+        throw new Error(`Не удалось получить подборки пользователя: ${error.message}`);
+    }
+};
+
+
+// --- 5. Функция автоматического обновления СИСТЕМНЫХ подборок (сложные правила) ---
+// (Эта функция предоставлена вами ранее, включаю ее для полноты файла)
+export const updateSystemCompilationsByGenre = async () => {
+    let localPrisma: PrismaClient | null = null; // Локальный экземпляр Prisma
+    try {
+        localPrisma = new PrismaClient();
+        console.log("Starting automatic update of system compilations by genre (complex rules)...");
+
+        const systemCompilations = await localPrisma.user_movie_collections.findMany({
+            where: { user_id: null },
+            select: { collection_id: true, title: true },
+        });
+
+        interface CompilationRule { requiredGenres?: string[]; optionalOrGenres?: string[]; }
         const compilationRules: { [title: string]: CompilationRule } = {
-            "Жуткие фильмы": { optionalOrGenres: ["ужасы", "триллер"] },
-            "Лучшие мультфильмы всех времен": {
-                requiredGenres: ["мультфильм"],
-                optionalOrGenres: ["семейный", "фэнтези"]
-            },
-            "Военные фильмы": {
-                 requiredGenres: ["военный"],
-                 optionalOrGenres: ["драма", "история"]
-            },
-            "Фильмы-мюзикл": { optionalOrGenres: ["мюзикл", "музыкальный"] },
-            "Лучшие комедии": { optionalOrGenres: ["комедия"] },
-            "Фильмы про супергероев": { optionalOrGenres: ["фантастика", "боевик", "приключения"] },
-            "Фильмы про спорт": { optionalOrGenres: ["спорт"] },
-            "Захватывающие детективы": {
-                 requiredGenres: ["детектив"],
-                 optionalOrGenres: ["триллер"]
-            },
-            "Криминальные драмы": {
-                 requiredGenres: ["криминал", "драма"]
-            },
-            "Фантастические миры": { optionalOrGenres: ["фантастика", "фэнтези"] },
-            "Дикий Запад": { optionalOrGenres: ["вестерн", "приключения"] },
-            "Документальное кино": { optionalOrGenres: ["документальный", "история"] },
+             "Жуткие фильмы": { optionalOrGenres: ["ужасы", "триллер"] },
+             "Лучшие мультфильмы всех времен": { requiredGenres: ["мультфильм"], optionalOrGenres: ["семейный", "фэнтези"] },
+             "Военные фильмы": { requiredGenres: ["военный"], optionalOrGenres: ["драма", "история"] },
+             "Фильмы-мюзикл": { optionalOrGenres: ["мюзикл", "музыкальный"] },
+             "Лучшие комедии": { optionalOrGenres: ["комедия"] },
+             "Фильмы про супергероев": { optionalOrGenres: ["фантастика", "боевик", "приключения"] },
+             "Фильмы про спорт": { optionalOrGenres: ["спорт"] },
+             "Захватывающие детективы": { requiredGenres: ["детектив"], optionalOrGenres: ["триллер"] },
+             "Криминальные драмы": { requiredGenres: ["криминал", "драма"] },
+             "Фантастические миры": { optionalOrGenres: ["фантастика", "фэнтези"] },
+             "Дикий Запад": { optionalOrGenres: ["вестерн", "приключения"] },
+             "Документальное кино": { optionalOrGenres: ["документальный", "история"] },
         };
 
-        // 3. Итерация по подборкам и применение правил
         for (const compilation of systemCompilations) {
             const compilationTitle = compilation.title;
             const rule = compilationRules[compilationTitle];
+            if (!rule) { console.log(`No rule found for compilation "${compilationTitle}"`); continue; }
 
-            if (rule) {
-                console.log(`Updating compilation "${compilationTitle}" with rule:`, rule);
+            console.log(`Updating compilation "${compilationTitle}" with rule:`, rule);
+            const allGenreNames = [...(rule.requiredGenres || []), ...(rule.optionalOrGenres || [])];
+            if (allGenreNames.length === 0) { console.log(`  No genres specified for "${compilationTitle}". Skipping.`); continue; }
 
-                const allGenreNames = [
-                    ...(rule.requiredGenres || []),
-                    ...(rule.optionalOrGenres || []),
-                ];
+            const genreIdsMap = new Map<string, number>();
+            const genresFromDb = await localPrisma.genres.findMany({ where: { name: { in: allGenreNames } }, select: { genre_id: true, name: true } });
+            genresFromDb.forEach(g => genreIdsMap.set(g.name, g.genre_id));
 
-                if (allGenreNames.length === 0) {
-                    console.log(`  No genres specified for compilation "${compilationTitle}". Skipping.`);
-                    continue;
-                }
+            const requiredGenreIds = (rule.requiredGenres || []).map(name => genreIdsMap.get(name)).filter((id): id is number => id !== undefined);
+            const optionalOrGenreIds = (rule.optionalOrGenres || []).map(name => genreIdsMap.get(name)).filter((id): id is number => id !== undefined);
 
-                const genreIdsMap = new Map<string, number>();
-                const genresFromDb = await localPrisma.genres.findMany({
-                    where: { name: { in: allGenreNames } },
-                    select: { genre_id: true, name: true },
-                });
-                genresFromDb.forEach(g => genreIdsMap.set(g.name, g.genre_id));
-
-                const requiredGenreIds = (rule.requiredGenres || [])
-                    .map(name => genreIdsMap.get(name))
-                    .filter((id): id is number => id !== undefined);
-
-                const optionalOrGenreIds = (rule.optionalOrGenres || [])
-                    .map(name => genreIdsMap.get(name))
-                    .filter((id): id is number => id !== undefined);
-
-                const requiredGenresNotFound = (rule.requiredGenres || []).length !== requiredGenreIds.length;
-                const optionalGenresNotFound = (rule.optionalOrGenres || []).length !== optionalOrGenreIds.length;
-
-                if (requiredGenresNotFound || optionalGenresNotFound) {
-                    console.warn(`  Could not find all specified genre IDs in DB for "${compilationTitle}". Check genre names. Skipping update for this compilation.`);
-                    continue; // Пропускаем подборку, если не все жанры найдены
-                }
-
-                // 4. Получаем movie_ids фильмов по новым правилам
-                let movieIdsValues: number[] = [];
-
-                try {
-                    const whereConditions: Prisma.moviesWhereInput[] = [];
-
-                    if (requiredGenreIds.length > 0) {
-                        whereConditions.push({
-                            AND: requiredGenreIds.map(reqId => ({
-                                movie_genres: { some: { genre_id: reqId } }
-                            }))
-                        });
-                    }
-
-                    if (optionalOrGenreIds.length > 0) {
-                         whereConditions.push({
-                            movie_genres: { some: { genre_id: { in: optionalOrGenreIds } } }
-                         });
-                    }
-
-                    if (whereConditions.length > 0) {
-                        const movies = await localPrisma.movies.findMany({
-                            where: {
-                               AND: whereConditions
-                            },
-                            select: {
-                                movie_id: true,
-                            }
-                        });
-                        movieIdsValues = movies.map(m => m.movie_id);
-                        console.log(`  Found ${movieIdsValues.length} movies matching the rule for "${compilationTitle}".`);
-                    } else {
-                         console.log(`  No valid conditions to query movies for "${compilationTitle}".`);
-                    }
-
-                } catch (queryError) {
-                     console.error(`  Error querying movies for "${compilationTitle}":`, queryError);
-                     continue;
-                }
-
-                // 5. Обновляем collection_movies
-                if (movieIdsValues.length > 0) {
-                  // Очищаем СТАРЫЕ связи только для ТЕКУЩЕЙ подборки перед добавлением новых
-                  await localPrisma.collection_movies.deleteMany({
-                      where: {
-                          collection_id: compilation.collection_id,
-                      }
-                  });
-                  console.log(`  Cleared old movie links for compilation "${compilationTitle}".`);
-
-                  // Добавляем новые связи
-                  for (const movieId of movieIdsValues) {
-                      // Проверка на существующую связь теперь не нужна, т.к. мы очистили
-                      try {
-                            await localPrisma.collection_movies.create({
-                                data: {
-                                    collection_id: compilation.collection_id,
-                                    movie_id: movieId,
-                                },
-                            });
-                            // console.log(`  Added movie ${movieId} to compilation "${compilationTitle}"`); // Можно сделать менее подробный лог
-                      } catch (createError) {
-                           console.error(`  Error adding movie ${movieId} to compilation "${compilationTitle}":`, createError);
-                      }
-                  }
-                   console.log(`  Finished adding ${movieIdsValues.length} movies to compilation "${compilationTitle}".`);
-                } else {
-                    // Если не найдено фильмов по новым правилам, очищаем связи для этой подборки
-                    await localPrisma.collection_movies.deleteMany({
-                        where: {
-                            collection_id: compilation.collection_id,
-                        }
-                    });
-                    console.log(`  No movies found matching the rule for "${compilationTitle}". Cleared existing links.`);
-                }
-
-            } else {
-                console.log(`No rule found for compilation "${compilationTitle}"`);
+            if ((rule.requiredGenres || []).length !== requiredGenreIds.length || (rule.optionalOrGenres || []).length !== optionalOrGenreIds.length) {
+                console.warn(`  Could not find all specified genre IDs in DB for "${compilationTitle}". Skipping update.`); continue;
             }
-        } // Конец цикла for
+
+            let movieIdsValues: number[] = [];
+            try {
+                const whereConditions: Prisma.moviesWhereInput[] = [];
+                if (requiredGenreIds.length > 0) { whereConditions.push({ AND: requiredGenreIds.map(reqId => ({ movie_genres: { some: { genre_id: reqId } } })) }); }
+                if (optionalOrGenreIds.length > 0) { whereConditions.push({ movie_genres: { some: { genre_id: { in: optionalOrGenreIds } } } }); }
+
+                if (whereConditions.length > 0) {
+                    const movies = await localPrisma.movies.findMany({ where: { AND: whereConditions }, select: { movie_id: true } });
+                    movieIdsValues = movies.map(m => m.movie_id);
+                    console.log(`  Found ${movieIdsValues.length} movies matching rule for "${compilationTitle}".`);
+                } else { console.log(`  No valid conditions for "${compilationTitle}".`); }
+            } catch (queryError) { console.error(`  Error querying movies for "${compilationTitle}":`, queryError); continue; }
+
+            await localPrisma.collection_movies.deleteMany({ where: { collection_id: compilation.collection_id } });
+            console.log(`  Cleared old movie links for "${compilationTitle}".`);
+
+            if (movieIdsValues.length > 0) {
+                try {
+                    await localPrisma.collection_movies.createMany({
+                        data: movieIdsValues.map(movieId => ({ collection_id: compilation.collection_id, movie_id: movieId })),
+                        skipDuplicates: true
+                    });
+                     console.log(`  Finished adding ${movieIdsValues.length} movies to "${compilationTitle}".`);
+                } catch (createError) { console.error(`  Error bulk adding movies to "${compilationTitle}":`, createError); }
+            } else { console.log(`  No movies found for "${compilationTitle}". Links remain cleared.`); }
+        } // Конец for
 
         console.log("Automatic update of system compilations by genre (complex rules) finished.");
     } catch (error) {
         console.error("Error updating system compilations by genre (complex rules):", error);
-        // Не бросаем ошибку дальше, чтобы не остановить cron задачу
     } finally {
         if (localPrisma) {
-            await localPrisma.$disconnect(); // Отключаем локальный экземпляр
+            await localPrisma.$disconnect();
             console.log("Disconnected local Prisma client for update job.");
         }
     }
