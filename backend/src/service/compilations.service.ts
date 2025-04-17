@@ -146,8 +146,7 @@ export const createUserCompilation = async (userId: number, title: string, movie
     }
 };
 
-// --- 4. Функция получения подборок КОНКРЕТНОГО пользователя ---
-// Возвращает данные в формате UserCompilationSummary для фронтенда
+// --- 4. Функция получения подборок КОНКРЕТНОГО пользователя (ИСПРАВЛЕНО) ---
 export const getUserCompilations = async (userId: number) => {
     if (!userId) {
         throw new Error("Требуется ID пользователя для получения его подборок.");
@@ -155,46 +154,36 @@ export const getUserCompilations = async (userId: number) => {
     try {
         const compilations = await prisma.user_movie_collections.findMany({
             where: {
-                user_id: userId, // Только подборки этого пользователя
+                user_id: userId,
             },
             select: {
                 collection_id: true,
                 title: true,
-                // Получаем связанные фильмы для постеров и подсчета
+                is_published: true, // <-- УБЕДИСЬ, ЧТО ЭТО ПОЛЕ ВЫБИРАЕТСЯ!
                 collection_movies: {
-                    select: {
-                        movies: {
-                            select: {
-                                poster_filename: true, // Нужен только постер для превью
-                            },
-                        },
-                    },
-                    orderBy: {
-                        collection_movie_id: 'asc', // Консистентный порядок постеров
-                    },
-                    take: 4, // Не больше 4 постеров
+                    select: { movies: { select: { poster_filename: true }}},
+                    orderBy: { collection_movie_id: 'asc' },
+                    take: 4,
                 },
-                // Эффективный подсчет фильмов
-                _count: {
-                    select: { collection_movies: true }
-                }
+                _count: { select: { collection_movies: true } }
             },
             orderBy: {
-                collection_id: 'desc', // Сначала новые
+                collection_id: 'desc',
             },
         });
 
-        // Форматируем результат для фронтенда
+        // Форматируем результат, ВКЛЮЧАЯ isPublished
         const formattedCompilations = compilations.map(comp => ({
             id: comp.collection_id,
             title: comp.title,
-            movieCount: comp._count.collection_movies, // Используем результат _count
+            movieCount: comp._count.collection_movies,
             previewPosters: comp.collection_movies
-                                .map(cm => cm.movies?.poster_filename) // Получаем имена файлов
-                                .filter((p): p is string => p !== null && p !== undefined), // Убираем null/undefined
+                                .map(cm => cm.movies?.poster_filename)
+                                .filter((p): p is string => p !== null && p !== undefined),
+            isPublished: comp.is_published // <-- ДОБАВЛЯЕМ isPublished В ВОЗВРАЩАЕМЫЙ ОБЪЕКТ!
         }));
 
-        return formattedCompilations;
+        return formattedCompilations; // Теперь объекты содержат isPublished
 
     } catch (error: any) {
         console.error(`Error fetching compilations for user ${userId}:`, error);
@@ -287,5 +276,58 @@ export const updateSystemCompilationsByGenre = async () => {
             await localPrisma.$disconnect();
             console.log("Disconnected local Prisma client for update job.");
         }
+    }
+};
+
+
+// --- 6. НОВАЯ ФУНКЦИЯ: Публикация подборки пользователем ---
+export const publishUserCompilation = async (userId: number, collectionId: number) => {
+    if (!userId || !collectionId) { throw new Error("Требуются ID пользователя и ID подборки."); }
+    try {
+        const updateResult = await prisma.user_movie_collections.updateMany({
+            where: { collection_id: collectionId, user_id: userId }, // Проверяем владение
+            data: { is_published: true }, // Публикуем
+        });
+        if (updateResult.count === 0) {
+             const exists = await prisma.user_movie_collections.findFirst({ where: { collection_id: collectionId } });
+             if (!exists) throw new Error(`Подборка с ID ${collectionId} не найдена.`);
+             else throw new Error(`Вы не можете опубликовать эту подборку.`);
+        }
+        console.log(`Compilation ID ${collectionId} published by user ${userId}`);
+        return { success: true, message: "Подборка успешно опубликована." };
+    } catch (error: any) {
+         console.error(`Error publishing compilation ${collectionId} by user ${userId}:`, error);
+         throw new Error(`Не удалось опубликовать подборку: ${error.message}`);
+    }
+};
+
+// --- 7. НОВАЯ ФУНКЦИЯ: Получение ВСЕХ опубликованных подборок (для GeneralPage) ---
+export const getPublishedCompilations = async (limit: number = 20, offset: number = 0) => {
+    try {
+        const compilations = await prisma.user_movie_collections.findMany({
+            where: { is_published: true, user_id: { not: null } }, // Только опубликованные пользовательские
+            select: {
+                collection_id: true, title: true,
+                collection_movies: { select: { movies: { select: { poster_filename: true }}}, orderBy: { collection_movie_id: 'asc' }, take: 4 },
+                _count: { select: { collection_movies: true } },
+                users: { select: { user_id: true, username: true } } // Информация об авторе
+            },
+            orderBy: { collection_id: 'desc' }, // Сначала новые
+            take: limit,
+            skip: offset,
+        });
+        // Форматируем результат (включая автора)
+        const formattedCompilations = compilations.map(comp => ({
+            id: comp.collection_id,
+            title: comp.title,
+            movieCount: comp._count.collection_movies,
+            previewPosters: comp.collection_movies.map(cm => cm.movies?.poster_filename).filter((p): p is string => p !== null && p !== undefined),
+            author: comp.users ? { id: comp.users.user_id, username: comp.users.username } : null
+        }));
+        const totalCount = await prisma.user_movie_collections.count({ where: { is_published: true, user_id: { not: null } } });
+        return { data: formattedCompilations, pagination: { total: totalCount, limit: limit, offset: offset }};
+    } catch (error: any) {
+        console.error("Error fetching published compilations:", error);
+        throw new Error(`Не удалось получить опубликованные подборки: ${error.message}`);
     }
 };

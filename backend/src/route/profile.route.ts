@@ -35,44 +35,66 @@ const FavoriteMovieRecordSchema = t.Object({
 
 const profileRoutes = new Elysia({ prefix: '/profile', detail: { tags: ['Profile'] } });
 
-// --- Получение своего профиля ---
-// (Этот роут не использует checkAuth, а проверяет токен вручную - ОСТАВЛЯЕМ ПОКА ТАК,
-// но лучше перевести на checkAuth для единообразия)
+// --- Получение своего профиля (ИСПРАВЛЕНО) ---
 profileRoutes.get('/', async (ctx) => {
-    // ... (код получения userId из токена и userData остается) ...
     const authorization = ctx.headers.authorization;
     if (!authorization) {
         ctx.set.status = 401; return { success: false, message: 'Unauthorized' };
     }
-    // Предполагаем, что ctx.jwt настроен глобально или через .use()
-    // Если checkAuth настроен глобально, этот код можно упростить, беря userId из store
-    const verification = await ctx.jwt.verify(authorization); // Нужен ctx.jwt!
-    if (!verification) {
-        ctx.set.status = 401; return { success: false, message: 'Invalid token' };
-    }
-    const { userId } = verification as { userId: number }; // Упростил тип JWTPayload
-    const userData = await UserProvider.getByID(userId);
-    if (!userData) {
-        ctx.set.status = 404; return { success: false, message: 'User not found' };
-    }
 
-    // !!! ИСПРАВЛЕНИЕ: Устанавливаем статус и возвращаем только тело !!!
-    ctx.set.status = 200;
-    return {
-        success: true,
-        data: {
-            user_id: userData.user_id,
-            username: userData.username,
-            email: userData.email,
-            // ... другие нужные поля пользователя ...
+    try {
+        // Проверяем токен (убедись, что ctx.jwt доступен - настроен через app.use(jwt(...)))
+        const verification = await ctx.jwt.verify(authorization);
+        if (!verification || typeof verification.userId !== 'number') { // Добавил проверку типа userId
+            ctx.set.status = 401; return { success: false, message: 'Invalid or missing token payload' };
         }
-    };
+
+        const { userId } = verification;
+
+        // Получаем данные пользователя
+        // UserProvider.getByID УЖЕ должен возвращать rating, т.к. нет select в провайдере
+        const userData = await UserProvider.getByID(userId);
+        if (!userData) {
+            ctx.set.status = 404; return { success: false, message: 'User not found' };
+        }
+
+        ctx.set.status = 200;
+        // Возвращаем данные, ВКЛЮЧАЯ рейтинг
+        return {
+            success: true,
+            data: {
+                user_id: userData.user_id,
+                username: userData.username,
+                email: userData.email,
+                rating: userData.rating ?? 0, // <-- ДОБАВЛЕНО: Возвращаем рейтинг (или 0, если null)
+                // Добавь другие поля, если нужно (например, аватар)
+            }
+        };
+    } catch (error: any) {
+         // Обработка ошибок верификации JWT или других ошибок
+         console.error("Error verifying token or fetching profile:", error);
+         if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+             ctx.set.status = 401;
+             return { success: false, message: 'Invalid or expired token' };
+         }
+         ctx.set.status = 500;
+         return { success: false, message: 'Internal server error' };
+    }
 }, {
-    // Схема ответа остается как есть
+    // Обновляем схему ответа, добавляя rating
     response: {
-        200: t.Object({ success: t.Boolean(), data: t.Object({ user_id: t.Number(), username: t.String(), email: t.String() }) }),
+        200: t.Object({
+            success: t.Boolean(),
+            data: t.Object({
+                user_id: t.Number(),
+                username: t.String(),
+                email: t.String(),
+                rating: t.Number() // <-- ДОБАВЛЕНО: Указываем, что rating будет числом
+            })
+        }),
         401: t.Object({ success: t.Boolean(), message: t.String() }),
-        404: t.Object({ success: t.Boolean(), message: t.String() })
+        404: t.Object({ success: t.Boolean(), message: t.String() }),
+        500: t.Object({ success: t.Boolean(), message: t.String() })
     }
 });
 
@@ -248,5 +270,70 @@ profileRoutes.get("/actors", async (ctx) => {
         500: t.Object({ success: t.Boolean(), message: t.String() })
     }
 });
+
+
+// --- НОВЫЙ МАРШРУТ: Получение топ пользователей по рейтингу ---
+profileRoutes.get('/top-rated', async ({ query, set }) => {
+    try {
+        const limit = query.limit ? parseInt(query.limit, 10) : 5;
+        // Простая валидация лимита
+        if (isNaN(limit) || limit <= 0 || limit > 100) { // Добавил верхний предел
+             set.status = 400;
+             return { success: false, message: "Параметр 'limit' должен быть числом от 1 до 100." };
+        }
+
+        const topUsers = await prisma.users.findMany({
+            orderBy: {
+                rating: 'desc', // Сортировка по убыванию рейтинга
+            },
+            take: limit,       // Взять указанное количество
+            select: {          // Выбрать только нужные поля
+                user_id: true,
+                username: true,
+                rating: true,
+                // Добавь сюда поле для аватара, если оно есть в модели users
+                // avatar_filename: true,
+            },
+        });
+
+        // Преобразование null рейтинга в 0
+        const resultUsers = topUsers.map(user => ({
+            ...user,
+            rating: user.rating ?? 0,
+        }));
+
+        set.status = 200;
+        return { success: true, data: resultUsers };
+
+    } catch (error: any) {
+        console.error("API Error fetching top rated users:", error);
+        set.status = 500;
+        return { success: false, message: error.message || "Ошибка сервера при получении рейтинга." };
+    }
+}, {
+    query: t.Object({ // Валидация query параметра
+        limit: t.Optional(t.String()) // Принимаем как строку, парсим и валидируем выше
+    }),
+    detail: { // Описание для Swagger
+        summary: 'Get Top Rated Users',
+        description: 'Retrieves a list of users sorted by rating in descending order. Default limit is 5.',
+        tags: ['Profile'] // Используем тег Profile, так как роут находится здесь
+    },
+    response: { // Схема ответа
+        200: t.Object({
+            success: t.Boolean(),
+            data: t.Array(t.Object({
+                user_id: t.Number(),
+                username: t.String(),
+                rating: t.Number(), // Рейтинг будет числом (0, если был null)
+                 // avatar_filename: t.Optional(t.Nullable(t.String())), // Если добавил аватар
+            }))
+        }),
+        400: t.Object({ success: t.Boolean(), message: t.String() }), // Bad Request (неверный limit)
+        500: t.Object({ success: t.Boolean(), message: t.String() })  // Internal Server Error
+    }
+});
+// --- Конец нового маршрута ---
+
 
 export default profileRoutes;

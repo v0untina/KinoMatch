@@ -7,10 +7,11 @@ import { staticPlugin } from '@elysiajs/static';
 import path from 'path';
 import 'dotenv/config';
 import colors from "colors";
-import packageJSON from "./../package.json"; // Убедитесь, что путь к package.json верный относительно backend/src
+import packageJSON from "./../package.json";
 import { Logestic } from 'logestic';
 import fs from 'node:fs/promises';
-import cron from 'node-cron';
+import cron from 'node-cron'; // <--- ДОБАВЛЕНО: Импорт node-cron
+import { PrismaClient } from '@prisma/client'; // <--- ДОБАВЛЕНО: Импорт PrismaClient
 import { updateSystemCompilationsByGenre } from './service/compilations.service';
 
 // Импорт Elysia роутов
@@ -26,6 +27,10 @@ import PostsRoute from './route/posts.route';
 import { newsRoute } from './route/news.route';
 
 const app = new Elysia();
+
+// --- Инициализация Prisma (если нужна глобально) ---
+// const prisma = new PrismaClient();
+// ---
 
 async function bootstrap() {
     const JWT_SECRET = process.env.JWT_SECRET;
@@ -47,39 +52,34 @@ async function bootstrap() {
     );
 
     // --- Настройка статики ---
-    const assetsFolder = 'data/images'; // Путь относительно корня проекта (backend/)
+    // (твой код настройки статики остается без изменений)
+    const assetsFolder = 'data/images';
     const absoluteAssetsPath = path.resolve(process.cwd(), assetsFolder);
     console.log(colors.magenta(`Serving static files from (using assets): ${absoluteAssetsPath}`));
     console.log(colors.magenta(`process.cwd(): ${process.cwd()}`));
-
-    // Убедимся, что директория для загрузок существует
     try {
         await fs.mkdir(absoluteAssetsPath, { recursive: true });
-        await fs.mkdir(path.join(absoluteAssetsPath, 'posts'), { recursive: true }); // И для постов
+        await fs.mkdir(path.join(absoluteAssetsPath, 'posts'), { recursive: true });
         console.log(colors.green(`Static directories ensured/created at ${absoluteAssetsPath}`));
     } catch (error) {
         console.error(colors.red(`Error creating static directories:`), error);
     }
-
     app.use(staticPlugin({
         assets: assetsFolder,
         prefix: '/public/images',
-        // noCache: true,       // Раскомментируй для разработки, если нужно
-        // alwaysStatic: true,
     }));
     console.log(colors.yellow(`Static file serving enabled at /public/images using assets folder: '${assetsFolder}'`));
     // --- КОНЕЦ НАСТРОЙКИ СТАТИКИ --
 
-
     // Плагин для Swagger документации
-    app.use(swagger({
+    // (твой код Swagger остается без изменений)
+     app.use(swagger({
         documentation: {
             info: {
                 title: `KinoMatch API Documentation v${packageJSON.version}`,
                 version: packageJSON.version,
                 description: `The backend API documentation for the KinoMatch project. Base URL: /api`,
             },
-             // Определение схемы безопасности для JWT
             security: [{ BearerAuth: [] }],
             components: {
                 securitySchemes: {
@@ -91,7 +91,7 @@ async function bootstrap() {
                     }
                 }
             },
-            tags: [ // Определение тегов для группировки эндпоинтов
+            tags: [
                 { name: 'Auth', description: 'Authentication endpoints (Login, Register)' },
                 { name: 'Profile', description: 'User profile management' },
                 { name: 'Movies', description: 'Movie related endpoints' },
@@ -104,29 +104,30 @@ async function bootstrap() {
                 { name: 'News', description: 'External news endpoints' },
             ]
         },
-        // Указываем путь, где будет доступна документация
         path: '/docs'
     }));
 
-    // Плагин для настройки CORS - он должен обрабатывать OPTIONS автоматически
+    // Плагин для настройки CORS
+    // (твой код CORS остается без изменений)
     app.use(cors({
         credentials: true,
-        origin: 'http://localhost:3000', // Разрешаем запросы с фронтенда
+        origin: 'http://localhost:3000',
         allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization",
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'] // Разрешенные методы
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
     }));
 
-    // Базовый роут для проверки работоспособности
+    // Базовый роут
+    // (твой базовый роут остается без изменений)
     app.get("/", () => {
         return {
             message: `KinoMatch Backend API v${packageJSON.version} is running!`
         };
     });
 
-    // Роут для favicon (опционально)
+    // Роут для favicon
+    // (твой роут favicon остается без изменений)
     app.get("/favicon.ico", async ({ set }) => {
-        try {
-            // Путь к иконке. Создайте папку public в корне backend, если ее нет, и положите туда иконку
+         try {
             const faviconPath = path.join(process.cwd(), 'public', 'favicon.ico');
             const file = await fs.readFile(faviconPath);
             set.headers['Content-Type'] = 'image/x-icon';
@@ -137,47 +138,24 @@ async function bootstrap() {
         }
      });
 
-    // --- Глобальные обработчики ошибок ---
+    // Глобальные обработчики ошибок
+    // (твой код onError остается без изменений)
     app.onError(({ code, error, set }) => {
         console.error(colors.red(`[${code}] Error: ${error.message}`));
-        // Раскомментируйте следующую строку для детальной отладки в консоли
-        // console.error(error.stack);
-
-        // Обработка специфических ошибок Elysia или HTTP статусов
-        if (code === 'NOT_FOUND') {
-            set.status = 404;
-            return { success: false, message: 'Resource not found.' };
-        }
+        if (code === 'NOT_FOUND') { set.status = 404; return { success: false, message: 'Resource not found.' }; }
         if (code === 'VALIDATION') {
-            set.status = 400;
-            // Безопасное отображение ошибки валидации
-            let validationErrors: any = 'Validation failed.';
-            if (error && typeof error.message === 'string') {
-                 try {
-                     // Попытка парсить, если ошибка содержит JSON
-                     const parsed = JSON.parse(error.message);
-                     validationErrors = parsed; // Показать распарсенную ошибку
-                 } catch (_) {
-                     validationErrors = error.message; // Показать исходное сообщение, если не JSON
-                 }
-            } else if (error instanceof Error) {
-                validationErrors = error.message;
-            }
+            set.status = 400; let validationErrors: any = 'Validation failed.';
+            if (error && typeof error.message === 'string') { try { const parsed = JSON.parse(error.message); validationErrors = parsed; } catch (_) { validationErrors = error.message; }} else if (error instanceof Error) { validationErrors = error.message; }
             return { success: false, message: 'Validation Error', errors: validationErrors };
         }
-        if (code === 'INTERNAL_SERVER_ERROR') {
-            set.status = 500;
-            return { success: false, message: 'An internal server error occurred.' };
-        }
-
-        // По умолчанию - ошибка сервера
-        set.status = 500;
-        // Не отправляем детали ошибки клиенту в продакшене
-        return { success: false, message: 'Something went wrong!' };
+        if (code === 'INTERNAL_SERVER_ERROR') { set.status = 500; return { success: false, message: 'An internal server error occurred.' }; }
+        set.status = 500; return { success: false, message: 'Something went wrong!' };
      });
 
-    // --- Группа для всех API роутов с префиксом /api ---
-    app.group("/api", (apiGroup) =>
+
+    // Группа для всех API роутов
+    // (твой код app.group остается без изменений)
+     app.group("/api", (apiGroup) =>
         apiGroup
             .use(AuthRoute)
             .use(ProfileRoute)
@@ -191,7 +169,7 @@ async function bootstrap() {
             .use(newsRoute)
     );
 
-    // --- Запуск Cron Job для обновления подборок ---
+    // --- БЛОК CRON ДЛЯ ОБНОВЛЕНИЯ ПОДБОРОК (ТВОЙ СУЩЕСТВУЮЩИЙ) ---
     cron.schedule('5 3 * * *', async () => {
         console.log(colors.cyan('Running scheduled job: Updating system compilations by genre...'));
         try {
@@ -205,34 +183,22 @@ async function bootstrap() {
         timezone: "Europe/Moscow"
     });
     console.log(colors.yellow('Cron job for compilations update scheduled for 03:05 AM Moscow time...'));
+    // --- КОНЕЦ БЛОКА CRON ДЛЯ ПОДБОРОК ---
 
 
-    // --- Запуск Cron Job для парсера новостей ---
-    const PARSER_SCRIPT_PATH = path.join(__dirname, '..', '..', 'parser.py'); // Путь к парсеру в корне проекта
-    const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'python3'; // Или 'python'
+    // --- БЛОК CRON ДЛЯ ПАРСЕРА НОВОСТЕЙ (ТВОЙ СУЩЕСТВУЮЩИЙ) ---
+    const PARSER_SCRIPT_PATH = path.join(__dirname, '..', '..', 'parser.py');
+    const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'python3';
 
-    cron.schedule('0 3 * * *', () => { // Каждый день в 3:00
+    cron.schedule('0 3 * * *', () => {
         console.log(colors.cyan(`Running scheduled job: Parsing news using ${PYTHON_EXECUTABLE}...`));
-        const { spawn } = require('child_process'); // Импорт внутри для ленивой загрузки
+        const { spawn } = require('child_process');
         try {
             const pythonProcess = spawn(PYTHON_EXECUTABLE, [PARSER_SCRIPT_PATH]);
-
-            pythonProcess.stdout.on('data', (data: Buffer) => {
-                console.log(colors.blue(`[News Parser STDOUT]: ${data.toString().trim()}`));
-            });
-            pythonProcess.stderr.on('data', (data: Buffer) => {
-                console.error(colors.yellow(`[News Parser STDERR]: ${data.toString().trim()}`));
-            });
-            pythonProcess.on('close', (code: number | null) => { // code может быть null
-                if (code === 0) {
-                    console.log(colors.green('News parsing job completed successfully.'));
-                } else {
-                    console.error(colors.red(`News parsing job failed with exit code: ${code ?? 'unknown'}`));
-                }
-            });
-            pythonProcess.on('error', (err: Error) => {
-                console.error(colors.red('Failed to start news parser process:'), err);
-            });
+            pythonProcess.stdout.on('data', (data: Buffer) => console.log(colors.blue(`[News Parser STDOUT]: ${data.toString().trim()}`)));
+            pythonProcess.stderr.on('data', (data: Buffer) => console.error(colors.yellow(`[News Parser STDERR]: ${data.toString().trim()}`)));
+            pythonProcess.on('close', (code: number | null) => { if (code === 0) console.log(colors.green('News parsing job completed successfully.')); else console.error(colors.red(`News parsing job failed with exit code: ${code ?? 'unknown'}`)); });
+            pythonProcess.on('error', (err: Error) => console.error(colors.red('Failed to start news parser process:'), err));
         } catch (spawnError) {
              console.error(colors.red('Error spawning news parser process:'), spawnError);
         }
@@ -244,14 +210,128 @@ async function bootstrap() {
     // --- КОНЕЦ БЛОКА CRON ДЛЯ ПАРСЕРА ---
 
 
+   // --- БЛОК РАСЧЕТА РЕЙТИНГА ---
+
+// Интерфейс для поста из JSON
+interface PostFromJson {
+    id: string;
+    author: string;
+    text?: string;
+    createdAt: string;
+    likes: number;
+    comments?: any[];
+    likedBy?: number[];
+    imageUrl?: string;
+}
+
+// Функция расчета рейтинга
+async function runRatingCalculation() {
+    console.log(`[CronJob] [${new Date().toISOString()}] Running scheduled user rating calculation (Posts Only)...`);
+    const localPrisma = new PrismaClient();
+    const POINTS_PER_POST_LIKE = 1; // Оставляем только вес для лайков постов
+    // const POINTS_PER_COMPILATION_FAVORITE = 5; // --- ЗАКОММЕНТИРОВАНО/УДАЛЕНО ---
+    let updatedUsersCount = 0;
+    let errorCount = 0;
+
+    // --- Чтение и парсинг posts.json ---
+    let postsData: PostFromJson[] = [];
+    const postsJsonPath = path.join(__dirname, '..', 'data', 'posts.json');
+    try {
+        console.log(`[CronJob:Rating] Attempting to read posts data from: ${postsJsonPath}`);
+        const postsFileContent = await fs.readFile(postsJsonPath, 'utf-8');
+        postsData = JSON.parse(postsFileContent);
+        if (!Array.isArray(postsData)) {
+            throw new Error('Parsed posts.json is not an array.');
+        }
+        console.log(`[CronJob:Rating] Successfully read and parsed ${postsData.length} posts from posts.json`);
+    } catch (fileError: any) {
+        console.error(colors.red(`[CronJob:Rating] FATAL ERROR: Could not read or parse posts.json at ${postsJsonPath}. Aborting rating calculation. Error: ${fileError.message}`));
+        await localPrisma.$disconnect().catch(e => console.error("Error disconnecting prisma after file error:", e));
+        return;
+    }
+    // --- Конец чтения JSON ---
+
+    try {
+        const users = await localPrisma.users.findMany({
+            select: { user_id: true, username: true },
+        });
+        console.log(`[CronJob:Rating] Found ${users.length} users to process.`);
+
+        for (const user of users) {
+            try {
+                // 1. Считаем лайки постов из JSON
+                const totalPostLikes = postsData
+                    .filter(post => post.author === user.username)
+                    .reduce((sum, post) => sum + (post.likes ?? 0), 0);
+
+                // 2. --- БЛОК ПОДСЧЕТА ИЗБРАННЫХ ПОДБОРОК ЗАКОММЕНТИРОВАН/УДАЛЕН ---
+                /*
+                const compilationFavoriteCount = await localPrisma.user_collection_favorites.count({
+                    where: {
+                        user_movie_collections: { user_id: user.user_id },
+                        user_id: { not: user.user_id },
+                    },
+                });
+                const totalCompilationFavorites = compilationFavoriteCount;
+                */
+               const totalCompilationFavorites = 0; // Просто ставим 0, пока нет функционала
+
+                // 3. Рассчитываем рейтинг (теперь только по лайкам)
+                const calculatedRating = totalPostLikes * POINTS_PER_POST_LIKE;
+                // Старая формула: (totalPostLikes * POINTS_PER_POST_LIKE) + (totalCompilationFavorites * POINTS_PER_COMPILATION_FAVORITE);
+
+                // 4. Обновляем рейтинг в БД
+                await localPrisma.users.update({
+                    where: { user_id: user.user_id },
+                    data: { rating: calculatedRating },
+                });
+                updatedUsersCount++;
+            } catch (userError: any) {
+                // Добавим проверку, чтобы не падать, если ошибка именно с user_collection_favorites,
+                // хотя мы и закомментировали вызов count()
+                if (!(userError instanceof TypeError && userError.message.includes("user_collection_favorites"))) {
+                     console.error(colors.red(`[CronJob:Rating] Error processing user ${user.user_id} (${user.username}): ${userError.message}`));
+                     errorCount++;
+                } else {
+                    // Игнорируем ошибку, связанную с отсутствующей таблицей (на всякий случай)
+                    console.warn(colors.yellow(`[CronJob:Rating] Ignored known error related to missing 'user_collection_favorites' for user ${user.user_id}`));
+                }
+            }
+        } // Конец цикла for
+        console.log(colors.green(`[CronJob:Rating] Finished calculation. Users updated: ${updatedUsersCount}. Errors: ${errorCount}.`));
+    } catch (dbError: any) {
+        console.error(colors.red('[CronJob:Rating] Fatal database error during rating calculation process:'), dbError);
+    } finally {
+        await localPrisma.$disconnect().catch(e => console.error("Error disconnecting prisma:", e));
+        console.log(colors.blue('[CronJob:Rating] Local Prisma client for calculation disconnected.'));
+    }
+}
+
+// Настройка Cron для расчета рейтинга (остается как было)
+const ratingCronSchedule = '0 4 * * *'; // Например, каждый день в 4:00 утра
+if (cron.validate(ratingCronSchedule)) {
+    console.log(colors.yellow(`[CronJob:Rating] Scheduling user rating calculation (Posts Only) with pattern: "${ratingCronSchedule}"`));
+    cron.schedule(ratingCronSchedule, runRatingCalculation, {
+        scheduled: true,
+        timezone: "Europe/Moscow"
+    });
+    // Немедленный запуск для теста
+    console.log(colors.blue('[CronJob:Rating] Performing initial rating calculation (Posts Only) on startup...'));
+    runRatingCalculation(); // <-- Раскомментировал для немедленного теста
+} else {
+    console.error(colors.red(`[CronJob:Rating] Invalid cron schedule pattern: "${ratingCronSchedule}". Rating calculation task will not run.`));
+}
+// --- КОНЕЦ БЛОКА РАСЧЕТА РЕЙТИНГА ---
+
+
     // --- Запуск сервера ---
+    // (твой код запуска сервера остается без изменений)
     const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
     if (isNaN(PORT)) {
         console.error(colors.red(`Invalid PORT specified in .env file. Using default 8000.`));
-        process.env.PORT = '8000'; // Исправляем для лога ниже
+        process.env.PORT = '8000';
     }
-    const effectivePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000; // Пересчитываем
-
+    const effectivePort = process.env.PORT ? parseInt(process.env.PORT, 10) : 8000;
     app.listen(effectivePort, () => {
         console.log(colors.green(`🚀 Server v${packageJSON.version} started successfully on http://localhost:${effectivePort}`));
         console.log(colors.blue(`📚 API Documentation available at http://localhost:${effectivePort}/docs`));
@@ -259,11 +339,13 @@ async function bootstrap() {
     });
 }
 
-// Вызов основной асинхронной функции и обработка возможных ошибок при запуске
+// Вызов основной асинхронной функции
 bootstrap().catch(err => {
     console.error(colors.red("💥 Failed to bootstrap the application:"), err);
-    process.exit(1); // Завершаем процесс с кодом ошибки
+    process.exit(1);
 });
 
-// Экспортируем тип приложения для возможного использования с Elysia Eden
+
+
+// Экспортируем тип приложения
 export type App = typeof app;

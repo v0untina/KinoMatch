@@ -103,12 +103,17 @@ const MoviesRoute = new Elysia({ prefix: '/movies' })
     })
 
 
-    // 4. Получение списка "новинок"
+    // --- ИЗМЕНЕНИЕ: Маршрут /new (новинки) ---
     .get('/new', async ({ set }) => {
         try {
             const newMovies = await prisma.movies.findMany({
-                take: 10,
-                orderBy: { movie_id: 'desc' },
+                take: 20, // Можно взять чуть больше, если нужно на фронте
+                // Сортируем по году выхода (убывание), фильмы без года - в конце
+                orderBy: [
+                    { year: { sort: 'desc', nulls: 'last' } },
+                    // Дополнительная сортировка по ID для стабильности, если годы совпадают
+                    { movie_id: 'desc' }
+                ],
                 select: { movie_id: true, title: true, poster_filename: true, year: true },
             });
             return newMovies;
@@ -119,27 +124,33 @@ const MoviesRoute = new Elysia({ prefix: '/movies' })
         }
     })
 
-    // 5. Получение списка "топ рейтинга"
+    // --- ИЗМЕНЕНИЕ: Маршрут /top_rated (топ рейтинга IMDb) ---
     .get('/top_rated', async ({ set }) => {
         try {
             const topRatedMovies = await prisma.movies.findMany({
-                take: 10,
-                orderBy: { kinomatch_rating: 'desc' },
-                where: { kinomatch_rating: { not: null } },
-                select: { movie_id: true, title: true, poster_filename: true, kinomatch_rating: true, year: true },
+                take: 20, // Можно взять чуть больше
+                // Сортируем по IMDb рейтингу (убывание), фильмы без рейтинга - в конце
+                orderBy: { imdb_rating: { sort: 'desc', nulls: 'last' } },
+                // Убираем фильмы без IMDb рейтинга из выборки
+                where: { imdb_rating: { not: null } },
+                // Выбираем нужные поля, включая imdb_rating
+                select: { movie_id: true, title: true, poster_filename: true, imdb_rating: true, year: true },
             });
-            // Преобразование Decimal в number
+
+            // Преобразование Decimal в number (если imdb_rating все еще Decimal)
             const resultsWithNumbers = topRatedMovies.map(movie => ({
                 ...movie,
-                kinomatch_rating: movie.kinomatch_rating ? Number(movie.kinomatch_rating) : null
+                // Теперь преобразуем imdb_rating
+                imdb_rating: movie.imdb_rating ? Number(movie.imdb_rating) : null
             }));
             return resultsWithNumbers;
         } catch (error) {
-            console.error("Ошибка при получении топа рейтинга:", error);
+            console.error("Ошибка при получении топа рейтинга IMDb:", error);
              set.status = 500;
              return { success: false, error: "Internal Server Error" };
         }
     })
+
 
     // 6. НОВЫЙ ЭНДПОИНТ ДЛЯ СЛУЧАЙНЫХ ФИЛЬМОВ
     .get('/random', async ({ query, set }) => {

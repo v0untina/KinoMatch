@@ -827,3 +827,74 @@
     font-size: 16px;
   }
 }
+
+
+
+
+/* --- Стили для секции опубликованных подборок --- */
+.publishedCompilationsSection h2 {
+  font-size: 1.5rem; /* Размер заголовка */
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: #eee;
+}
+
+/* --- Стили для сетки подборок (переиспользуем из ProfileUser.module.css) --- */
+/* Убедись, что эти стили есть или скопируй их сюда, если компоненты в разных модулях */
+.userCompilationsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    padding-top: 10px; /* Меньше отступ */
+}
+
+/* --- Стили для карточки опубликованной подборки (PublishedCompilationCard) --- */
+/* Используем те же стили, что и для UserCompilationCard в профиле */
+.userCompilationCard {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    height: 100%; /* Занимает высоту ячейки */
+}
+.userCompilationCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+}
+.userCompilationPosters {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    aspect-ratio: 16 / 9;
+    background-color: #2a2a2a;
+}
+.userCompilationPosterWrapper {
+    position: relative;
+    width: 100%; height: 100%;
+    overflow: hidden;
+}
+.userCompilationPosterWrapper.placeholder { background-color: #333; }
+.userCompilationPoster { display: block; object-fit: cover; background-color: #444; }
+.userCompilationInfo { padding: 12px 15px; margin-top: auto; /* Прижимает инфо вниз */ }
+.userCompilationTitle { font-size: 1rem; font-weight: 600; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.userCompilationMeta { font-size: 0.8rem; color: #aaa; display: flex; justify-content: space-between; align-items: center; }
+
+/* Дополнительный стиль для имени автора */
+.compilationAuthor {
+    font-style: italic;
+    /* Можно добавить иконку пользователя */
+}
+
+/* Сообщение об ошибке (если еще не добавлено) */
+.error_message {
+    color: #e63946;
+    text-align: center;
+    padding: 20px;
+    font-weight: 500;
+}

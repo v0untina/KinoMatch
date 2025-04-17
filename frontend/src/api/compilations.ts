@@ -15,11 +15,11 @@ export interface Movie { // Добавляем export
     poster_filename?: string;
 }
 
-export interface CompilationDetails { // Добавляем export
-    collection_id: number;
-    title: string;
-    movies: Movie[];
-}
+export interface CompilationDetails { 
+  collection_id: number; title: string; 
+  movies: Movie[]; 
+  user: { id: number; 
+    username: string; } | null; }
 
 export interface CreateCompilationData { // Добавляем export
   title: string;
@@ -36,15 +36,31 @@ export interface CreateCompilationResponse { // Добавляем export
   };
 }
 
-// --- НОВЫЙ ИНТЕРФЕЙС: Краткая информация о подборке пользователя ---
-// Этот тип должен соответствовать тому, что будет возвращать бэкенд
+
+
+// Интерфейс для ПОДБОРКИ ПОЛЬЗОВАТЕЛЯ (для /my)
+// Добавляем isPublished
 export interface UserCompilationSummary {
-  id: number;             // collection_id
+  id: number;
   title: string;
-  movieCount: number;     // Количество фильмов в подборке
-  previewPosters: (string | null)[]; // Массив имен файлов постеров (до 4-х)
-  // Добавьте другие поля, если нужно (например, likes)
+  movieCount: number;
+  previewPosters: string[]; // Уже отфильтрованы от null на бэке
+  isPublished: boolean; // <-- Добавлено
+  author?: AuthorInfo | null; // Автор может быть добавлен для /published
 }
+
+// Интерфейс для ответа от /published
+interface PublishedCompilationsResponse {
+  success: boolean;
+  data: UserCompilationSummary[]; // Массив подборок (без isPublished, но с author)
+  pagination: {
+      total: number;
+      limit: number;
+      offset: number;
+  };
+}
+
+
 
 
 // Функция для получения списка подборок (остается без изменений)
@@ -87,16 +103,40 @@ export const createUserCompilation = async (data: CreateCompilationData): Promis
 };
 
 
-// --- НОВАЯ ЭКСПОРТИРУЕМАЯ ФУНКЦИЯ: Получение подборок текущего пользователя ---
+// --- Функция получения ПОДБОРОК ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ ---
+// Теперь возвращает UserCompilationSummary[], включая isPublished
 export const getMyCompilations = async (): Promise<UserCompilationSummary[]> => {
   try {
-    // Отправляем GET запрос на эндпоинт /compilations/my (который мы создадим на бэкенде)
-    // AxiosInstance должен автоматически подставить токен авторизации
     const response = await axiosInstance.get<UserCompilationSummary[]>('/compilations/my');
     return response.data; // Возвращаем массив подборок пользователя
   } catch (error: any) {
     console.error("Error fetching user compilations:", error);
-    // Пробрасываем ошибку дальше, чтобы компонент мог ее обработать
     throw error;
   }
+};
+
+// --- НОВАЯ ФУНКЦИЯ: Получение ОПУБЛИКОВАННЫХ подборок ---
+export const getPublishedCompilations = async (limit: number = 20, offset: number = 0): Promise<PublishedCompilationsResponse> => {
+    try {
+        const response = await axiosInstance.get<PublishedCompilationsResponse>('/compilations/published', {
+            params: { length: limit, offset }
+        });
+        return response.data; // Возвращаем объект { success, data, pagination }
+    } catch (error: any) {
+        console.error("Error fetching published compilations:", error);
+        throw error;
+    }
+};
+
+// --- НОВАЯ ФУНКЦИЯ: Публикация подборки ---
+export const publishCompilation = async (collectionId: number): Promise<PublishedCompilationsResponse> => {
+    if (!collectionId) throw new Error("Collection ID is required to publish.");
+    try {
+        // Отправляем PATCH запрос (или POST, если предпочитаешь)
+        const response = await axiosInstance.patch<PublishedCompilationsResponse>(`/compilations/${collectionId}/publish`);
+        return response.data; // Возвращаем { success, message }
+    } catch (error: any) {
+        console.error(`Error publishing compilation ${collectionId}:`, error);
+        throw error;
+    }
 };

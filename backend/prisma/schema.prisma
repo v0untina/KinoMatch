@@ -125,8 +125,12 @@ model user_movie_collections {
   user_id           Int?
   title             String              @db.VarChar(255)
   likes             Int?                @default(0)
+  is_published      Boolean             @default(false)
   collection_movies collection_movies[]
   users             users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([is_published], map: "idx_user_movie_collections_is_published")
+  @@index([user_id, is_published], map: "idx_user_movie_collections_user_id_is_published")
 }
 
 model movie_online_cinema {

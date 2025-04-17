@@ -1,3 +1,4 @@
+// frontend/src/widgets/Landing/BestFilms/BestFilms.tsx
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -108,18 +109,17 @@ export default function BestFilms() {
   }, []);
 
   const handleNextNew = () => {
-    setNewMoviesIndex(prev => {
-      const newIndex = prev + 3;
-      return newIndex >= newMovies.length ? 0 : newIndex;
-    });
+    if (newMovies.length === 0) return; // Защита от пустого массива
+    // Вычисляем новый индекс с учетом visibleCount и зацикливанием
+    setNewMoviesIndex(prev => (prev + visibleCount) % newMovies.length);
   };
-
+  
   const handleNextBest = () => {
-    setBestMoviesIndex(prev => {
-      const newIndex = prev + 3;
-      return newIndex >= bestMovies.length ? 0 : newIndex;
-    });
+    if (bestMovies.length === 0) return; // Защита от пустого массива
+    // Вычисляем новый индекс с учетом visibleCount и зацикливанием
+    setBestMoviesIndex(prev => (prev + visibleCount) % bestMovies.length);
   };
+  
 
   const getVisibleMovies = (movies: Movie[], currentIndex: number) => {
     const endIndex = currentIndex + visibleCount;

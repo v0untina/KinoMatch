@@ -82,146 +82,141 @@
 }
 
 
-/* Общий контейнер для контента табов */
+
 .tab_content_area {
-    /* width: 80%; */ /* Раскомментируйте и настройте, если нужно ограничить ширину */
-    margin: 40px auto; /* Центрируем и добавляем отступ сверху/снизу */
-    padding: 0 20px; /* Добавим боковые отступы */
+   
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-/* Базовый стиль для контента каждого таба */
+
 .tab_content {
     padding: 20px;
-    min-height: 500px; /* Минимальная высота */
+    min-height: 500px;
     border-radius: 8px; 
-     /* Можно добавить фон или рамку, если нужно */
-    /* background-color: rgba(255, 255, 255, 0.03); */
+    
+   
 }
 
-/* Стили специально для контейнера формы создания */
+
 .create_compilation_container {
-    padding: 30px 40px; /* Больше внутренних отступов */
-    /* background-color: #252525; /* Темный фон, как на макете */
+    padding: 30px 40px;
+   
     border-radius: 15px;
 }
 
 .create_compilation_form {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Центрируем содержимое формы */
-    gap: 25px; /* Увеличим расстояние между блоками */
+    align-items: center;
+    gap: 25px;
     width: 100%;
-    max-width: 700px; /* Ограничим максимальную ширину формы */
-    margin: 0 auto; /* Центрируем саму форму в контейнере */
+    max-width: 700px;
+    margin: 0 auto;
 }
 
 .create_title {
-    font-size: 24px; /* Немного уменьшим для гармонии */
+    font-size: 24px;
     font-weight: bold;
     text-transform: uppercase;
-    color: var(--text-color-primary); /* Используйте переменную или цвет #FFFFFF */
+    color: var(--text-color-primary);
     margin-bottom: 15px;
 }
 
 .input_group {
     display: flex;
-    /* align-items: center; /* Выравнивание по центру */
-    flex-direction: column; /* Лейбл над инпутом */
-    gap: 8px; /* Отступ между лейблом и инпутом */
-    width: 100%; /* Ширина инпут-группы */
+   
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
 .input_group label {
-    font-size: 14px; /* Размер шрифта лейбла */
-    font-weight: 500; /* Средняя жирность */
+    font-size: 14px;
+    font-weight: 500;
     text-transform: uppercase;
-    color: var(--text-color-secondary); /* Используйте переменную или цвет #AAAAAA */
-    align-self: flex-start; /* Лейбл слева */
-    /* margin-right: 15px; */ /* Отступ справа от лейбла */
-    /* width: 250px; /* Фиксированная ширина лейбла */
-    /* text-align: right; */
+    color: var(--text-color-secondary);
+    align-self: flex-start;
+   
+   
+   
 }
 
 .input_field {
-    flex-grow: 1; /* Поле ввода занимает оставшееся место */
+    flex-grow: 1;
     padding: 12px 15px;
-    border: 1px solid #444; /* Темная рамка */
-    background-color: #333; /* Темный фон инпута */
+    border: 1px solid #444;
+    background-color: #333;
     border-radius: 8px;
     font-size: 16px;
-    color: var(--text-color-primary); /* Белый текст */
-    outline: none; /* Убираем стандартный контур */
+    color: var(--text-color-primary);
+    outline: none;
     transition: border-color 0.2s ease;
 }
 
 .input_field::placeholder {
-    color: #777; /* Цвет плейсхолдера */
+    color: #777;
 }
 
 .input_field:focus {
-    border-color: #00B9AE; /* Бирюзовая рамка при фокусе */
+    border-color: #00B9AE;
 }
 
 
-/* --- Стили для поля поиска и выпадающего списка --- */
 
-/* Добавляем position: relative к обертке инпута */
+
+
 .search_container_relative {
     position: relative;
 }
 
-/* Стили для выпадающего списка (аналог .suggestions_list) */
+
 .suggestions_list {
     position: absolute; 
-    top: calc(100% + 2px); /* Чуть ниже инпута */
+    top: calc(100% + 2px);
     left: 0;
     right: 0; 
-    background-color: #3a3a3a; /* Фон темнее */
+    background-color: #3a3a3a;
     border: 1px solid #555;
-    border-radius: 8px; /* Скругляем все углы */
+    border-radius: 8px;
     list-style: none;
     padding: 5px 0;
     margin: 0;
-    max-height: 350px; /* Максимальная высота */
+    max-height: 350px;
     overflow-y: auto; 
-    z-index: 100; /* Выше других элементов */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Тень */
-    /* Плавное появление (опционально) */
-    /* opacity: 0;
-    transform: translateY(-5px);
-    transition: opacity 0.15s ease-out, transform 0.15s ease-out; */
+    z-index: 100;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+   
+   
 }
-/* Показываем список (если используем transition) */
-/* .suggestions_list.visible {
-    opacity: 1;
-    transform: translateY(0);
-} */
 
-/* Элемент списка (аналог .suggestion_item) */
+
+
+
 .suggestion_item {
     display: flex;
     align-items: center;
     padding: 8px 12px;
     cursor: pointer;
     transition: background-color 0.15s ease;
-    color: #e0e0e0; /* Светлый текст */
+    color: #e0e0e0;
 }
 .suggestion_item:hover {
-    background-color: #505050; /* Подсветка при наведении */
+    background-color: #505050;
 }
 
-/* Постер в элементе списка (аналог .suggestion_image) */
+
 .suggestion_image {
     width: 40px;
     height: 60px;
     object-fit: cover;
     margin-right: 10px;
     border-radius: 4px;
-    background-color: #555; /* Фон-заглушка */
+    background-color: #555;
     flex-shrink: 0; 
 }
 
-/* Текст в элементе списка (аналог .suggestion_text) */
+
 .suggestion_text {
     font-weight: 500;
     margin-right: 8px;
@@ -231,14 +226,14 @@
     flex-grow: 1; 
 }
 
-/* Год в элементе списка */
+
 .suggestion_year {
     color: #a0a0a0; 
-    font-size: 0.85em; /* Чуть меньше */
+    font-size: 0.85em;
     flex-shrink: 0; 
 }
 
-/* Стили для лоадера и "не найдено" */
+
 .suggestion_item_loading,
 .suggestion_item_no_results {
     padding: 10px 15px;
@@ -248,24 +243,24 @@
 }
 
 
-/* Сетка для карточек подборок пользователя */
+
 .userCompilationsGrid {
     display: grid;
-    /* Колонки: автозаполнение, мин. ширина 240px, макс. 1fr (равномерно) */
+   
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 20px; /* Отступы между карточками */
-    padding-top: 20px; /* Отступ сверху */
+    gap: 20px;
+    padding-top: 20px;
 }
 
-/* Сама карточка подборки пользователя */
+
 .userCompilationCard {
-    background-color: rgba(255, 255, 255, 0.05); /* Легкий фон */
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    overflow: hidden; /* Обрезаем все, что выходит за рамки */
-    text-decoration: none; /* Убираем подчеркивание ссылки */
-    color: inherit; /* Наследуем цвет текста */
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
     display: flex;
-    flex-direction: column; /* Элементы друг под другом */
+    flex-direction: column;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
@@ -274,55 +269,55 @@
     box-shadow: 0 8px 15px rgba(0,0,0,0.3);
 }
 
-/* Контейнер для 2x2 постеров */
+
 .userCompilationPosters {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 колонки */
-    grid-template-rows: repeat(2, 1fr);    /* 2 строки */
-    aspect-ratio: 16 / 9; /* Соотношение сторон контейнера постеров */
-    background-color: #2a2a2a; /* Фон на случай отсутствия постеров */
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);   
+    aspect-ratio: 16 / 9;
+    background-color: #2a2a2a;
 }
 
-/* Обертка для каждого постера (или заглушки) */
+
 .userCompilationPosterWrapper {
-    position: relative; /* Для абсолютного позиционирования Image */
+    position: relative;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* Обрезаем изображение */
+    overflow: hidden;
 }
 .userCompilationPosterWrapper.placeholder {
-     background-color: #333; /* Фон для пустых слотов */
+     background-color: #333;
 }
 
-/* Сам постер (компонент Image) */
+
 .userCompilationPoster {
-    /* Адаптивное изображение заполняет обертку */
+   
    display: block;
-   object-fit: cover; /* Масштабирует с сохранением пропорций, обрезая лишнее */
-   background-color: #444; /* Фон на случай ошибки загрузки */
+   object-fit: cover;
+   background-color: #444;
 }
 
-/* Информация под постерами */
+
 .userCompilationInfo {
     padding: 12px 15px;
 }
 
-/* Название подборки */
+
 .userCompilationTitle {
-    font-size: 1rem; /* Размер шрифта */
-    font-weight: 600; /* Полужирный */
-    margin: 0 0 5px 0; /* Отступы */
-    white-space: nowrap; /* Запрет переноса */
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis; /* Многоточие, если не влезает */
+    text-overflow: ellipsis;
 }
 
-/* Мета-информация (количество фильмов и т.д.) */
+
 .userCompilationMeta {
-    font-size: 0.8rem; /* Меньший шрифт */
-    color: #aaa; /* Серый цвет */
+    font-size: 0.8rem;
+    color: #aaa;
     display: flex;
-    justify-content: space-between; /* Разносим элементы по краям */
+    justify-content: space-between;
     align-items: center;
 }
 
@@ -330,27 +325,27 @@
 
 .selected_movies {
     display: flex;
-    flex-wrap: wrap; /* Перенос карточек */
-    gap: 20px; /* Отступы между карточками */
-    justify-content: flex-start; /* Выравнивание по левому краю */
-    align-items: flex-start; /* Выравнивание по верху */
-    margin-top: 10px; /* Небольшой отступ сверху */
-    width: 100%; /* На всю ширину формы */
-    min-height: 180px; /* Минимальная высота области */
-    /* background-color: rgba(0, 0, 0, 0.1); /* Очень легкий фон для области */
-    /* border-radius: 8px; */
-    /* padding: 15px; */ /* Внутренние отступы области */
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: 10px;
+    width: 100%;
+    min-height: 180px;
+   
+   
+   
 }
 
 .movie_card_small {
-    width: 130px; /* Ширина карточки */
+    width: 130px;
     text-align: center;
-    background-color: #333; /* Фон карточки */
+    background-color: #333;
     border-radius: 10px;
     overflow: hidden; 
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     transition: transform 0.2s ease;
-    position: relative; /* Для возможного добавления кнопки удаления */
+    position: relative;
 }
 .movie_card_small:hover {
      transform: scale(1.03);
@@ -359,52 +354,52 @@
 
 .movie_card_small img {
     width: 100%;
-    height: 180px; /* Высота постера */
+    height: 180px;
     object-fit: cover; 
     display: block;
-    background-color: #444; /* Фон для случаев, если картинка не загрузится */
+    background-color: #444;
 }
 
 .movie_card_small p {
     font-size: 14px;
     padding: 10px 5px;
-    color: var(--text-color-primary); /* Белый текст */
+    color: var(--text-color-primary);
     white-space: nowrap; 
     overflow: hidden; 
     text-overflow: ellipsis; 
 }
 
-.movie_card_poster { /* Класс для Image выбранного фильма */
-    display: block; /* Убирает лишний отступ под картинкой */
-    background-color: #444; /* Фон на случай ошибки */
+.movie_card_poster {
+    display: block;
+    background-color: #444;
 }
 
 .no_movies_placeholder {
     width: 100%;
     text-align: center;
-    color: var(--text-color-secondary); /* Серый цвет */
+    color: var(--text-color-secondary);
     font-style: italic;
-    padding: 50px 0; /* Чтобы текст был по центру пустой области */
+    padding: 50px 0;
 }
 
 
-/* --- Стили для сетки избранных фильмов --- */
+
 .favoriteMoviesGrid {
     display: grid;
-    /* Адаптивные колонки: минимум 140px, максимум 1fr */
+   
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 20px; /* Отступы между карточками */
+    gap: 20px;
     padding-top: 20px;
 }
 
-/* --- Стили для карточки избранного фильма --- */
+
 .favoriteMovieCard {
     text-decoration: none;
     color: inherit;
-    display: block; /* Чтобы ссылка занимала всю карточку */
-    border-radius: 8px; /* Небольшое скругление */
-    overflow: hidden; /* Обрезаем постер */
-    background-color: rgba(255, 255, 255, 0.03); /* Очень легкий фон */
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.03);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .favoriteMovieCard:hover {
@@ -412,26 +407,26 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Обертка для постера (для соотношения сторон) */
+
 .favoriteMoviePosterWrapper {
     position: relative;
     width: 100%;
-    aspect-ratio: 2 / 3; /* Классическое соотношение сторон постера */
-    background-color: #333; /* Фон-заглушка */
+    aspect-ratio: 2 / 3;
+    background-color: #333;
 }
 
-/* Сам постер */
+
 .favoriteMoviePoster {
     display: block;
     object-fit: cover;
 }
 
-/* Информация под постером */
+
 .favoriteMovieInfo {
     padding: 10px;
 }
 
-/* Название фильма */
+
 .favoriteMovieTitle {
     font-size: 0.9rem;
     font-weight: 500;
@@ -441,20 +436,20 @@
     text-overflow: ellipsis;
 }
 
-/* Год фильма */
+
 .favoriteMovieYear {
     font-size: 0.8rem;
     color: #aaa;
 }
 
-/* Сообщение об ошибке (можно переиспользовать) */
+
 .errorMessage {
     color: #e63946;
     text-align: center;
     padding: 20px;
 }
 .errorMessage button {
-    /* Стили для кнопки "Повторить" */
+   
     background-color: #555;
     color: white;
     border: none;
@@ -470,33 +465,84 @@
 
 
 .publish_button {
-    padding: 12px 45px; /* Поля для кнопки */
-    background: linear-gradient(90deg, #00B9AE 0%, #00d4c5 100%); /* Градиент */
+    padding: 12px 45px;
+    background: linear-gradient(90deg, #00B9AE 0%, #00d4c5 100%);
     color: white;
     border: none;
-    border-radius: 25px; /* Сильно скругленные края */
+    border-radius: 25px;
     font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     box-shadow: 0px 8px 15px rgba(0, 185, 174, 0.3); 
-    margin-top: 20px; /* Отступ сверху от блока с фильмами */
+    margin-top: 20px;
 }
 
-.publish_button:hover:not(:disabled) { /* Эффект ховера только для активной кнопки */
-    transform: translateY(-2px) scale(1.03); /* Небольшой подъем и увеличение */
+.publish_button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.03);
     box-shadow: 0px 10px 20px rgba(0, 185, 174, 0.4);
 }
 
 .publish_button:disabled {
-    opacity: 0.6; /* Полупрозрачность для неактивной кнопки */
-    cursor: not-allowed; /* Курсор запрета */
-    box-shadow: none; /* Убираем тень у неактивной */
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-/* Опционально: оверлей для блокировки при загрузке */
+
 .disabled_overlay {
     opacity: 0.5;
-    pointer-events: none; /* Нельзя кликать */
+    pointer-events: none;
 }
+
+
+
+.compilationCardWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+   
+   
+   
+    height: 100%;
+    justify-content: space-between;
+  }
+  
+ 
+ 
+  .compilationCardWrapper .userCompilationCard {
+      margin-bottom: 0;
+      flex-grow: 1;
+  }
+  
+  
+ 
+  .publishCompilationButton {
+    padding: 7px 15px;
+    font-size: 0.8rem;
+   
+    background-color: #444;
+    color: #eee;
+    border: 1px solid #666;
+    border-radius: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    align-self: center;
+    width: fit-content;
+    margin-top: auto;
+  }
+  
+  .publishCompilationButton:hover:not(:disabled) {
+   
+    background-color: #555;
+    border-color: #888;
+    transform: scale(1.03);
+  }
+  
+  .publishCompilationButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }

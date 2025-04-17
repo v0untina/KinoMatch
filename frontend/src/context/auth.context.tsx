@@ -1,19 +1,22 @@
-// frontend/src/context/auth.context.tsx
 "use client";
 // Добавляем useMemo
 import React, { createContext, ReactNode, useEffect, useState, useCallback, useMemo } from 'react';
 import { fetchProfile } from "@/api/auth";
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { User } from '@/types/user.interface'; // <-- ИМПОРТИРУЙ User отсюда
 
+/* УДАЛИ ЭТО ЛОКАЛЬНОЕ ОПРЕДЕЛЕНИЕ:
 interface User {
     user_id: number;
     username: string;
     email: string;
 }
+*/
 
+// Теперь AuthContextType будет использовать импортированный User с полем rating
 interface AuthContextType {
-    user: User | null;
+    user: User | null; // <-- Теперь это User из user.interface.ts
     login: (token: string) => void;
     logout: () => void;
     loading: boolean;
@@ -24,31 +27,37 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 interface AuthProviderProps {
     children: ReactNode;
 }
-console.log("Rendering AuthProvider"); // Отладочный лог
+console.log("Rendering AuthProvider");
 
 export const AuthProvider = ({children}: AuthProviderProps) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [user, setUser] = useState<User | null>(null); // <-- useState тоже будет использовать User из user.interface.ts
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
-    // Загрузка профиля при инициализации (без изменений)
+    // Загрузка профиля при инициализации
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
             fetchProfile()
-                .then((response) => { setUser(response.data.data); })
+                // Убедись, что fetchProfile возвращает данные, соответствующие НОВОМУ типу User (с rating)
+                .then((response) => {
+                    // Предполагаем, что response.data.data соответствует User
+                    setUser(response.data.data);
+                    console.log("Profile loaded on startup:", response.data.data); // Лог для проверки
+                })
                 .catch((error) => { console.error("Fetch profile error on startup:", error); localStorage.removeItem('token'); setUser(null); })
                 .finally(() => setLoading(false));
         } else { setLoading(false); }
     }, []);
 
-    // login и logout уже обернуты в useCallback - это хорошо
+    // login
     const login = useCallback((token: string) => {
         localStorage.setItem('token', token);
-        setLoading(true); // Показываем загрузку после логина
+        setLoading(true);
         fetchProfile()
             .then((response) => {
                 setUser(response.data.data);
+                console.log("Profile loaded after login:", response.data.data); // Лог для проверки
                 toast.success(`Добро пожаловать, ${response.data.data.username}!`);
                 router.push('/');
             })
@@ -57,29 +66,26 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
                 localStorage.removeItem('token'); setUser(null);
                 toast.error("Не удалось загрузить профиль после входа.");
             })
-            .finally(() => setLoading(false)); // Убираем загрузку
-    }, [router]); // Зависимость только от router
+            .finally(() => setLoading(false));
+    }, [router]);
 
+    // logout
     const logout = useCallback(() => {
         localStorage.removeItem('token');
         setUser(null);
         router.push('/login');
         toast.success("Вы вышли из аккаунта.");
-    }, [router]); // Зависимость только от router
+    }, [router]);
 
-    // --- МЕМОИЗАЦИЯ КОНТЕКСТА ---
-    // Создаем объект value с помощью useMemo.
-    // Он будет пересоздаваться только если user, loading, login или logout изменятся.
+    // Мемоизация контекста
     const contextValue = useMemo(() => ({
         user,
         login,
         logout,
         loading
-    // login и logout стабильны благодаря useCallback.
     }), [user, loading, login, logout]);
 
     return (
-        // Передаем мемоизированное значение contextValue
         <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>

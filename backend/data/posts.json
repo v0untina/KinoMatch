@@ -4,7 +4,7 @@
     "author": "tashe",
     "text": "привети к как делишки ёоууууу",
     "createdAt": "2025-04-12T21:59:53.049Z",
-    "likes": 2,
+    "likes": 3,
     "comments": [
       {
         "id": "d04f00c8-22f9-479a-a8e8-d0681f9c3619",
@@ -22,8 +22,9 @@
       }
     ],
     "likedBy": [
+      30,
       26,
-      30
+      25
     ]
   },
   {
@@ -31,7 +32,7 @@
     "author": "tashe",
     "text": "w",
     "createdAt": "2025-04-12T20:17:31.317Z",
-    "likes": 3,
+    "likes": 4,
     "comments": [
       {
         "id": "c7c3aeb2-5608-4b4d-b36b-f7968b5f34ef",
@@ -41,7 +42,9 @@
         "createdAt": "2025-04-12T20:17:35.709Z"
       }
     ],
-    "likedBy": []
+    "likedBy": [
+      25
+    ]
   },
   {
     "id": "7d74877a-594f-4d0b-aeed-63a22d6ac5b9",
@@ -49,7 +52,7 @@
     "text": "уввацу",
     "createdAt": "2025-04-12T18:59:59.004Z",
     "imageUrl": "/public/images/posts/2eef6e0b-5772-4994-8d9a-818ac708928e.jpg",
-    "likes": 32,
+    "likes": 33,
     "comments": [
       {
         "id": "a4c43a40-d5f0-4c08-a2a7-296f22fd8d1d",
@@ -59,7 +62,9 @@
         "createdAt": "2025-04-12T19:00:05.204Z"
       }
     ],
-    "likedBy": []
+    "likedBy": [
+      25
+    ]
   },
   {
     "id": "87ad5506-3939-4f7a-919b-06af8e7abb17",
