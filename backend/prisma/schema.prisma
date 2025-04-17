@@ -91,11 +91,13 @@ model movies {
 }
 
 model user_movie_favorites {
-  user_id  Int
-  movie_id Int
-  added_at DateTime? @default(now()) @db.Timestamp(6)
-  movies   movies    @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
-  users    users     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user_id                Int
+  movie_id               Int
+  added_at               DateTime?               @default(now()) @db.Timestamp(6)
+  collection_id          Int?
+  user_movie_collections user_movie_collections? @relation(fields: [collection_id], references: [collection_id], map: "fk_user_movie_favorites_collection_id")
+  movies                 movies                  @relation(fields: [movie_id], references: [movie_id], onDelete: NoAction, onUpdate: NoAction)
+  users                  users                   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
 
   @@id([user_id, movie_id])
 }
@@ -121,13 +123,14 @@ model collection_movies {
 }
 
 model user_movie_collections {
-  collection_id     Int                 @id @default(autoincrement())
-  user_id           Int?
-  title             String              @db.VarChar(255)
-  likes             Int?                @default(0)
-  is_published      Boolean             @default(false)
-  collection_movies collection_movies[]
-  users             users?              @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  collection_id        Int                    @id @default(autoincrement())
+  user_id              Int?
+  title                String                 @db.VarChar(255)
+  likes                Int?                   @default(0)
+  is_published         Boolean                @default(false)
+  collection_movies    collection_movies[]
+  users                users?                 @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+  user_movie_favorites user_movie_favorites[]
 
   @@index([is_published], map: "idx_user_movie_collections_is_published")
   @@index([user_id, is_published], map: "idx_user_movie_collections_user_id_is_published")
