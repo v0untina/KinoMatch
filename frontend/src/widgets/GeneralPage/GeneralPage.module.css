@@ -831,67 +831,152 @@
 
 
 
+
 /* --- Стили для секции опубликованных подборок --- */
 .publishedCompilationsSection h2 {
   font-size: 1.5rem; /* Размер заголовка */
   font-weight: 600;
   margin-bottom: 20px;
   text-transform: uppercase;
-  color: #eee;
+  /* Используй переменную цвета, если определена, например: */
+  /* color: var(--text-primary); */
+  color: #eee; /* Или оставь как есть */
+  /* Можешь добавить text-align: center; если нужно */
 }
 
-/* --- Стили для сетки подборок (переиспользуем из ProfileUser.module.css) --- */
-/* Убедись, что эти стили есть или скопируй их сюда, если компоненты в разных модулях */
+/* --- Стили для сетки подборок --- */
 .userCompilationsGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 20px;
-    padding-top: 10px; /* Меньше отступ */
+    padding-top: 10px;
 }
 
-/* --- Стили для карточки опубликованной подборки (PublishedCompilationCard) --- */
-/* Используем те же стили, что и для UserCompilationCard в профиле */
-.userCompilationCard {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    overflow: hidden;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
+/* --- ИЗМЕНЕНИЕ: Обертка для карточки и кнопки лайка --- */
+.userCompilationCardWrapper {
+    background-color: rgba(255, 255, 255, 0.05); /* Переносим фон сюда */
+    border-radius: 12px; /* Переносим скругление сюда */
+    overflow: hidden; /* Переносим overflow сюда */
+    display: flex; /* Используем flex для управления Link и Actions */
     flex-direction: column;
+    height: 100%; /* Занимает всю высоту ячейки грида */
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    height: 100%; /* Занимает высоту ячейки */
 }
-.userCompilationCard:hover {
+.userCompilationCardWrapper:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(0,0,0,0.3);
 }
+
+/* --- ИЗМЕНЕНИЕ: Ссылка внутри обертки --- */
+.userCompilationCardLink {
+    /* display: block; убираем, т.к. родитель flex */
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1; /* Позволяет ссылке занять все доступное место над кнопками */
+    display: flex; /* Делаем саму ссылку flex-контейнером */
+    flex-direction: column; /* Располагаем постеры и инфо вертикально */
+}
+
+/* --- Стили для постеров (оставляем как есть) --- */
 .userCompilationPosters {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    aspect-ratio: 16 / 9;
-    background-color: #2a2a2a;
+    aspect-ratio: 16 / 9; /* Можно оставить или задать min-height */
+    /* min-height: 150px; /* Пример минимальной высоты */
+    background-color: #2a2a2a; /* Фон для пустых ячеек */
 }
 .userCompilationPosterWrapper {
     position: relative;
     width: 100%; height: 100%;
     overflow: hidden;
 }
-.userCompilationPosterWrapper.placeholder { background-color: #333; }
-.userCompilationPoster { display: block; object-fit: cover; background-color: #444; }
-.userCompilationInfo { padding: 12px 15px; margin-top: auto; /* Прижимает инфо вниз */ }
-.userCompilationTitle { font-size: 1rem; font-weight: 600; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.userCompilationMeta { font-size: 0.8rem; color: #aaa; display: flex; justify-content: space-between; align-items: center; }
-
-/* Дополнительный стиль для имени автора */
-.compilationAuthor {
-    font-style: italic;
-    /* Можно добавить иконку пользователя */
+.userCompilationPosterWrapper.placeholder { background-color: #333; } /* Стиль для заглушки */
+.userCompilationPoster {
+    display: block;
+    width: 100%; height: 100%; /* Растягиваем картинку */
+    object-fit: cover;
+    background-color: #444; /* Фон на случай медленной загрузки */
 }
 
-/* Сообщение об ошибке (если еще не добавлено) */
+/* --- Стили для информации под постерами (оставляем почти как есть) --- */
+.userCompilationInfo {
+    padding: 12px 15px;
+    /* margin-top: auto; Убираем, т.к. ссылка теперь flex-grow: 1 */
+}
+.userCompilationTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary); /* Явный цвет текста */
+}
+.userCompilationMeta {
+    font-size: 0.8rem;
+    color: #aaa; /* Цвет мета-информации */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px; /* Добавим небольшой отступ между элементами */
+}
+.compilationAuthor {
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* --- ДОБАВЛЕНО: Стили для контейнера кнопок подборки --- */
+.compilationActions {
+    display: flex; /* Располагаем кнопки в ряд */
+    justify-content: flex-end; /* Прижимаем кнопки вправо */
+    padding: 0px 15px 10px; /* Отступы: 0 сверху, 15 по бокам, 10 снизу */
+    border-top: 1px solid rgba(255, 255, 255, 0.1); /* Тонкая линия сверху */
+    margin-top: 10px; /* Небольшой отступ от .userCompilationInfo */
+}
+
+/* --- Используем существующие стили для кнопки и иконки --- */
+/* Убедись, что эти стили подходят или скопируй/адаптируй их */
+.actionButton {
+  background: none;
+  border: none;
+  padding: 5px; /* Можно оставить или сделать чуть меньше */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary); /* Используй переменную или цвет #aaa */
+  font-size: 0.9em;
+  transition: transform 0.1s ease, color 0.2s ease;
+}
+.actionButton:hover {
+  /* color: var(--text-primary); */ /* Цвет при наведении */
+  color: #eee;
+}
+.actionButton:active {
+  transform: scale(0.95);
+}
+.actionButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.actionIcon {
+  width: 20px; /* Можно сделать чуть меньше для карточки */
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Стиль для лайкнутой кнопки (если нужен особый цвет, а не только картинка) */
+.actionButton.liked {
+  color: #e63946;
+}
+
+
+/* --- Сообщение об ошибке (оставляем как есть) --- */
 .error_message {
     color: #e63946;
     text-align: center;
