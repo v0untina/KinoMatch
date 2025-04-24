@@ -9,3 +9,5 @@ frontend/public/actors
 frontend/public/posters
 backend/bun.lockb
 frontend/.next/app-build-manifest.json
+backend/.env
+frontend/.env.local
